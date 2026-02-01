@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EscarolaOS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div id="login-screen">
+        <div class="login-card">
+            <img src="logo.png" alt="EscarolaOS" class="logo-img" onerror="this.style.display='none'; document.getElementById('logoText').style.display='block'">
+            <h1 id="logoText" style="display:none; color:var(--cantera); letter-spacing:3px;">ESCAROLAOS</h1>
+            
+            <div class="pin-display">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+            </div>
+            <div class="keypad">
+                <button class="key" onclick="press('1')">1</button>
+                <button class="key" onclick="press('2')">2</button>
+                <button class="key" onclick="press('3')">3</button>
+                <button class="key" onclick="press('4')">4</button>
+                <button class="key" onclick="press('5')">5</button>
+                <button class="key" onclick="press('6')">6</button>
+                <button class="key" onclick="press('7')">7</button>
+                <button class="key" onclick="press('8')">8</button>
+                <button class="key" onclick="press('9')">9</button>
+                <button class="key" onclick="reset()" style="color:var(--terracota)">C</button>
+                <button class="key" onclick="press('0')">0</button>
+                <button class="key" onclick="backspace()" style="color:var(--terracota)">⌫</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="dashboard">
+        <h2 id="userName" style="color:var(--verde-bosque)">Bienvenido</h2>
+        <div class="finance-grid">
+            <div class="stat-card">
+                <small>BANCO</small>
+                <div class="stat-amount" id="valBanco">$0.00</div>
+                <button class="edit-btn" onclick="ajustarSaldo('banco')">✎</button>
+            </div>
+            <div class="stat-card">
+                <small>EFECTIVO</small>
+                <div class="stat-amount" id="valEfectivo">$0.00</div>
+                <button class="edit-btn" onclick="ajustarSaldo('efectivo')">✎</button>
+            </div>
+            <div class="stat-card">
+                <small>TOTAL</small>
+                <div class="stat-amount" id="valTotal">$0.00</div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

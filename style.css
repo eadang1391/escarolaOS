@@ -1,0 +1,54 @@
+:root {
+    --verde-bosque: #1B3022;
+    --terracota: #A44A3F;
+    --cantera: #E8DCC4;
+    --dorado: #C5A059;
+    --negro-profundo: #0F1A13;
+}
+
+body {
+    margin: 0; padding: 0;
+    background-color: var(--cantera);
+    font-family: 'Montserrat', sans-serif;
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh;
+}
+
+/* --- LOGIN --- */
+.login-card {
+    background: var(--verde-bosque); padding: 40px; border-radius: 30px;
+    box-shadow: 15px 15px 35px rgba(0,0,0,0.3); text-align: center;
+    width: 300px; border: 1px solid var(--dorado);
+}
+
+.logo-img { width: 150px; margin-bottom: 20px; }
+
+.pin-display { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; }
+.dot { width: 16px; height: 16px; border: 2px solid var(--dorado); border-radius: 50%; }
+.dot.filled { background: var(--dorado); box-shadow: 0 0 12px var(--dorado); }
+
+.keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; }
+.key {
+    width: 70px; height: 70px; border-radius: 50%; border: none;
+    background: var(--verde-bosque); color: var(--cantera); font-size: 22px;
+    box-shadow: 5px 5px 10px var(--negro-profundo), -2px -2px 5px rgba(255,255,255,0.05);
+    cursor: pointer; transition: 0.1s;
+}
+.key:active { transform: scale(0.9); box-shadow: inset 4px 4px 10px var(--negro-profundo); }
+
+/* --- DASHBOARD --- */
+#dashboard { display: none; width: 90%; max-width: 800px; text-align: center; }
+.finance-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin: 30px 0; }
+.stat-card {
+    background: var(--verde-bosque); padding: 25px; border-radius: 20px;
+    border: 1px solid var(--dorado); color: var(--cantera); position: relative;
+}
+.stat-amount { font-size: 28px; font-weight: 700; color: var(--dorado); }
+.edit-btn { position: absolute; top: 10px; right: 10px; background: none; border: 1px solid var(--dorado); color: var(--dorado); border-radius: 50%; cursor: pointer; }
+
+/* --- MODAL --- */
+#customModal {
+    display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.8); z-index: 1000; justify-content: center; align-items: center;
+}
+.modal-content { background: var(--cantera); padding: 30px; border-radius: 20px; border: 3px solid var(--dorado); text-align: center; }
