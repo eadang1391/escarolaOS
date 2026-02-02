@@ -168,7 +168,47 @@
             window.notificar("❌ Error al guardar en base de datos", true);
         }
     };
+// --- FUNCIÓN PARA LEER PERSONAL DE FIREBASE ---
+window.cargarPersonal = async () => {
+    const listaContenedor = document.getElementById('lista-personal-db');
+    if (!listaContenedor) return;
 
+    try {
+        const querySnapshot = await getDocs(collection(db, "usuarios"));
+        listaContenedor.innerHTML = ""; // Limpiar lista actual
+
+        querySnapshot.forEach((docSnap) => {
+            const u = docSnap.data();
+            const id = docSnap.id;
+
+            listaContenedor.innerHTML += `
+                <div class="user-row">
+                    <div>
+                        <strong style="color: var(--dorado);">${u.nombre}</strong><br>
+                        <small style="opacity: 0.6; font-size: 0.7rem;">${u.rol}</small>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <span style="font-family: monospace; letter-spacing: 2px;">****</span>
+                        <button onclick="eliminarUsuario('${id}')" style="background:none; border:none; color:var(--terracota); cursor:pointer;">✕</button>
+                    </div>
+                </div>
+            `;
+        });
+    } catch (error) {
+        console.error("Error al cargar lista:", error);
+    }
+};
+
+// --- FUNCIÓN PARA ELIMINAR (Como pediste en tus instrucciones) ---
+window.eliminarUsuario = async (id) => {
+    if (confirm("¿Seguro que quieres eliminar a este colaborador?")) {
+        try {
+            await deleteDoc(doc(db, "usuarios", id));
+            window.notificar("Colaborador eliminado");
+            window.cargarPersonal(); // Recargar lista
+        } catch (e) { window.notificar("Error al eliminar", true); }
+    }
+};
     // 6. LÓGICA DEL PINPAD (Tecleo y Borrado)
     window.tecleo = (num) => {
     if (pinIngresado.length < 4) {
@@ -228,6 +268,7 @@ function actualizarInterfaz() {
 </script>
 </body>
 </html>
+
 
 
 
