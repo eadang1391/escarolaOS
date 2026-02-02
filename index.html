@@ -31,6 +31,34 @@
             </div>
         </div>
     </div>
+    <div id="seccion-admin" style="display: none; width: 100%; max-width: 500px; margin: 0 auto;">
+    
+    <div class="stat-card" style="margin-bottom: 20px;">
+        <h3 style="color: var(--dorado);">➕ Registrar Personal</h3>
+        <input type="text" id="reg-nombre" placeholder="Nombre" style="width: 80%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: none;">
+        <input type="number" id="reg-pin" placeholder="PIN (4 dígitos)" style="width: 80%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: none;">
+        
+        <p style="color: var(--cantera); font-size: 0.8rem;">Selecciona Rol:</p>
+        <div id="selector-roles" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px;">
+            <button class="rol-btn" onclick="seleccionarRol('Socio', this)">Socio</button>
+            <button class="rol-btn" onclick="seleccionarRol('Chef', this)">Chef</button>
+            <button class="rol-btn" onclick="seleccionarRol('Barista', this)">Barista</button>
+            <button class="rol-btn" onclick="seleccionarRol('Barman', this)">Barman</button>
+            <button class="rol-btn" onclick="seleccionarRol('Staff', this)">Staff</button>
+        </div>
+        
+        <button onclick="guardarNuevoUsuario()" style="background: var(--dorado); color: var(--negro-profundo); border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer;">
+            GUARDAR COLABORADOR
+        </button>
+    </div>
+
+    <div class="stat-card">
+        <h3 style="color: var(--dorado);">👥 Personal Activo</h3>
+        <div id="lista-personal-db" style="text-align: left;">
+            <p style="color: var(--cantera);">Cargando lista...</p>
+        </div>
+    </div>
+</div>
 
     <div id="dashboard">
         <h1 style="color: var(--verde-bosque);">EscarolaOS</h1>
@@ -116,6 +144,7 @@ window.notificar = (mensaje, esError = false) => {
 </script>
 </body>
 </html>
+
 
 
 
