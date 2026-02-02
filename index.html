@@ -80,13 +80,15 @@
 
             if (docSnap.exists()) {
                 const datos = docSnap.data();
-                if (pinIngresado === datos.pin) {
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('dashboard').style.display = 'block';
-                } else {
-                    alert("PIN Incorrecto");
-                    window.borrar();
-                }
+                // Ejemplo de cómo quedaría tu validación:
+if (pinIngresado === datos.pin) {
+    window.notificar("¡Acceso Correcto! Bienvenido."); // Notificación verde
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+} else {
+    window.notificar("PIN Incorrecto. Intenta de nuevo.", true); // Notificación terracota (roja)
+    window.borrar();
+}
             }
         } catch (error) {
             console.error("Error al conectar:", error);
@@ -114,5 +116,6 @@ window.notificar = (mensaje, esError = false) => {
 </script>
 </body>
 </html>
+
 
 
