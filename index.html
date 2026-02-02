@@ -3,244 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EscarolaOS - Premium</title>
+    <title>EscarolaOS - Oficial</title>
     <style>
         :root {
             --verde-bosque: #1b4332;
             --rojo-terracota: #bc4749;
             --color-cantera: #f4f1de;
-            --dorado-detalle: #a68a64;
-            --dorado-brillante: #d4af37;
+            --dorado: #a68a64;
             --blanco-marfil: #fdfdfb;
         }
 
         body { 
             margin: 0; 
-            font-family: 'Playfair Display', serif, system-ui; 
+            font-family: 'Segoe UI', sans-serif; 
             background-color: var(--color-cantera); 
+            height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
             overflow: hidden;
-            color: var(--verde-bosque);
         }
 
-        /* --- ANIMACIONES ELEGANTES --- */
-        @keyframes fadeGold {
-            0% { border-color: var(--dorado-detalle); }
-            50% { border-color: var(--dorado-brillante); box-shadow: 0 0 15px var(--dorado-brillante); }
-            100% { border-color: var(--dorado-detalle); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); filter: blur(10px); }
-            to { opacity: 1; transform: translateY(0); filter: blur(0); }
-        }
-
-        /* --- PANTALLA DE LOGIN --- */
+        /* PANTALLA DE LOGIN */
         #pantalla-login {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background-color: var(--color-cantera);
             z-index: 10000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .card-login {
-            background: var(--blanco-marfil);
-            padding: 50px;
-            border-radius: 40px;
-            border: 1px solid var(--dorado-detalle);
-            box-shadow: 0 20px 50px rgba(27, 67, 50, 0.15);
+        .contenedor-central {
             text-align: center;
-            animation: slideUp 1s ease-out;
-            max-width: 400px;
-            width: 85%;
+            max-width: 350px;
         }
 
-        .logo-premium {
-            font-size: 2.5rem;
+        .logo-escarola {
+            font-size: 2.2rem;
             color: var(--verde-bosque);
-            margin: 0;
+            font-weight: bold;
             letter-spacing: 2px;
-            font-weight: 700;
-            border-bottom: 2px solid var(--dorado-detalle);
-            padding-bottom: 10px;
-            display: inline-block;
+            margin-bottom: 5px;
+        }
+
+        .subtitulo {
+            color: var(--dorado);
+            font-size: 0.8rem;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
         }
 
         .pin-display { 
-            font-size: 3rem; 
-            letter-spacing: 20px; 
+            font-size: 2.5rem; 
+            letter-spacing: 15px; 
             color: var(--verde-bosque); 
-            margin: 40px 0;
-            transition: all 0.3s;
+            margin-bottom: 40px;
         }
 
-        /* --- TECLADO MODERNO --- */
+        /* BOTONES REDONDOS VERDES */
         .teclado { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
-            gap: 25px; 
+            gap: 20px; 
         }
 
-        .btn-tecla {
-            height: 75px; width: 75px; border-radius: 20px; 
-            border: 1px solid rgba(166, 138, 100, 0.3); 
-            background: white;
-            color: var(--verde-bosque);
-            font-size: 1.6rem; font-weight: 400;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
-        }
-
-        .btn-tecla:hover {
-            border-color: var(--dorado-brillante);
-            transform: scale(1.05);
-        }
-
-        .btn-tecla:active { 
+        .btn-circular {
+            height: 80px; width: 80px; 
+            border-radius: 50%; 
+            border: 2px solid var(--dorado); 
             background: var(--verde-bosque);
             color: var(--blanco-marfil);
-            transform: scale(0.95);
+            font-size: 1.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
         }
 
-        .btn-borrar { 
+        .btn-circular:active { 
+            transform: scale(0.9);
+            background: var(--dorado);
+        }
+
+        .btn-c { 
             background: var(--rojo-terracota); 
-            color: white; 
-            border: none;
-            font-size: 0.9rem;
+            border-color: var(--blanco-marfil);
+            font-size: 1.2rem;
             font-weight: bold;
         }
 
-        /* --- CONTENIDO DE LA APP --- */
+        /* CONTENIDO APP */
         #contenido-app {
             display: none;
-            width: 100%;
-            height: 100vh;
-            background: var(--blanco-marfil);
-            animation: slideUp 0.8s ease;
-        }
-
-        .header-app {
-            background: var(--verde-bosque);
-            padding: 20px;
-            color: var(--color-cantera);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 4px solid var(--dorado-detalle);
+            text-align: center;
+            animation: fadeIn 0.5s ease;
         }
 
         .btn-entendido {
-            margin-top: 50px;
-            padding: 15px 40px;
-            background: var(--rojo-terracota);
+            background: var(--verde-bosque);
             color: white;
-            border: 2px solid var(--dorado-detalle);
-            border-radius: 50px;
+            border: 1px solid var(--dorado);
+            padding: 15px 40px;
+            border-radius: 30px;
             font-size: 1.1rem;
             cursor: pointer;
-            box-shadow: 0 5px 15px rgba(188, 71, 73, 0.3);
-            transition: 0.3s;
+            margin-top: 30px;
         }
-        
-        .btn-entendido:hover {
-            background: var(--verde-bosque);
-            box-shadow: 0 8px 20px rgba(27, 67, 50, 0.4);
-        }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div id="pantalla-login">
-        <div class="card-login">
-            <h1 class="logo-premium">ESCAROLA</h1>
-            <p style="color: var(--dorado-detalle); letter-spacing: 3px; font-size: 0.8rem; margin-top: 10px;">OPERATING SYSTEM</p>
+        <div class="contenedor-central">
+            <div class="logo-escarola">ESCAROLA</div>
+            <div class="subtitulo">Operating System</div>
             
-            <div id="visualizador-pin" class="pin-display">○○○○</div>
+            <div id="pin-visual" class="pin-display">○ ○ ○ ○</div>
 
             <div class="teclado">
-                <button class="btn-tecla" onclick="presionarTecla('1')">1</button>
-                <button class="btn-tecla" onclick="presionarTecla('2')">2</button>
-                <button class="btn-tecla" onclick="presionarTecla('3')">3</button>
-                <button class="btn-tecla" onclick="presionarTecla('4')">4</button>
-                <button class="btn-tecla" onclick="presionarTecla('5')">5</button>
-                <button class="btn-tecla" onclick="presionarTecla('6')">6</button>
-                <button class="btn-tecla" onclick="presionarTecla('7')">7</button>
-                <button class="btn-tecla" onclick="presionarTecla('8')">8</button>
-                <button class="btn-tecla" onclick="presionarTecla('9')">9</button>
-                <button class="btn-tecla btn-borrar" onclick="borrarPin()">BORRAR</button>
-                <button class="btn-tecla" onclick="presionarTecla('0')">0</button>
+                <button class="btn-circular" onclick="teclear('1')">1</button>
+                <button class="btn-circular" onclick="teclear('2')">2</button>
+                <button class="btn-circular" onclick="teclear('3')">3</button>
+                <button class="btn-circular" onclick="teclear('4')">4</button>
+                <button class="btn-circular" onclick="teclear('5')">5</button>
+                <button class="btn-circular" onclick="teclear('6')">6</button>
+                <button class="btn-circular" onclick="teclear('7')">7</button>
+                <button class="btn-circular" onclick="teclear('8')">8</button>
+                <button class="btn-circular" onclick="teclear('9')">9</button>
+                <button class="btn-circular btn-c" onclick="borrar()">C</button>
+                <button class="btn-circular" onclick="teclear('0')">0</button>
             </div>
         </div>
     </div>
 
     <div id="contenido-app">
-        <header class="header-app">
-            <span style="font-weight: bold; letter-spacing: 1px;">ESCAROLA OS</span>
-            <span style="font-size: 0.8rem; border: 1px solid var(--dorado-detalle); padding: 5px 10px; border-radius: 20px;">MODO SOCIO</span>
-        </header>
-
-        <div style="text-align: center; padding: 50px;">
-            <div style="font-size: 3rem; margin-bottom: 20px;">🌿</div>
-            <h2 style="color: var(--verde-bosque); font-style: italic;">Bienvenido, Propietario.</h2>
-            <p style="color: #666;">El sistema está listo para operar.</p>
-            
-            <button class="btn-entendido" onclick="alert('Iniciando Módulos...')">
-                ENTENDIDO
-            </button>
+        <div style="background: white; padding: 50px; border-radius: 40px; border: 1px solid var(--dorado);">
+            <h2 style="color: var(--verde-bosque);">Panel de Control</h2>
+            <p>Acceso verificado correctamente.</p>
+            <button class="btn-entendido">ENTENDIDO</button>
         </div>
     </div>
 
     <script>
-        let pinActual = "";
-        const PIN_CORRECTO = "2026";
+        let pin = "";
+        const PIN_ACCESO = "2026";
 
-        function presionarTecla(numero) {
-            if (pinActual.length < 4) {
-                pinActual += numero;
-                dibujarPuntos();
+        function teclear(n) {
+            if (pin.length < 4) {
+                pin += n;
+                document.getElementById('pin-visual').innerText = "● ".repeat(pin.length) + "○ ".repeat(4 - pin.length);
             }
-            if (pinActual.length === 4) {
-                setTimeout(validar, 200);
-            }
-        }
-
-        function dibujarPuntos() {
-            const visualizador = document.getElementById('visualizador-pin');
-            let puntos = "";
-            for (let i = 0; i < 4; i++) {
-                puntos += (i < pinActual.length) ? "●" : "○";
-            }
-            visualizador.innerText = puntos;
-        }
-
-        function validar() {
-            if (pinActual === PIN_CORRECTO) {
-                const login = document.getElementById('pantalla-login');
-                login.style.opacity = "0";
+            if (pin.length === 4) {
                 setTimeout(() => {
-                    login.style.display = 'none';
-                    document.getElementById('contenido-app').style.display = 'block';
-                }, 800);
-            } else {
-                const vis = document.getElementById('visualizador-pin');
-                vis.style.color = "var(--rojo-terracota)";
-                setTimeout(() => {
-                    alert("PIN Inválido");
-                    borrarPin();
-                    vis.style.color = "var(--verde-bosque)";
-                }, 100);
+                    if (pin === PIN_ACCESO) {
+                        document.getElementById('pantalla-login').style.display = 'none';
+                        document.getElementById('contenido-app').style.display = 'block';
+                    } else {
+                        alert("PIN Incorrecto");
+                        borrar();
+                    }
+                }, 200);
             }
         }
 
-        function borrarPin() {
-            pinActual = "";
-            dibujarPuntos();
+        function borrar() {
+            pin = "";
+            document.getElementById('pin-visual').innerText = "○ ○ ○ ○";
         }
     </script>
-
 </body>
 </html>
