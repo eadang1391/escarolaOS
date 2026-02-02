@@ -172,9 +172,57 @@ window.notificar = (mensaje, esError = false) => {
         setTimeout(() => aviso.remove(), 500);
     }, 3000);
 };
+        // --- LÓGICA DE SELECCIÓN DE ROLES ---
+let rolSeleccionado = ""; // Variable para guardar el rol elegido
+
+window.seleccionarRol = (rol, elemento) => {
+    // 1. Quitar el color dorado de todos los botones
+    document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
+    
+    // 2. Ponerle el color dorado al que clickeaste
+    elemento.classList.add('active');
+    
+    // 3. Guardar el nombre del rol en la variable
+    rolSeleccionado = rol;
+};
+
+// --- LÓGICA PARA GUARDAR EN FIREBASE ---
+window.guardarNuevoUsuario = async () => {
+    const nombre = document.getElementById('reg-nombre').value;
+    const pin = document.getElementById('reg-pin').value;
+
+    // Validación de seguridad
+    if (!nombre || pin.length !== 4 || !rolSeleccionado) {
+        window.notificar("⚠️ Completa nombre, PIN (4 dígitos) y selecciona un puesto", true);
+        return;
+    }
+
+    try {
+        // 'db' debe estar definido arriba en tu configuración de Firebase
+        await addDoc(collection(db, "usuarios"), {
+            nombre: nombre,
+            pin: pin,
+            rol: rolSeleccionado,
+            creado: new Date().toISOString()
+        });
+
+        window.notificar(`✅ ${nombre} registrado como ${rolSeleccionado}`);
+
+        // Limpiar el formulario para el siguiente registro
+        document.getElementById('reg-nombre').value = "";
+        document.getElementById('reg-pin').value = "";
+        document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
+        rolSeleccionado = "";
+
+    } catch (error) {
+        window.notificar("❌ Error al guardar en base de datos", true);
+        console.error(error);
+    }
+};
 </script>
 </body>
 </html>
+
 
 
 
