@@ -1,6 +1,15 @@
 // Importar las librerías necesarias
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, 
+    collection, 
+    addDoc, 
+    getDocs, 
+    query, 
+    where, 
+    doc, 
+    getDoc, 
+    updateDoc, 
+    deleteDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAqnPu5uInhoWBTwPs46asfm4ecotShfHY",
@@ -14,4 +23,4 @@ const firebaseConfig = {
 // Inicializar Firebase y exportar para usar en el index
 const app = initializeApp(firebaseConfig);
 export const db = getFirestore(app);
-export { doc, getDoc };
+export { db, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc };
