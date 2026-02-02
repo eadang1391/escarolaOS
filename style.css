@@ -75,3 +75,26 @@ body {
     from { transform: translate(-50%, -20px); opacity: 0; }
     to { transform: translate(-50%, 0); opacity: 1; }
 }
+
+.input-elegante {
+    background: var(--negro-profundo);
+    border: 1px solid var(--dorado);
+    color: var(--cantera);
+    padding: 12px;
+    border-radius: 10px;
+    font-family: 'Montserrat', sans-serif;
+    outline: none;
+}
+
+.input-elegante:focus {
+    box-shadow: 0 0 8px var(--dorado);
+}
+
+/* Estilo para la lista de personal dentro de la tarjeta */
+.usuario-fila {
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    padding: 10px 0; 
+    border-bottom: 1px solid rgba(197,160,89,0.1);
+}
