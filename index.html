@@ -167,26 +167,29 @@
 
     // 6. LÓGICA DEL PINPAD (Tecleo y Borrado)
     window.tecleo = (num) => {
-        if (pinIngresado.length < 4) {
-            pinIngresado += num;
-            actualizarInterfaz();
-            if (pinIngresado.length === 4) {
-                setTimeout(verificarAcceso, 200);
-            }
-        }
-    };
-
-    window.borrar = () => {
-        pinIngresado = "";
+    if (pinIngresado.length < 4) {
+        pinIngresado += num;
         actualizarInterfaz();
-    };
-
-    function actualizarInterfaz() {
-        for (let i = 0; i < 4; i++) {
-            const dot = document.getElementById(`dot-${i}`);
-            if(dot) dot.classList.toggle('filled', i < pinIngresado.length);
+        if (pinIngresado.length === 4) {
+            // Un pequeño retraso para que se vea el cuarto punto lleno
+            setTimeout(verificarAcceso, 200);
         }
     }
+};
+
+window.borrar = () => {
+    pinIngresado = "";
+    actualizarInterfaz();
+};
+
+function actualizarInterfaz() {
+    for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if(dot) {
+            dot.classList.toggle('filled', i < pinIngresado.length);
+        }
+    }
+}
 
     // 7. VERIFICACIÓN DE ACCESO (Login con Firebase)
     async function verificarAcceso() {
@@ -221,6 +224,7 @@
 </script>
 </body>
 </html>
+
 
 
 
