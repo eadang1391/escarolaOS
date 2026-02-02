@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EscarolaOS - Auténtico</title>
+    <title>EscarolaOS - Premium</title>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --verde-bosque: #1b4332;
-            --dorado: #a68a64;
-            --cantera: #f4f1de;
-            --terracota: #bc4749;
-            --blanco: #fdfdfb;
+            --rojo-terracota: #bc4749;
+            --color-cantera: #f4f1de;
+            --dorado-escarola: #a68a64;
+            --blanco-marfil: #fdfdfb;
         }
 
         body { 
             margin: 0; 
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            background-color: var(--cantera); 
+            font-family: 'Quicksand', sans-serif; 
+            background-color: var(--color-cantera); 
             height: 100vh;
             display: flex;
             align-items: center;
@@ -24,163 +25,181 @@
             overflow: hidden;
         }
 
-        /* CAPA DE BLOQUEO */
+        /* --- PANTALLA DE LOGIN (Capa Superior) --- */
         #pantalla-login {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--cantera);
+            background-color: var(--color-cantera);
             z-index: 10000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
             transition: opacity 0.6s ease;
         }
 
-        .header-login { text-align: center; margin-bottom: 40px; }
-        
-        .logo-tipo {
-            font-size: 2.8rem;
-            font-weight: 900;
+        .contenedor-login {
+            background: var(--blanco-marfil);
+            padding: 40px;
+            border-radius: 50px;
+            box-shadow: 0 15px 35px rgba(27, 67, 50, 0.15);
+            border: 2px solid var(--dorado-escarola);
+            text-align: center;
+            max-width: 380px;
+            width: 85%;
+        }
+
+        .titulo-app {
+            font-size: 2.2rem;
             color: var(--verde-bosque);
-            letter-spacing: 5px;
+            font-weight: 700;
             margin: 0;
+            letter-spacing: 1px;
         }
 
-        .linea-dorada {
-            width: 60px;
-            height: 3px;
-            background: var(--dorado);
-            margin: 10px auto;
+        .sub-titulo {
+            color: var(--dorado-escarola);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            margin-bottom: 30px;
         }
 
-        .pin-display {
+        .pin-input-area {
             font-size: 2.5rem;
+            margin-bottom: 30px;
             color: var(--verde-bosque);
-            letter-spacing: 15px;
-            margin-bottom: 40px;
             height: 50px;
+            letter-spacing: 10px;
         }
 
-        /* EL TECLADO DE LA FOTO */
-        .grid-teclado {
+        /* --- TECLADO DE BOTONES REDONDOS --- */
+        .teclado-grid {
             display: grid;
-            grid-template-columns: repeat(3, 90px);
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            justify-items: center;
         }
 
-        .btn-round {
-            width: 90px;
-            height: 90px;
+        .boton-num {
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
-            border: 2px solid var(--dorado);
+            border: 2px solid var(--dorado-escarola);
             background-color: var(--verde-bosque);
-            color: var(--blanco);
-            font-size: 2rem;
-            font-weight: 300;
+            color: var(--blanco-marfil);
+            font-size: 1.8rem;
+            font-weight: 600;
             cursor: pointer;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            transition: all 0.1s ease;
-            -webkit-tap-highlight-color: transparent;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
 
-        .btn-round:active {
+        .boton-num:active {
             transform: scale(0.9);
-            background-color: var(--dorado);
-            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            background-color: var(--dorado-escarola);
         }
 
-        .btn-c {
-            background-color: var(--terracota);
+        .boton-num.clear {
+            background-color: var(--rojo-terracota);
+            border-color: var(--blanco-marfil);
             font-size: 1.2rem;
-            font-weight: bold;
-            border-color: var(--blanco);
         }
 
-        /* CONTENIDO DE LA APP */
+        /* --- CONTENIDO DE LA APP (Atrás del Login) --- */
         #contenido-app {
             display: none;
             text-align: center;
-            animation: aparecer 0.8s ease;
+            width: 100%;
         }
 
-        @keyframes aparecer {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+        .btn-entendido {
+            background: var(--verde-bosque);
+            color: white;
+            border: 2px solid var(--dorado-escarola);
+            padding: 15px 45px;
+            border-radius: 30px;
+            font-family: 'Quicksand', sans-serif;
+            font-weight: 700;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .btn-entendido:hover {
+            background: var(--rojo-terracota);
+            transform: translateY(-3px);
         }
     </style>
 </head>
 <body>
 
     <div id="pantalla-login">
-        <div class="header-login">
-            <h1 class="logo-tipo">ESCAROLA</h1>
-            <div class="linea-dorada"></div>
-            <p style="color: var(--dorado); font-size: 0.7rem; letter-spacing: 3px;">PREMIUM SYSTEM</p>
-        </div>
+        <div class="contenedor-login">
+            <h1 class="titulo-app">ESCAROLA</h1>
+            <div class="sub-titulo">Operating System</div>
+            
+            <div id="pin-dots" class="pin-input-area">○ ○ ○ ○</div>
 
-        <div id="dots" class="pin-display">○ ○ ○ ○</div>
-
-        <div class="grid-teclado">
-            <button class="btn-round" onclick="pulsar('1')">1</button>
-            <button class="btn-round" onclick="pulsar('2')">2</button>
-            <button class="btn-round" onclick="pulsar('3')">3</button>
-            <button class="btn-round" onclick="pulsar('4')">4</button>
-            <button class="btn-round" onclick="pulsar('5')">5</button>
-            <button class="btn-round" onclick="pulsar('6')">6</button>
-            <button class="btn-round" onclick="pulsar('7')">7</button>
-            <button class="btn-round" onclick="pulsar('8')">8</button>
-            <button class="btn-round" onclick="pulsar('9')">9</button>
-            <button class="btn-round btn-c" onclick="reset()">C</button>
-            <button class="btn-round" onclick="pulsar('0')">0</button>
+            <div class="teclado-grid">
+                <button class="boton-num" onclick="addNum('1')">1</button>
+                <button class="boton-num" onclick="addNum('2')">2</button>
+                <button class="boton-num" onclick="addNum('3')">3</button>
+                <button class="boton-num" onclick="addNum('4')">4</button>
+                <button class="boton-num" onclick="addNum('5')">5</button>
+                <button class="boton-num" onclick="addNum('6')">6</button>
+                <button class="boton-num" onclick="addNum('7')">7</button>
+                <button class="boton-num" onclick="addNum('8')">8</button>
+                <button class="boton-num" onclick="addNum('9')">9</button>
+                <button class="boton-num clear" onclick="limpiar()">C</button>
+                <button class="boton-num" onclick="addNum('0')">0</button>
+            </div>
         </div>
     </div>
 
     <div id="contenido-app">
-        <div style="background: white; padding: 60px; border-radius: 50px; border: 1px solid var(--dorado); box-shadow: 0 30px 60px rgba(0,0,0,0.1);">
-            <h2 style="color: var(--verde-bosque); font-size: 2rem;">Acceso Concedido</h2>
-            <div class="linea-dorada"></div>
-            <button style="margin-top: 30px; padding: 15px 40px; border-radius: 30px; border: none; background: var(--verde-bosque); color: white; font-weight: bold; cursor: pointer;">
-                ENTENDIDO
-            </button>
+        <div style="background: white; display: inline-block; padding: 50px; border-radius: 50px; border: 2px solid var(--dorado-escarola);">
+            <h2 style="color: var(--verde-bosque); margin-top: 0;">¡Acceso Correcto!</h2>
+            <p style="color: #555;">Bienvenido al sistema de gestión EscarolaOS.</p>
+            <button class="btn-entendido" onclick="alert('Cargando módulos...')">ENTENDIDO</button>
         </div>
     </div>
 
     <script>
-        let codigo = "";
-        const CLAVE = "2026";
+        let clave = "";
+        const CLAVE_REAL = "2026";
 
-        function pulsar(n) {
-            if (codigo.length < 4) {
-                codigo += n;
-                actualizarPantalla();
+        function addNum(n) {
+            if (clave.length < 4) {
+                clave += n;
+                renderDots();
             }
-            if (codigo.length === 4) {
-                setTimeout(verificar, 200);
+            if (clave.length === 4) {
+                setTimeout(validarEntrada, 250);
             }
         }
 
-        function actualizarPantalla() {
-            const d = document.getElementById('dots');
-            d.innerText = "● ".repeat(codigo.length) + "○ ".repeat(4 - codigo.length);
+        function renderDots() {
+            const dots = document.getElementById('pin-dots');
+            dots.innerText = "● ".repeat(clave.length) + "○ ".repeat(4 - clave.length);
         }
 
-        function verificar() {
-            if (codigo === CLAVE) {
-                const login = document.getElementById('pantalla-login');
-                login.style.opacity = "0";
+        function validarEntrada() {
+            if (clave === CLAVE_REAL) {
+                const loginLayer = document.getElementById('pantalla-login');
+                loginLayer.style.opacity = "0";
                 setTimeout(() => {
-                    login.style.display = 'none';
+                    loginLayer.style.display = 'none';
                     document.getElementById('contenido-app').style.display = 'block';
                 }, 600);
             } else {
                 alert("PIN INCORRECTO");
-                reset();
+                limpiar();
             }
         }
 
-        function reset() {
-            codigo = "";
-            actualizarPantalla();
+        function limpiar() {
+            clave = "";
+            renderDots();
         }
     </script>
 </body>
