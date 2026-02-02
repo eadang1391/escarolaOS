@@ -44,47 +44,56 @@
         <button onclick="location.reload()" style="background: var(--terracota); color: white; border: none; padding: 10px 20px; border-radius: 10px;">SALIR</button>
     </div>
 
-    <script>
-        let pinIngresado = "";
+    <script type="module">
+    import { db, doc, getDoc } from './firebase-config.js';
 
-        function tecleo(num) {
-            if (pinIngresado.length < 4) {
-                pinIngresado += num;
-                actualizarInterfaz();
-                
-                if (pinIngresado.length === 4) {
-                    setTimeout(verificarAcceso, 200);
-                }
-            }
-        }
+    let pinIngresado = "";
 
-        function borrar() {
-            pinIngresado = "";
+    // Las funciones deben ser globales para que los botones las vean
+    window.tecleo = (num) => {
+        if (pinIngresado.length < 4) {
+            pinIngresado += num;
             actualizarInterfaz();
+            if (pinIngresado.length === 4) {
+                setTimeout(verificarAcceso, 200);
+            }
         }
+    };
 
-        function actualizarInterfaz() {
-            // Actualiza los puntitos del PIN
-            for (let i = 0; i < 4; i++) {
-                const dot = document.getElementById(`dot-${i}`);
-                if (i < pinIngresado.length) {
-                    dot.classList.add('filled');
+    window.borrar = () => {
+        pinIngresado = "";
+        actualizarInterfaz();
+    };
+
+    function actualizarInterfaz() {
+        for (let i = 0; i < 4; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            dot.classList.toggle('filled', i < pinIngresado.length);
+        }
+    }
+
+    async function verificarAcceso() {
+        try {
+            // BUSCAMOS EN FIREBASE AL SOCIO
+            const docRef = doc(db, "usuarios", "socio_principal");
+            const docSnap = await getDoc(docRef);
+
+            if (docSnap.exists()) {
+                const datos = docSnap.data();
+                if (pinIngresado === datos.pin) {
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
                 } else {
-                    dot.classList.remove('filled');
+                    alert("PIN Incorrecto");
+                    window.borrar();
                 }
             }
+        } catch (error) {
+            console.error("Error al conectar:", error);
+            alert("Error de conexión con la base de datos.");
         }
-
-        function verificarAcceso() {
-            // PIN de prueba (luego usaremos Firebase)
-            if (pinIngresado === "2026") {
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('dashboard').style.display = 'block';
-            } else {
-                alert("PIN Incorrecto");
-                borrar();
-            }
-        }
-    </script>
+    }
+</script>
 </body>
 </html>
+
