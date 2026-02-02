@@ -9,63 +9,77 @@
 <body>
 
     <div id="login-screen">
-        <div class="login-container">
-            <img src="logo.png" alt="Logo Escarola" class="logo">
-            <div id="pin-display">○ ○ ○ ○</div>
+        <div class="login-card"> <img src="logo.png" class="logo-img"> <div class="pin-display">
+                <div class="dot" id="dot-0"></div>
+                <div class="dot" id="dot-1"></div>
+                <div class="dot" id="dot-2"></div>
+                <div class="dot" id="dot-3"></div>
+            </div>
             
             <div class="keypad">
-                <button onclick="tecleo(1)">1</button>
-                <button onclick="tecleo(2)">2</button>
-                <button onclick="tecleo(3)">3</button>
-                <button onclick="tecleo(4)">4</button>
-                <button onclick="tecleo(5)">5</button>
-                <button onclick="tecleo(6)">6</button>
-                <button onclick="tecleo(7)">7</button>
-                <button onclick="tecleo(8)">8</button>
-                <button onclick="tecleo(9)">9</button>
-                <button onclick="borrar()">C</button>
-                <button onclick="tecleo(0)">0</button>
+                <button class="key" onclick="tecleo(1)">1</button>
+                <button class="key" onclick="tecleo(2)">2</button>
+                <button class="key" onclick="tecleo(3)">3</button>
+                <button class="key" onclick="tecleo(4)">4</button>
+                <button class="key" onclick="tecleo(5)">5</button>
+                <button class="key" onclick="tecleo(6)">6</button>
+                <button class="key" onclick="tecleo(7)">7</button>
+                <button class="key" onclick="tecleo(8)">8</button>
+                <button class="key" onclick="tecleo(9)">9</button>
+                <button class="key" onclick="borrar()">C</button>
+                <button class="key" onclick="tecleo(0)">0</button>
             </div>
         </div>
     </div>
 
-    <div id="main-content" style="display: none;">
-        <div class="dashboard-temporal">
-            <button class="btn-entendido" onclick="location.reload()">ENTENDIDO</button>
+    <div id="dashboard">
+        <h1 style="color: var(--verde-bosque);">EscarolaOS</h1>
+        <div class="finance-grid">
+            <div class="stat-card">
+                <p>Ingresos Totales</p>
+                <div class="stat-amount">$0.00</div>
+                <button class="edit-btn">✎</button>
+            </div>
         </div>
+        <button onclick="location.reload()" style="background: var(--terracota); color: white; border: none; padding: 10px 20px; border-radius: 10px;">SALIR</button>
     </div>
 
     <script>
         let pinIngresado = "";
 
-        function tecleo(numero) {
+        function tecleo(num) {
             if (pinIngresado.length < 4) {
-                pinIngresado += numero;
-                actualizarDisplay();
-            }
-            
-            if (pinIngresado.length === 4) {
-                verificarPin();
+                pinIngresado += num;
+                actualizarInterfaz();
+                
+                if (pinIngresado.length === 4) {
+                    setTimeout(verificarAcceso, 200);
+                }
             }
         }
 
         function borrar() {
             pinIngresado = "";
-            actualizarDisplay();
+            actualizarInterfaz();
         }
 
-        function actualizarDisplay() {
-            const display = document.getElementById('pin-display');
-            let circulos = "● ".repeat(pinIngresado.length) + "○ ".repeat(4 - pinIngresado.length);
-            display.innerText = circulos.trim();
+        function actualizarInterfaz() {
+            // Actualiza los puntitos del PIN
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (i < pinIngresado.length) {
+                    dot.classList.add('filled');
+                } else {
+                    dot.classList.remove('filled');
+                }
+            }
         }
 
-        function verificarPin() {
-            // AQUÍ VALIDAMOS (Por ahora manual, luego con Firebase)
+        function verificarAcceso() {
+            // PIN de prueba (luego usaremos Firebase)
             if (pinIngresado === "2026") {
-                // OCULTAR LOGIN Y MOSTRAR APP
                 document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-content').style.display = 'block';
+                document.getElementById('dashboard').style.display = 'block';
             } else {
                 alert("PIN Incorrecto");
                 borrar();
