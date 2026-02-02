@@ -93,7 +93,26 @@
             alert("Error de conexión con la base de datos.");
         }
     }
+        // Función simplificada de notificaciones
+window.notificar = (mensaje, esError = false) => {
+    const aviso = document.createElement("div");
+    aviso.className = "toast";
+    
+    // Si es error, cambiamos el color a terracota (tu color de alerta)
+    if(esError) aviso.style.backgroundColor = "var(--terracota)";
+    
+    aviso.innerText = mensaje;
+    document.body.appendChild(aviso);
+
+    // Se elimina automáticamente tras 3 segundos
+    setTimeout(() => {
+        aviso.style.opacity = "0";
+        aviso.style.transition = "0.5s";
+        setTimeout(() => aviso.remove(), 500);
+    }, 3000);
+};
 </script>
 </body>
 </html>
+
 
