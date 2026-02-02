@@ -249,6 +249,20 @@ function actualizarInterfaz() {
                 // Cambiar de pantalla
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
+                // ... dentro de verificarAcceso()
+if (!querySnapshot.empty) {
+    const usuario = querySnapshot.docs[0].data();
+    
+    // 1. Entramos al Dashboard
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('dashboard').style.display = 'block';
+
+    // 2. Filtramos: Si es SOCIO, despertamos las funciones financieras y de personal
+    if (usuario.rol === 'Socio') {
+        window.cargarPersonal();      // Esto llena la lista de empleados
+        window.calcularFinanzasReales(); // Esto suma el dinero en Firebase
+    }
+}
                 if (usuario.rol === 'Socio') {
     window.cargarPersonal(); // <--- Carga los nombres solo si es Socio
 }
@@ -312,6 +326,7 @@ function actualizarInterfaz() {
 </script>
 </body>
 </html>
+
 
 
 
