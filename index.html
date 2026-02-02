@@ -4,115 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EscarolaOS</title>
-    <style>
-        /* Capas principales */
-        #login-layer {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #2c2c2c; /* Color de fondo de tu foto */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            transition: opacity 0.5s ease;
-        }
-
-        #app-layer {
-            display: none; /* Oculto hasta el login */
-            padding: 20px;
-            background: #f0f0f0;
-            height: 100vh;
-        }
-
-        /* El teclado identico a tu imagen */
-        .keypad-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border-radius: 30px;
-            padding: 40px;
-            text-align: center;
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        /* Estilo de los botones circulares */
-        .key {
-            width: 70px;
-            height: 70px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 1.5rem;
-            margin: 10px;
-            cursor: pointer;
-            transition: transform 0.1s;
-        }
-
-        .key:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div id="login-layer">
-        <div class="keypad-card">
-            <img src="logo_escarola.png" width="120">
-            <div id="pin-dots" style="color: #d4af37; font-size: 2rem; margin: 20px;">○ ○ ○ ○</div>
+    <div id="login-screen">
+        <div class="login-container">
+            <img src="logo.png" alt="Logo Escarola" class="logo">
+            <div id="pin-display">○ ○ ○ ○</div>
             
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr);">
-                <button class="key" onclick="press('1')">1</button>
-                <button class="key" onclick="press('2')">2</button>
-                <button class="key" onclick="press('3')">3</button>
-                <button class="key" style="color: #ff4444;" onclick="clean()">C</button>
-                <button class="key" onclick="press('0')">0</button>
-                <button class="key" onclick="back()"><-</button>
+            <div class="keypad">
+                <button onclick="tecleo(1)">1</button>
+                <button onclick="tecleo(2)">2</button>
+                <button onclick="tecleo(3)">3</button>
+                <button onclick="tecleo(4)">4</button>
+                <button onclick="tecleo(5)">5</button>
+                <button onclick="tecleo(6)">6</button>
+                <button onclick="tecleo(7)">7</button>
+                <button onclick="tecleo(8)">8</button>
+                <button onclick="tecleo(9)">9</button>
+                <button onclick="borrar()">C</button>
+                <button onclick="tecleo(0)">0</button>
             </div>
         </div>
     </div>
 
-    <div id="app-layer">
-        <div style="border: 2px solid #ccc; border-radius: 15px; padding: 50px; text-align: center;">
-             <button style="padding: 15px 40px; border-radius: 10px; background: #333; color: white;">ENTENDIDO</button>
+    <div id="main-content" style="display: none;">
+        <div class="dashboard-temporal">
+            <button class="btn-entendido" onclick="location.reload()">ENTENDIDO</button>
         </div>
     </div>
 
-    <script type="module">
-        // IMPORTANTE: Aquí pegas la configuración de Firebase que ya tienes
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    <script>
+        let pinIngresado = "";
 
-        // ... Tu firebaseConfig ...
-
-        let currentPin = "";
-
-        window.press = async (num) => {
-            if(currentPin.length < 4) {
-                currentPin += num;
-                actualizarDots();
+        function tecleo(numero) {
+            if (pinIngresado.length < 4) {
+                pinIngresado += numero;
+                actualizarDisplay();
             }
             
-            if(currentPin.length === 4) {
-                validarConFirebase(currentPin);
-            }
-        };
-
-        async function validarConFirebase(pin) {
-            // Buscamos en la colección 'usuarios' que creaste
-            // Nota: Aquí la lógica de seguridad para que nadie entre sin PIN
-            if(pin === "2026") { // Prueba local primero
-                document.getElementById('login-layer').style.opacity = "0";
-                setTimeout(() => {
-                    document.getElementById('login-layer').style.display = "none";
-                    document.getElementById('app-layer').style.display = "block";
-                }, 500);
-            } else {
-                alert("PIN incorrecto");
-                clean();
+            if (pinIngresado.length === 4) {
+                verificarPin();
             }
         }
 
-        window.clean = () => { currentPin = ""; actualizarDots(); };
-        function actualizarDots() { /* Lógica para rellenar los círculos ○ por ● */ }
+        function borrar() {
+            pinIngresado = "";
+            actualizarDisplay();
+        }
+
+        function actualizarDisplay() {
+            const display = document.getElementById('pin-display');
+            let circulos = "● ".repeat(pinIngresado.length) + "○ ".repeat(4 - pinIngresado.length);
+            display.innerText = circulos.trim();
+        }
+
+        function verificarPin() {
+            // AQUÍ VALIDAMOS (Por ahora manual, luego con Firebase)
+            if (pinIngresado === "2026") {
+                // OCULTAR LOGIN Y MOSTRAR APP
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-content').style.display = 'block';
+            } else {
+                alert("PIN Incorrecto");
+                borrar();
+            }
+        }
     </script>
 </body>
 </html>
