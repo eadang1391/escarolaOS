@@ -103,171 +103,116 @@
     </div>
 </div>
 
-    <script type="module">
-    // Importamos las nuevas funciones desde tu archivo config
-    import { 
-        db, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc 
-    } from './firebase-config.js';
+    // 1. Importaciones únicas
+import { 
+    db, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc 
+} from './firebase-config.js';
 
-    let pinIngresado = "";
-    let rolSeleccionado = ""; // Recuerda agregar esta variable
+// 2. Variables de estado (Solo una vez)
+let pinIngresado = "";
+let rolSeleccionado = "";
 
-    // --- LÓGICA DE SELECCIÓN DE ROLES (Visual) ---
-    window.seleccionarRol = (rol, elemento) => {
-        document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
-        elemento.classList.add('active');
-        rolSeleccionado = rol;
-    };
-
-    // --- FUNCIÓN PARA GUARDAR (Actualizada) ---
-    window.guardarNuevoUsuario = async () => {
-        const nombre = document.getElementById('reg-nombre').value;
-        const pin = document.getElementById('reg-pin').value;
-
-        if (!nombre || pin.length !== 4 || !rolSeleccionado) {
-            window.notificar("⚠️ Completa nombre, PIN y elige un puesto", true);
-            return;
-        }
-
-        try {
-            // Usamos addDoc que ahora sí viene importado
-            await addDoc(collection(db, "usuarios"), {
-                nombre: nombre,
-                pin: pin,
-                rol: rolSeleccionado,
-                creado: new Date().toISOString()
-            });
-
-            window.notificar(`✅ ${nombre} registrado como ${rolSeleccionado}`);
-            
-            // Limpiar campos
-            document.getElementById('reg-nombre').value = "";
-            document.getElementById('reg-pin').value = "";
-            document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
-            rolSeleccionado = "";
-
-        } catch (error) {
-            console.error(error);
-            window.notificar("❌ Error de conexión con la base de datos", true);
-        }
-    };
-
-    let pinIngresado = "";
-
-    // Las funciones deben ser globales para que los botones las vean
-    window.tecleo = (num) => {
-        if (pinIngresado.length < 4) {
-            pinIngresado += num;
-            actualizarInterfaz();
-            if (pinIngresado.length === 4) {
-                setTimeout(verificarAcceso, 200);
-            }
-        }
-    };
-
-    window.borrar = () => {
-        pinIngresado = "";
-        actualizarInterfaz();
-    };
-
-    function actualizarInterfaz() {
-        for (let i = 0; i < 4; i++) {
-            const dot = document.getElementById(`dot-${i}`);
-            dot.classList.toggle('filled', i < pinIngresado.length);
-        }
-    }
-
-    async function verificarAcceso() {
-        try {
-            // BUSCAMOS EN FIREBASE AL SOCIO
-            const docRef = doc(db, "usuarios", "socio_principal");
-            const docSnap = await getDoc(docRef);
-
-            if (docSnap.exists()) {
-                const datos = docSnap.data();
-                // Ejemplo de cómo quedaría tu validación:
-if (pinIngresado === datos.pin) {
-    window.notificar("¡Acceso Correcto! Bienvenido."); // Notificación verde
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-} else {
-    window.notificar("PIN Incorrecto. Intenta de nuevo.", true); // Notificación terracota (roja)
-    window.borrar();
-}
-            }
-        } catch (error) {
-            console.error("Error al conectar:", error);
-            alert("Error de conexión con la base de datos.");
-        }
-    }
-        // Función simplificada de notificaciones
+// 3. Notificaciones Toast
 window.notificar = (mensaje, esError = false) => {
     const aviso = document.createElement("div");
     aviso.className = "toast";
-    
-    // Si es error, cambiamos el color a terracota (tu color de alerta)
     if(esError) aviso.style.backgroundColor = "var(--terracota)";
-    
     aviso.innerText = mensaje;
     document.body.appendChild(aviso);
-
-    // Se elimina automáticamente tras 3 segundos
     setTimeout(() => {
         aviso.style.opacity = "0";
         aviso.style.transition = "0.5s";
         setTimeout(() => aviso.remove(), 500);
     }, 3000);
 };
-        // --- LÓGICA DE SELECCIÓN DE ROLES ---
-let rolSeleccionado = ""; // Variable para guardar el rol elegido
 
+// 4. Lógica de Selección de Roles
 window.seleccionarRol = (rol, elemento) => {
-    // 1. Quitar el color dorado de todos los botones
     document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
-    
-    // 2. Ponerle el color dorado al que clickeaste
     elemento.classList.add('active');
-    
-    // 3. Guardar el nombre del rol en la variable
     rolSeleccionado = rol;
 };
 
-// --- LÓGICA PARA GUARDAR EN FIREBASE ---
+// 5. Lógica para Guardar Personal
 window.guardarNuevoUsuario = async () => {
     const nombre = document.getElementById('reg-nombre').value;
     const pin = document.getElementById('reg-pin').value;
 
-    // Validación de seguridad
     if (!nombre || pin.length !== 4 || !rolSeleccionado) {
         window.notificar("⚠️ Completa nombre, PIN (4 dígitos) y selecciona un puesto", true);
         return;
     }
 
     try {
-        // 'db' debe estar definido arriba en tu configuración de Firebase
         await addDoc(collection(db, "usuarios"), {
-            nombre: nombre,
-            pin: pin,
-            rol: rolSeleccionado,
-            creado: new Date().toISOString()
+            nombre: nombre, pin: pin, rol: rolSeleccionado, creado: new Date().toISOString()
         });
-
         window.notificar(`✅ ${nombre} registrado como ${rolSeleccionado}`);
-
-        // Limpiar el formulario para el siguiente registro
         document.getElementById('reg-nombre').value = "";
         document.getElementById('reg-pin').value = "";
         document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
         rolSeleccionado = "";
-
     } catch (error) {
-        window.notificar("❌ Error al guardar en base de datos", true);
+        window.notificar("❌ Error al guardar", true);
         console.error(error);
     }
+};
+
+// 6. Lógica del PINpad
+window.tecleo = (num) => {
+    if (pinIngresado.length < 4) {
+        pinIngresado += num;
+        actualizarInterfaz();
+        if (pinIngresado.length === 4) {
+            setTimeout(verificarAcceso, 200);
+        }
+    }
+};
+
+window.borrar = () => {
+    pinIngresado = "";
+    actualizarInterfaz();
+};
+
+function actualizarInterfaz() {
+    for (let i = 0; i < 4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if(dot) dot.classList.toggle('filled', i < pinIngresado.length);
+    }
+}
+
+// 7. Verificación de Acceso (Busca en toda la colección de usuarios)
+async function verificarAcceso() {
+    try {
+        const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
+        const querySnapshot = await getDocs(q);
+
+        if (!querySnapshot.empty) {
+            const usuario = querySnapshot.docs[0].data();
+            window.notificar("¡Bienvenido, " + usuario.nombre + "!");
+            
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+
+            // Solo el Socio ve la gestión de personal
+            const seccionAdmin = document.getElementById('seccion-admin');
+            if (seccionAdmin) {
+                seccionAdmin.style.display = (usuario.rol === 'Socio') ? 'block' : 'none';
+            }
+        } else {
+            window.notificar("PIN Incorrecto", true);
+            window.borrar();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        window.notificar("Error de conexión", true);
+    }
+}
 };
 </script>
 </body>
 </html>
+
 
 
 
