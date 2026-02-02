@@ -5,67 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EscarolaOS</title>
     <style>
-        /* CSS: Aquí controlamos que nada se encime */
-        body { margin: 0; font-family: sans-serif; background-color: #f4f4f4; }
+        :root {
+            --verde-escarola: #2e7d32;
+            --verde-claro: #e8f5e9;
+            --rojo-error: #c62828;
+            --sombra: 0 8px 30px rgba(0,0,0,0.1);
+        }
 
-        /* Estilo de la pantalla de bloqueo (Login) */
+        body { 
+            margin: 0; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background-color: #f0f2f5; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* --- ANIMACIONES --- */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        /* --- PANTALLA DE LOGIN --- */
         #pantalla-login {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: white; z-index: 10000; /* Siempre al frente */
+            background: linear-gradient(135deg, #ffffff 0%, #f1f8e9 100%);
+            z-index: 10000;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: all 0.5s ease;
         }
 
-        /* Estilo del contenido de la App (Oculto al inicio) */
-        #contenido-app {
-            display: none; /* Escondido hasta que el PIN sea correcto */
-            padding: 20px; text-align: center;
+        .contenedor-login {
+            text-align: center;
+            animation: fadeIn 0.8s ease-out;
+            padding: 40px;
+            border-radius: 24px;
+            background: white;
+            box-shadow: var(--sombra);
         }
 
-        /* Estilo del teclado */
-        .pin-display { font-size: 2.5rem; letter-spacing: 15px; color: #2e7d32; margin-bottom: 30px; }
-        .teclado { display: grid; grid-template-columns: repeat(3, 85px); gap: 20px; }
+        .logo-texto {
+            font-size: 2.8rem;
+            color: var(--verde-escarola);
+            margin: 0;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+
+        .pin-display { 
+            font-size: 2.5rem; 
+            letter-spacing: 15px; 
+            color: var(--verde-escarola); 
+            margin: 30px 0;
+            min-height: 50px;
+        }
+
+        /* --- TECLADO ESTÉTICO --- */
+        .teclado { 
+            display: grid; 
+            grid-template-columns: repeat(3, 80px); 
+            gap: 20px; 
+        }
+
         .btn-tecla {
-            height: 85px; width: 85px; border-radius: 50%; border: 1px solid #ddd;
-            background: #fff; font-size: 1.8rem; cursor: pointer; transition: 0.2s;
+            height: 80px; width: 80px; border-radius: 50%; 
+            border: none; background: var(--verde-claro);
+            color: var(--verde-escarola);
+            font-size: 1.8rem; font-weight: 600;
+            cursor: pointer; transition: all 0.2s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
         }
-        .btn-tecla:active { background: #e0e0e0; }
-        .btn-borrar { background: #ffcdd2; color: #c62828; border: none; font-size: 1.2rem; font-weight: bold; }
+
+        .btn-tecla:active { 
+            transform: scale(0.9);
+            background: var(--verde-escarola);
+            color: white;
+        }
+
+        .btn-borrar { 
+            background: #ffebee; 
+            color: var(--rojo-error); 
+            font-size: 1rem; 
+        }
+
+        /* --- CONTENIDO DE LA APP --- */
+        #contenido-app {
+            display: none;
+            width: 90%;
+            max-width: 500px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .card-bienvenida {
+            background: white;
+            padding: 40px;
+            border-radius: 30px;
+            box-shadow: var(--sombra);
+            text-align: center;
+        }
+
+        .btn-principal {
+            padding: 18px 45px;
+            font-size: 1.1rem;
+            background: var(--verde-escarola);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(46, 125, 50, 0.2);
+            transition: 0.3s;
+        }
+
+        .btn-principal:hover { transform: translateY(-3px); }
     </style>
 </head>
 <body>
 
     <div id="pantalla-login">
-        <h1 style="color: #2e7d32; margin-bottom: 10px;">EscarolaOS</h1>
-        <p style="color: #666;">Ingresa tu PIN</p>
-        
-        <div id="visualizador-pin" class="pin-display">○ ○ ○ ○</div>
+        <div class="contenedor-login">
+            <h1 class="logo-texto">EscarolaOS</h1>
+            <p style="color: #888; font-weight: 500;">SISTEMA OPERATIVO</p>
+            
+            <div id="visualizador-pin" class="pin-display">○ ○ ○ ○</div>
 
-        <div class="teclado">
-            <button class="btn-tecla" onclick="presionarTecla('1')">1</button>
-            <button class="btn-tecla" onclick="presionarTecla('2')">2</button>
-            <button class="btn-tecla" onclick="presionarTecla('3')">3</button>
-            <button class="btn-tecla" onclick="presionarTecla('4')">4</button>
-            <button class="btn-tecla" onclick="presionarTecla('5')">5</button>
-            <button class="btn-tecla" onclick="presionarTecla('6')">6</button>
-            <button class="btn-tecla" onclick="presionarTecla('7')">7</button>
-            <button class="btn-tecla" onclick="presionarTecla('8')">8</button>
-            <button class="btn-tecla" onclick="presionarTecla('9')">9</button>
-            <button class="btn-tecla btn-borrar" onclick="borrarPin()">C</button>
-            <button class="btn-tecla" onclick="presionarTecla('0')">0</button>
+            <div class="teclado">
+                <button class="btn-tecla" onclick="presionarTecla('1')">1</button>
+                <button class="btn-tecla" onclick="presionarTecla('2')">2</button>
+                <button class="btn-tecla" onclick="presionarTecla('3')">3</button>
+                <button class="btn-tecla" onclick="presionarTecla('4')">4</button>
+                <button class="btn-tecla" onclick="presionarTecla('5')">5</button>
+                <button class="btn-tecla" onclick="presionarTecla('6')">6</button>
+                <button class="btn-tecla" onclick="presionarTecla('7')">7</button>
+                <button class="btn-tecla" onclick="presionarTecla('8')">8</button>
+                <button class="btn-tecla" onclick="presionarTecla('9')">9</button>
+                <button class="btn-tecla btn-borrar" onclick="borrarPin()">C</button>
+                <button class="btn-tecla" onclick="presionarTecla('0')">0</button>
+            </div>
         </div>
     </div>
 
     <div id="contenido-app">
-        <h2 style="color: #333; margin-top: 50px;">Panel Principal</h2>
-        <p>Bienvenido al sistema.</p>
-        
-        <button style="padding: 20px 40px; font-size: 1.2rem; background: #2e7d32; color: white; border: none; border-radius: 8px; cursor: pointer;">
-            ENTENDIDO
-        </button>
+        <div class="card-bienvenida">
+            <div style="font-size: 4rem; margin-bottom: 20px;">🥗</div>
+            <h2 style="color: #333; margin: 0;">¡Acceso Concedido!</h2>
+            <p style="color: #666; margin-bottom: 30px;">Bienvenido al centro de control de Escarola.</p>
+            
+            <button class="btn-principal" onclick="alert('Iniciando sistema...')">
+                ENTENDIDO
+            </button>
+        </div>
     </div>
 
     <script>
-        // LÓGICA: El cerebro que hace que funcione el PIN
         let pinActual = "";
         const PIN_CORRECTO = "2026";
 
@@ -74,10 +175,8 @@
                 pinActual += numero;
                 dibujarPuntos();
             }
-            
             if (pinActual.length === 4) {
-                // Esperamos un poquito para que se vea el último punto
-                setTimeout(validar, 200);
+                setTimeout(validar, 250);
             }
         }
 
@@ -92,12 +191,21 @@
 
         function validar() {
             if (pinActual === PIN_CORRECTO) {
-                // Quitamos el login y mostramos la app
-                document.getElementById('pantalla-login').style.display = 'none';
-                document.getElementById('contenido-app').style.display = 'block';
+                const login = document.getElementById('pantalla-login');
+                login.style.opacity = "0";
+                setTimeout(() => {
+                    login.style.display = 'none';
+                    document.getElementById('contenido-app').style.display = 'block';
+                }, 500);
             } else {
-                alert("PIN Incorrecto");
-                borrarPin();
+                // Animación de error (vibración)
+                const visualizador = document.getElementById('visualizador-pin');
+                visualizador.style.color = "var(--rojo-error)";
+                setTimeout(() => {
+                    alert("PIN Incorrecto");
+                    borrarPin();
+                    visualizador.style.color = "var(--verde-escarola)";
+                }, 100);
             }
         }
 
