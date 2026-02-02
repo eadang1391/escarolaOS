@@ -3,204 +3,116 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EscarolaOS - Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>EscarolaOS</title>
     <style>
-        :root {
-            --verde-bosque: #1b4332;
-            --rojo-terracota: #bc4749;
-            --color-cantera: #f4f1de;
-            --dorado-escarola: #a68a64;
-            --blanco-marfil: #fdfdfb;
+        /* Capas principales */
+        #login-layer {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #2c2c2c; /* Color de fondo de tu foto */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
         }
 
-        body { 
-            margin: 0; 
-            font-family: 'Quicksand', sans-serif; 
-            background-color: var(--color-cantera); 
+        #app-layer {
+            display: none; /* Oculto hasta el login */
+            padding: 20px;
+            background: #f0f0f0;
             height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
         }
 
-        /* --- PANTALLA DE LOGIN (Capa Superior) --- */
-        #pantalla-login {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background-color: var(--color-cantera);
-            z-index: 10000;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.6s ease;
-        }
-
-        .contenedor-login {
-            background: var(--blanco-marfil);
-            padding: 40px;
-            border-radius: 50px;
-            box-shadow: 0 15px 35px rgba(27, 67, 50, 0.15);
-            border: 2px solid var(--dorado-escarola);
-            text-align: center;
-            max-width: 380px;
-            width: 85%;
-        }
-
-        .titulo-app {
-            font-size: 2.2rem;
-            color: var(--verde-bosque);
-            font-weight: 700;
-            margin: 0;
-            letter-spacing: 1px;
-        }
-
-        .sub-titulo {
-            color: var(--dorado-escarola);
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            margin-bottom: 30px;
-        }
-
-        .pin-input-area {
-            font-size: 2.5rem;
-            margin-bottom: 30px;
-            color: var(--verde-bosque);
-            height: 50px;
-            letter-spacing: 10px;
-        }
-
-        /* --- TECLADO DE BOTONES REDONDOS --- */
-        .teclado-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 15px;
-            justify-items: center;
-        }
-
-        .boton-num {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            border: 2px solid var(--dorado-escarola);
-            background-color: var(--verde-bosque);
-            color: var(--blanco-marfil);
-            font-size: 1.8rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        }
-
-        .boton-num:active {
-            transform: scale(0.9);
-            background-color: var(--dorado-escarola);
-        }
-
-        .boton-num.clear {
-            background-color: var(--rojo-terracota);
-            border-color: var(--blanco-marfil);
-            font-size: 1.2rem;
-        }
-
-        /* --- CONTENIDO DE LA APP (Atrás del Login) --- */
-        #contenido-app {
-            display: none;
-            text-align: center;
-            width: 100%;
-        }
-
-        .btn-entendido {
-            background: var(--verde-bosque);
-            color: white;
-            border: 2px solid var(--dorado-escarola);
-            padding: 15px 45px;
+        /* El teclado identico a tu imagen */
+        .keypad-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
             border-radius: 30px;
-            font-family: 'Quicksand', sans-serif;
-            font-weight: 700;
-            font-size: 1.1rem;
-            cursor: pointer;
-            transition: 0.3s;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        .btn-entendido:hover {
-            background: var(--rojo-terracota);
-            transform: translateY(-3px);
+        /* Estilo de los botones circulares */
+        .key {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1.5rem;
+            margin: 10px;
+            cursor: pointer;
+            transition: transform 0.1s;
         }
+
+        .key:active { transform: scale(0.9); background: rgba(255, 255, 255, 0.2); }
     </style>
 </head>
 <body>
 
-    <div id="pantalla-login">
-        <div class="contenedor-login">
-            <h1 class="titulo-app">ESCAROLA</h1>
-            <div class="sub-titulo">Operating System</div>
+    <div id="login-layer">
+        <div class="keypad-card">
+            <img src="logo_escarola.png" width="120">
+            <div id="pin-dots" style="color: #d4af37; font-size: 2rem; margin: 20px;">○ ○ ○ ○</div>
             
-            <div id="pin-dots" class="pin-input-area">○ ○ ○ ○</div>
-
-            <div class="teclado-grid">
-                <button class="boton-num" onclick="addNum('1')">1</button>
-                <button class="boton-num" onclick="addNum('2')">2</button>
-                <button class="boton-num" onclick="addNum('3')">3</button>
-                <button class="boton-num" onclick="addNum('4')">4</button>
-                <button class="boton-num" onclick="addNum('5')">5</button>
-                <button class="boton-num" onclick="addNum('6')">6</button>
-                <button class="boton-num" onclick="addNum('7')">7</button>
-                <button class="boton-num" onclick="addNum('8')">8</button>
-                <button class="boton-num" onclick="addNum('9')">9</button>
-                <button class="boton-num clear" onclick="limpiar()">C</button>
-                <button class="boton-num" onclick="addNum('0')">0</button>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr);">
+                <button class="key" onclick="press('1')">1</button>
+                <button class="key" onclick="press('2')">2</button>
+                <button class="key" onclick="press('3')">3</button>
+                <button class="key" style="color: #ff4444;" onclick="clean()">C</button>
+                <button class="key" onclick="press('0')">0</button>
+                <button class="key" onclick="back()"><-</button>
             </div>
         </div>
     </div>
 
-    <div id="contenido-app">
-        <div style="background: white; display: inline-block; padding: 50px; border-radius: 50px; border: 2px solid var(--dorado-escarola);">
-            <h2 style="color: var(--verde-bosque); margin-top: 0;">¡Acceso Correcto!</h2>
-            <p style="color: #555;">Bienvenido al sistema de gestión EscarolaOS.</p>
-            <button class="btn-entendido" onclick="alert('Cargando módulos...')">ENTENDIDO</button>
+    <div id="app-layer">
+        <div style="border: 2px solid #ccc; border-radius: 15px; padding: 50px; text-align: center;">
+             <button style="padding: 15px 40px; border-radius: 10px; background: #333; color: white;">ENTENDIDO</button>
         </div>
     </div>
 
-    <script>
-        let clave = "";
-        const CLAVE_REAL = "2026";
+    <script type="module">
+        // IMPORTANTE: Aquí pegas la configuración de Firebase que ya tienes
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        function addNum(n) {
-            if (clave.length < 4) {
-                clave += n;
-                renderDots();
+        // ... Tu firebaseConfig ...
+
+        let currentPin = "";
+
+        window.press = async (num) => {
+            if(currentPin.length < 4) {
+                currentPin += num;
+                actualizarDots();
             }
-            if (clave.length === 4) {
-                setTimeout(validarEntrada, 250);
+            
+            if(currentPin.length === 4) {
+                validarConFirebase(currentPin);
             }
-        }
+        };
 
-        function renderDots() {
-            const dots = document.getElementById('pin-dots');
-            dots.innerText = "● ".repeat(clave.length) + "○ ".repeat(4 - clave.length);
-        }
-
-        function validarEntrada() {
-            if (clave === CLAVE_REAL) {
-                const loginLayer = document.getElementById('pantalla-login');
-                loginLayer.style.opacity = "0";
+        async function validarConFirebase(pin) {
+            // Buscamos en la colección 'usuarios' que creaste
+            // Nota: Aquí la lógica de seguridad para que nadie entre sin PIN
+            if(pin === "2026") { // Prueba local primero
+                document.getElementById('login-layer').style.opacity = "0";
                 setTimeout(() => {
-                    loginLayer.style.display = 'none';
-                    document.getElementById('contenido-app').style.display = 'block';
-                }, 600);
+                    document.getElementById('login-layer').style.display = "none";
+                    document.getElementById('app-layer').style.display = "block";
+                }, 500);
             } else {
-                alert("PIN INCORRECTO");
-                limpiar();
+                alert("PIN incorrecto");
+                clean();
             }
         }
 
-        function limpiar() {
-            clave = "";
-            renderDots();
-        }
+        window.clean = () => { currentPin = ""; actualizarDots(); };
+        function actualizarDots() { /* Lógica para rellenar los círculos ○ por ● */ }
     </script>
 </body>
 </html>
