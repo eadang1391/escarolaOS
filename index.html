@@ -321,11 +321,32 @@ if (!querySnapshot.empty) {
         const utilElement = document.getElementById('val-utilidad');
         utilElement.style.color = utilidad < 0 ? 'var(--terracota)' : 'var(--dorado)';
     };
+        <script type="module">
+    // ... aquí están tus imports
+    // ... aquí está tu lógica de PIN
+    // ... aquí está tu función de verificarAcceso
+
+    // --- AQUÍ PEGAS EL PUNTO 3 (AL FINAL) ---
+    window.actualizarFinanzasUI = (ingresos, gastos) => {
+        const utilidad = ingresos - gastos;
+        
+        // Buscamos los IDs en tu HTML y les ponemos el valor
+        document.getElementById('val-ingresos').innerText = `$${ingresos.toLocaleString()}`;
+        document.getElementById('val-gastos').innerText = `$${gastos.toLocaleString()}`;
+        document.getElementById('val-utilidad').innerText = `$${utilidad.toLocaleString()}`;
+        
+        // Color dinámico según el resultado
+        const utilElement = document.getElementById('val-utilidad');
+        utilElement.style.color = utilidad < 0 ? 'var(--terracota)' : 'var(--dorado)';
+    };
+
+</script>
 
 </script>
 </script>
 </body>
 </html>
+
 
 
 
