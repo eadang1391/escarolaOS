@@ -33,42 +33,48 @@
     </div>
     
     <div id="dashboard">
-        <div id="seccion-admin" style="display: none; width: 100%; max-width: 500px; margin: 0 auto;">
-    
-    <div class="stat-card" style="margin-bottom: 20px;">
-        <h3 style="color: var(--dorado);">➕ Registrar Personal</h3>
-        <input type="text" id="reg-nombre" placeholder="Nombre" style="width: 80%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: none;">
-        <input type="number" id="reg-pin" placeholder="PIN (4 dígitos)" style="width: 80%; padding: 10px; margin-bottom: 10px; border-radius: 10px; border: none;">
-        
-        <p style="color: var(--cantera); font-size: 0.8rem;">Selecciona Rol:</p>
-        <div id="selector-roles" style="display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 15px;">
-            <button class="rol-btn" onclick="seleccionarRol('Socio', this)">Socio</button>
-            <button class="rol-btn" onclick="seleccionarRol('Chef', this)">Chef</button>
-            <button class="rol-btn" onclick="seleccionarRol('Barista', this)">Barista</button>
-            <button class="rol-btn" onclick="seleccionarRol('Barman', this)">Barman</button>
-            <button class="rol-btn" onclick="seleccionarRol('Staff', this)">Staff</button>
+    <h1 style="color: var(--verde-bosque); margin-bottom: 30px;">EscarolaOS</h1>
+
+    <div class="finance-grid">
+        <div class="stat-card" id="card-ingresos">
+            <p>Ingresos Totales</p>
+            <div class="stat-amount">$0.00</div>
+            <button class="edit-btn">✎</button>
         </div>
+        </div>
+
+    <div class="stat-card" id="seccion-admin" style="margin-top: 20px; text-align: left;">
+        <h3 style="color: var(--dorado); margin-top: 0;">👥 Gestión de Personal</h3>
         
-        <button onclick="guardarNuevoUsuario()" style="background: var(--dorado); color: var(--negro-profundo); border: none; padding: 12px 25px; border-radius: 10px; font-weight: bold; cursor: pointer;">
-            GUARDAR COLABORADOR
-        </button>
+        <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px;">
+            <input type="text" id="reg-nombre" placeholder="Nombre completo" class="input-elegante">
+            <input type="number" id="reg-pin" placeholder="PIN de 4 dígitos" class="input-elegante">
+            
+            <div id="selector-roles" style="display: flex; flex-wrap: wrap; gap: 5px; justify-content: center;">
+                <button class="rol-btn" onclick="seleccionarRol('Socio', this)">Socio</button>
+                <button class="rol-btn" onclick="seleccionarRol('Chef', this)">Chef</button>
+                <button class="rol-btn" onclick="seleccionarRol('Barista', this)">Barista</button>
+                <button class="rol-btn" onclick="seleccionarRol('Barman', this)">Barman</button>
+                <button class="rol-btn" onclick="seleccionarRol('Staff', this)">Staff</button>
+            </div>
+            
+            <button onclick="guardarNuevoUsuario()" class="key" style="width: 100%; height: 50px; background: var(--dorado); color: var(--negro-profundo); font-weight: bold; margin-top: 10px;">
+                GUARDAR COLABORADOR
+            </button>
+        </div>
+
+        <h4 style="color: var(--cantera); border-top: 1px solid rgba(197,160,89,0.3); padding-top: 15px;">Colaboradores Activos</h4>
+        <div id="lista-personal-db">
+            </div>
     </div>
 
-    <div class="stat-card">
-        <h3 style="color: var(--dorado);">👥 Personal Activo</h3>
-        <div id="lista-personal-db" style="text-align: left;">
-            <p style="color: var(--cantera);">Cargando lista...</p>
+    <div class="stat-card" id="seccion-checklists" style="margin-top: 20px;">
+        <h3 style="color: var(--dorado);">🧹 Checklists Diarios</h3>
+        <div id="contenedor-tareas">
+            <p style="color: var(--cantera); font-size: 0.8rem;">Cargando tareas...</p>
         </div>
     </div>
 </div>
-        <h1 style="color: var(--verde-bosque);">EscarolaOS</h1>
-        <div class="finance-grid">
-            <div class="stat-card">
-                <p>Ingresos Totales</p>
-                <div class="stat-amount">$0.00</div>
-                <button class="edit-btn">✎</button>
-            </div>
-        </div>
         <button onclick="location.reload()" style="background: var(--terracota); color: white; border: none; padding: 10px 20px; border-radius: 10px;">SALIR</button>
     </div>
 
@@ -144,6 +150,7 @@ window.notificar = (mensaje, esError = false) => {
 </script>
 </body>
 </html>
+
 
 
 
