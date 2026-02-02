@@ -268,9 +268,27 @@ function actualizarInterfaz() {
             window.borrar();
         }
     }
+        // ... (aquí estarían tus otras funciones como verificarAcceso)
+
+    // --- PUNTO 3: CÁLCULO DE UTILIDAD ---
+    window.actualizarFinanzasUI = (ingresos, gastos) => {
+        const utilidad = ingresos - gastos;
+        
+        // Actualiza los textos en las tarjetas que diseñamos
+        document.getElementById('val-ingresos').innerText = `$${ingresos.toLocaleString()}`;
+        document.getElementById('val-gastos').innerText = `$${gastos.toLocaleString()}`;
+        document.getElementById('val-utilidad').innerText = `$${utilidad.toLocaleString()}`;
+        
+        // Color dinámico: Rojo si es pérdida, Dorado si es ganancia
+        const utilElement = document.getElementById('val-utilidad');
+        utilElement.style.color = utilidad < 0 ? 'var(--terracota)' : 'var(--dorado)';
+    };
+
+</script>
 </script>
 </body>
 </html>
+
 
 
 
