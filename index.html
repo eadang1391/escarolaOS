@@ -268,6 +268,30 @@ function actualizarInterfaz() {
             window.borrar();
         }
     }
+        window.calcularFinanzasReales = async () => {
+    try {
+        let totalIngresos = 0;
+        let totalGastos = 0;
+
+        // 1. Sumar Ingresos (Pagos de planes/clases)
+        const qIngresos = await getDocs(collection(db, "pagos"));
+        qIngresos.forEach(doc => {
+            totalIngresos += Number(doc.data().monto || 0);
+        });
+
+        // 2. Sumar Gastos (Insumos, renta, etc.)
+        const qGastos = await getDocs(collection(db, "gastos"));
+        qGastos.forEach(doc => {
+            totalGastos += Number(doc.data().monto || 0);
+        });
+
+        // 3. Mandar los totales a la interfaz que pegamos antes
+        window.actualizarFinanzasUI(totalIngresos, totalGastos);
+
+    } catch (error) {
+        console.error("Error calculando finanzas:", error);
+    }
+};
         // ... (aquí estarían tus otras funciones como verificarAcceso)
 
     // --- PUNTO 3: CÁLCULO DE UTILIDAD ---
@@ -288,6 +312,7 @@ function actualizarInterfaz() {
 </script>
 </body>
 </html>
+
 
 
 
