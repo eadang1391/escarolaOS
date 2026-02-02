@@ -104,7 +104,53 @@
 </div>
 
     <script type="module">
-    import { db, doc, getDoc } from './firebase-config.js';
+    // Importamos las nuevas funciones desde tu archivo config
+    import { 
+        db, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc 
+    } from './firebase-config.js';
+
+    let pinIngresado = "";
+    let rolSeleccionado = ""; // Recuerda agregar esta variable
+
+    // --- LÓGICA DE SELECCIÓN DE ROLES (Visual) ---
+    window.seleccionarRol = (rol, elemento) => {
+        document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
+        elemento.classList.add('active');
+        rolSeleccionado = rol;
+    };
+
+    // --- FUNCIÓN PARA GUARDAR (Actualizada) ---
+    window.guardarNuevoUsuario = async () => {
+        const nombre = document.getElementById('reg-nombre').value;
+        const pin = document.getElementById('reg-pin').value;
+
+        if (!nombre || pin.length !== 4 || !rolSeleccionado) {
+            window.notificar("⚠️ Completa nombre, PIN y elige un puesto", true);
+            return;
+        }
+
+        try {
+            // Usamos addDoc que ahora sí viene importado
+            await addDoc(collection(db, "usuarios"), {
+                nombre: nombre,
+                pin: pin,
+                rol: rolSeleccionado,
+                creado: new Date().toISOString()
+            });
+
+            window.notificar(`✅ ${nombre} registrado como ${rolSeleccionado}`);
+            
+            // Limpiar campos
+            document.getElementById('reg-nombre').value = "";
+            document.getElementById('reg-pin').value = "";
+            document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
+            rolSeleccionado = "";
+
+        } catch (error) {
+            console.error(error);
+            window.notificar("❌ Error de conexión con la base de datos", true);
+        }
+    };
 
     let pinIngresado = "";
 
@@ -222,6 +268,7 @@ window.guardarNuevoUsuario = async () => {
 </script>
 </body>
 </html>
+
 
 
 
