@@ -249,6 +249,9 @@ function actualizarInterfaz() {
                 // Cambiar de pantalla
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
+                if (usuario.rol === 'Socio') {
+    window.cargarPersonal(); // <--- Carga los nombres solo si es Socio
+}
 
                 // Solo el Socio ve la gestión de personal (ID: seccion-admin)
                 const seccionAdmin = document.getElementById('seccion-admin');
@@ -268,6 +271,7 @@ function actualizarInterfaz() {
 </script>
 </body>
 </html>
+
 
 
 
