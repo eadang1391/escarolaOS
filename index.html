@@ -103,114 +103,125 @@
     </div>
 </div>
 
-    // 1. Importaciones únicas
-import { 
-    db, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc 
-} from './firebase-config.js';
+    <script type="module">
+    // 1. IMPORTACIONES (Desde tu archivo de configuración)
+    import { 
+        db, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc 
+    } from './firebase-config.js';
 
-// 2. Variables de estado (Solo una vez)
-let pinIngresado = "";
-let rolSeleccionado = "";
+    // 2. VARIABLES DE ESTADO (Globales dentro del módulo)
+    let pinIngresado = "";
+    let rolSeleccionado = "";
 
-// 3. Notificaciones Toast
-window.notificar = (mensaje, esError = false) => {
-    const aviso = document.createElement("div");
-    aviso.className = "toast";
-    if(esError) aviso.style.backgroundColor = "var(--terracota)";
-    aviso.innerText = mensaje;
-    document.body.appendChild(aviso);
-    setTimeout(() => {
-        aviso.style.opacity = "0";
-        aviso.style.transition = "0.5s";
-        setTimeout(() => aviso.remove(), 500);
-    }, 3000);
-};
+    // 3. SISTEMA DE NOTIFICACIONES (Toasts)
+    window.notificar = (mensaje, esError = false) => {
+        const aviso = document.createElement("div");
+        aviso.className = "toast";
+        if(esError) aviso.style.backgroundColor = "var(--terracota)";
+        aviso.innerText = mensaje;
+        document.body.appendChild(aviso);
+        setTimeout(() => {
+            aviso.style.opacity = "0";
+            aviso.style.transition = "0.5s";
+            setTimeout(() => aviso.remove(), 500);
+        }, 3000);
+    };
 
-// 4. Lógica de Selección de Roles
-window.seleccionarRol = (rol, elemento) => {
-    document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
-    elemento.classList.add('active');
-    rolSeleccionado = rol;
-};
-
-// 5. Lógica para Guardar Personal
-window.guardarNuevoUsuario = async () => {
-    const nombre = document.getElementById('reg-nombre').value;
-    const pin = document.getElementById('reg-pin').value;
-
-    if (!nombre || pin.length !== 4 || !rolSeleccionado) {
-        window.notificar("⚠️ Completa nombre, PIN (4 dígitos) y selecciona un puesto", true);
-        return;
-    }
-
-    try {
-        await addDoc(collection(db, "usuarios"), {
-            nombre: nombre, pin: pin, rol: rolSeleccionado, creado: new Date().toISOString()
-        });
-        window.notificar(`✅ ${nombre} registrado como ${rolSeleccionado}`);
-        document.getElementById('reg-nombre').value = "";
-        document.getElementById('reg-pin').value = "";
+    // 4. LÓGICA DE SELECCIÓN DE ROLES (Botones Chef, Barista, etc.)
+    window.seleccionarRol = (rol, elemento) => {
         document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
-        rolSeleccionado = "";
-    } catch (error) {
-        window.notificar("❌ Error al guardar", true);
-        console.error(error);
-    }
-};
+        elemento.classList.add('active');
+        rolSeleccionado = rol;
+    };
 
-// 6. Lógica del PINpad
-window.tecleo = (num) => {
-    if (pinIngresado.length < 4) {
-        pinIngresado += num;
+    // 5. LÓGICA PARA GUARDAR PERSONAL NUEVO
+    window.guardarNuevoUsuario = async () => {
+        const nombre = document.getElementById('reg-nombre').value;
+        const pin = document.getElementById('reg-pin').value;
+
+        if (!nombre || pin.length !== 4 || !rolSeleccionado) {
+            window.notificar("⚠️ Completa nombre, PIN (4 dígitos) y puesto", true);
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, "usuarios"), {
+                nombre: nombre,
+                pin: pin,
+                rol: rolSeleccionado,
+                creado: new Date().toISOString()
+            });
+
+            window.notificar(`✅ ${nombre} registrado como ${rolSeleccionado}`);
+
+            // Limpiar formulario
+            document.getElementById('reg-nombre').value = "";
+            document.getElementById('reg-pin').value = "";
+            document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
+            rolSeleccionado = "";
+        } catch (error) {
+            console.error("Error al guardar:", error);
+            window.notificar("❌ Error al guardar en base de datos", true);
+        }
+    };
+
+    // 6. LÓGICA DEL PINPAD (Tecleo y Borrado)
+    window.tecleo = (num) => {
+        if (pinIngresado.length < 4) {
+            pinIngresado += num;
+            actualizarInterfaz();
+            if (pinIngresado.length === 4) {
+                setTimeout(verificarAcceso, 200);
+            }
+        }
+    };
+
+    window.borrar = () => {
+        pinIngresado = "";
         actualizarInterfaz();
-        if (pinIngresado.length === 4) {
-            setTimeout(verificarAcceso, 200);
+    };
+
+    function actualizarInterfaz() {
+        for (let i = 0; i < 4; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            if(dot) dot.classList.toggle('filled', i < pinIngresado.length);
         }
     }
-};
 
-window.borrar = () => {
-    pinIngresado = "";
-    actualizarInterfaz();
-};
+    // 7. VERIFICACIÓN DE ACCESO (Login con Firebase)
+    async function verificarAcceso() {
+        try {
+            // Buscamos en la colección 'usuarios' cualquier documento que coincida con el PIN
+            const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
+            const querySnapshot = await getDocs(q);
 
-function actualizarInterfaz() {
-    for (let i = 0; i < 4; i++) {
-        const dot = document.getElementById(`dot-${i}`);
-        if(dot) dot.classList.toggle('filled', i < pinIngresado.length);
-    }
-}
+            if (!querySnapshot.empty) {
+                const usuario = querySnapshot.docs[0].data();
+                window.notificar("¡Bienvenido, " + usuario.nombre + "!");
+                
+                // Cambiar de pantalla
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
 
-// 7. Verificación de Acceso (Busca en toda la colección de usuarios)
-async function verificarAcceso() {
-    try {
-        const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
-        const querySnapshot = await getDocs(q);
-
-        if (!querySnapshot.empty) {
-            const usuario = querySnapshot.docs[0].data();
-            window.notificar("¡Bienvenido, " + usuario.nombre + "!");
-            
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('dashboard').style.display = 'block';
-
-            // Solo el Socio ve la gestión de personal
-            const seccionAdmin = document.getElementById('seccion-admin');
-            if (seccionAdmin) {
-                seccionAdmin.style.display = (usuario.rol === 'Socio') ? 'block' : 'none';
+                // Solo el Socio ve la gestión de personal (ID: seccion-admin)
+                const seccionAdmin = document.getElementById('seccion-admin');
+                if (seccionAdmin) {
+                    seccionAdmin.style.display = (usuario.rol === 'Socio') ? 'block' : 'none';
+                }
+            } else {
+                window.notificar("PIN Incorrecto", true);
+                window.borrar();
             }
-        } else {
-            window.notificar("PIN Incorrecto", true);
+        } catch (error) {
+            console.error("Error de acceso:", error);
+            window.notificar("❌ Error de conexión", true);
             window.borrar();
         }
-    } catch (error) {
-        console.error("Error:", error);
-        window.notificar("Error de conexión", true);
     }
-};
 </script>
 </body>
 </html>
+
 
 
 
