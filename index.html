@@ -241,31 +241,33 @@
         let pinIngresado = "";
         let usuarioActual = null;
 
-        // 1. RELOJ Y FECHA REAL
+        // --- 1. RELOJ Y NAVEGACIÓN ---
         setInterval(() => {
             const now = new Date();
-            if(document.getElementById('current-time')){
-                document.getElementById('current-time').innerText = now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'});
+            const clock = document.getElementById('current-time');
+            if(clock) {
+                clock.innerText = now.toLocaleTimeString();
                 document.getElementById('current-date').innerText = now.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
             }
         }, 1000);
 
-        // 2. SISTEMA DE NOTIFICACIONES TIPO POP-UP
-        window.notificar = (msg, err = false) => {
-            const t = document.createElement("div");
-            t.className = "toast";
-            t.style.cssText = `position:fixed; bottom:100px; left:50%; transform:translateX(-50%); background:${err ? 'var(--terracota)' : 'var(--dorado)'}; color:var(--verde-oscuro); padding:15px 30px; border-radius:50px; font-weight:bold; z-index:5000; box-shadow:0 5px 15px rgba(0,0,0,0.3);`;
-            t.innerText = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
+        window.showTab = (tabId) => {
+            if(!usuarioActual) return;
+            if(usuarioActual.rol !== 'Socio' && (tabId === 'finanzas' || tabId === 'admin')) {
+                window.notificar("🚫 Acceso restringido", true);
+                return;
+            }
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
         };
 
-        // 3. TECLADO PIN
+        // --- 2. LOGIN Y PINPAD ---
         window.tecleo = (n) => {
             if(pinIngresado.length < 4) {
                 pinIngresado += n;
                 actualizarDots();
-                if(pinIngresado.length === 4) setTimeout(verificarAcceso, 250);
+                if(pinIngresado.length === 4) setTimeout(verificarAcceso, 200);
             }
         };
         window.borrar = () => { pinIngresado = ""; actualizarDots(); };
@@ -276,7 +278,6 @@
             }
         }
 
-        // 4. VERIFICAR ACCESO Y ROLES
         async function verificarAcceso() {
             const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
             const snap = await getDocs(q);
@@ -285,131 +286,117 @@
                 usuarioActual = { id: d.id, ...d.data() };
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-nav').style.display = 'grid';
-                
-                // Si es Socio, activar herramientas especiales
-                if(usuarioActual.rol === 'Socio') {
-                    document.getElementById('nomina-socio').style.display = 'block';
-                    document.getElementById('btn-add-evento').style.display = 'block';
-                    window.cargarPersonal();
-                    window.cargarNomina();
-                } else {
-                    document.getElementById('btn-add-evento').style.display = 'none';
-                }
-                
+                window.notificar(`Bienvenido ${usuarioActual.nombre}`);
                 showTab(usuarioActual.rol === 'Socio' ? 'finanzas' : 'reloj');
-                window.notificar(`¡Hola, ${usuarioActual.nombre}!`);
-                window.cargarEventos();
-                window.cargarReservas();
+                if(usuarioActual.rol === 'Socio') { window.cargarPersonal(); window.cargarNomina(); }
             } else {
                 window.notificar("PIN Incorrecto", true);
                 window.borrar();
             }
         }
 
-        // 5. NAVEGACIÓN PROTEGIDA
-        window.showTab = (tabId) => {
-            if(usuarioActual.rol !== 'Socio' && (tabId === 'finanzas' || tabId === 'admin')) {
-                window.notificar("🚫 Acceso exclusivo para Socios", true);
-                return;
-            }
-            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).style.display = 'block';
-            // Activar ícono
-            const tabs = document.querySelectorAll('.tab-item');
-            tabs.forEach(t => { if(t.innerText.toLowerCase().includes(tabId)) t.classList.add('active'); });
-        };
-
-        // 6. RELOJ CHECADOR (ENTRADA/SALIDA)
+        // --- 3. RELOJ CHECADOR (BOTONES CORREGIDOS) ---
         window.registrarAsistencia = async (tipo) => {
             if(!usuarioActual) return;
             try {
+                // Verificar checklist antes de salir
+                if(tipo === 'SALIDA') {
+                    const confirmCheck = confirm("¿Completaste tu Checklist de Limpieza?");
+                    if(!confirmCheck) return;
+                }
+
                 const q = query(collection(db, "asistencias"), where("uid", "==", usuarioActual.id), orderBy("timestamp", "desc"), limit(1));
                 const snap = await getDocs(q);
                 const ultimo = !snap.empty ? snap.docs[0].data().tipo : 'SALIDA';
 
-                if(tipo === ultimo) return window.notificar(`⚠️ Ya marcaste ${tipo}`, true);
+                if(tipo === ultimo) {
+                    window.notificar(`⚠️ Ya marcaste ${tipo}`, true);
+                    return;
+                }
 
                 await addDoc(collection(db, "asistencias"), {
                     uid: usuarioActual.id, nombre: usuarioActual.nombre, tipo, 
-                    timestamp: new Date().toISOString(), fecha: new Date().toLocaleDateString(),
-                    pagado: false // Para control de nómina
+                    timestamp: new Date().toISOString(), pagado: false
                 });
-                window.notificar(`✅ ${tipo} registrada`);
-                if(usuarioActual.rol === 'Socio') window.cargarNomina();
-            } catch (e) { console.error(e); }
+                window.notificar(`✨ ${tipo} exitosa`);
+            } catch (e) { window.notificar("Error al registrar", true); }
         };
 
-        // 7. NÓMINA CON BOTÓN DE PAGADO
-        window.cargarNomina = async () => {
-            const cont = document.getElementById('lista-nomina');
-            if(!cont) return;
-            cont.innerHTML = "<p class='text-small'>Calculando haberes...</p>";
-            
-            const snap = await getDocs(collection(db, "asistencias"));
-            const users = await getDocs(collection(db, "usuarios"));
-            
-            let html = "";
-            // Lógica simplificada de horas (Próximamente reporte detallado)
-            users.forEach(uDoc => {
-                const u = uDoc.data();
-                if(u.rol !== 'Socio') {
-                    html += `
-                        <div class="card" style="background:rgba(0,0,0,0.2); margin-top:10px;">
-                            <div class="flex-between">
-                                <span><b>${u.nombre}</b></span>
-                                <button class="btn-pill btn-gold" style="padding:5px 15px; font-size:0.6rem;" onclick="marcarComoPagado('${uDoc.id}')">PAGAR</button>
-                            </div>
-                            <small class="text-gold">$${u.sueldo || 0} / hr</small>
-                        </div>
-                    `;
-                }
-            });
-            cont.innerHTML = html;
+        // --- 4. MODALES Y RECETARIO (IMPORTAR EXCEL) ---
+        window.abrirModalReceta = () => {
+            abrirModal(`
+                <h3 class="text-gold">Gestión de Recetas</h3>
+                <div class="card" style="background:var(--verde-bosque)">
+                    <p class="text-small">Importar Recetario (Excel/CSV):</p>
+                    <input type="file" id="excel-input" accept=".csv, .xlsx" style="font-size:0.8rem">
+                    <button class="btn-pill btn-gold" style="width:100%" onclick="procesarExcel()">SUBIR EXCEL</button>
+                </div>
+                <hr style="border:0.5px solid var(--blanco-trans)">
+                <button class="btn-pill btn-green" style="width:100%" onclick="notificar('Función Manual activada')">+ Crear Manual</button>
+            `);
         };
 
-        // 8. MODALES UNIVERSALES
-        window.abrirModalEvento = () => {
-            document.getElementById('modal-universal').style.display = 'flex';
-            document.getElementById('modal-body').innerHTML = `
-                <h3 class="text-gold">Nuevo Evento</h3>
-                <input type="text" id="ev-titulo" placeholder="Nombre del Evento">
-                <input type="date" id="ev-fecha">
-                <button class="btn-pill btn-gold" style="width:100%" onclick="guardarEvento()">GUARDAR EVENTO</button>
-            `;
+        // --- 5. CHECKLIST DE LIMPIEZA ---
+        window.abrirModalChecklist = () => {
+            abrirModal(`
+                <h3 class="text-gold">Checklist de Limpieza</h3>
+                <div style="text-align:left">
+                    <label><input type="checkbox"> Limpieza de Estación</label><br>
+                    <label><input type="checkbox"> Lavado de loza</label><br>
+                    <label><input type="checkbox"> Sacar basura</label><br>
+                    <label><input type="checkbox"> Barrido y trapeado</label>
+                </div>
+                <button class="btn-pill btn-gold" style="width:100%; margin-top:15px" onclick="cerrarModal()">GUARDAR</button>
+            `);
         };
 
+        // --- 6. UTILIDADES ---
+        window.abrirModal = (contenido) => {
+            const modal = document.getElementById('modal-universal');
+            document.getElementById('modal-body').innerHTML = contenido;
+            modal.style.display = 'flex';
+        };
         window.cerrarModal = () => { document.getElementById('modal-universal').style.display = 'none'; };
-
-        // 9. CARGAR PERSONAL EN ADMIN
-        window.cargarPersonal = async () => {
-            const snap = await getDocs(collection(db, "usuarios"));
-            const cont = document.getElementById('lista-personal-db');
-            cont.innerHTML = "<h3>Equipo Escarola</h3>";
-            snap.forEach(d => {
-                const u = d.data();
-                cont.innerHTML += `<div class="flex-between" style="padding:10px 0; border-bottom:1px solid var(--blanco-trans)">
-                    <span>${u.nombre} <small class="text-gold">(${u.rol})</small></span>
-                    <button onclick="eliminarUsuario('${d.id}')" style="background:none; border:none; color:var(--terracota)">✕</button>
-                </div>`;
-            });
+        window.notificar = (msg, err = false) => {
+            const t = document.createElement("div");
+            t.style.cssText = `position:fixed; bottom:110px; left:50%; transform:translateX(-50%); background:${err?'var(--terracota)':'var(--dorado)'}; color:var(--verde-oscuro); padding:12px 25px; border-radius:50px; z-index:9999; font-weight:bold;`;
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
         };
 
+        // --- 7. ADMIN Y NÓMINA ---
         window.guardarNuevoUsuario = async () => {
             const n = document.getElementById('reg-nombre').value;
             const p = document.getElementById('reg-pin').value;
             const r = document.getElementById('reg-rol').value;
             const s = document.getElementById('reg-sueldo').value;
-            if(!n || !p || !s) return window.notificar("Completa los campos", true);
+            if(!n || !p || !s) return notificar("Faltan datos", true);
             await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, rol: r, sueldo: Number(s) });
-            window.notificar("✅ Colaborador añadido");
+            notificar("✅ Guardado");
             window.cargarPersonal();
         };
 
-        window.eliminarUsuario = async (id) => {
-            if(confirm("¿Eliminar usuario?")) { await deleteDoc(doc(db, "usuarios", id)); window.cargarPersonal(); }
+        window.cargarPersonal = async () => {
+            const snap = await getDocs(collection(db, "usuarios"));
+            const cont = document.getElementById('lista-personal-db');
+            if(!cont) return;
+            cont.innerHTML = "<h3>Personal</h3>";
+            snap.forEach(d => {
+                const u = d.data();
+                cont.innerHTML += `<div class="flex-between" style="margin-bottom:10px">
+                    <span>${u.nombre} ($${u.sueldo}/hr)</span>
+                    <button class="btn-pill btn-red" style="padding:5px 10px" onclick="eliminarUsuario('${d.id}')">✕</button>
+                </div>`;
+            });
         };
 
+        window.eliminarUsuario = async (id) => {
+            if(confirm("¿Borrar?")) { await deleteDoc(doc(db, "usuarios", id)); window.cargarPersonal(); }
+        };
+
+        // Vincular funciones a la ventana para que los botones las vean
+        window.verificarAcceso = verificarAcceso;
     </script>
-</body>
 </html>
+
