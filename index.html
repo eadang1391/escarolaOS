@@ -6,11 +6,11 @@
     <title>EscarolaOS</title>
     <style>
         :root {
-            --verde-bosque: #1b3022; /* Fondo principal */
-            --verde-oscuro: #14241a; /* Variación para tarjetas */
-            --terracota: #b0413e;    /* Alertas y gastos */
-            --cantera: #d9d4c7;      /* Textos y detalles */
-            --dorado: #d4af37;       /* Acentos y títulos */
+            --verde-bosque: #1b3022;
+            --verde-oscuro: #14241a;
+            --terracota: #b0413e;
+            --cantera: #d9d4c7;
+            --dorado: #d4af37;
             --negro: #0a0a0a;
         }
 
@@ -22,7 +22,7 @@
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* --- LOGIN SCREEN (PALETA ESCAROLA) --- */
+        /* --- LOGIN --- */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--verde-bosque);
@@ -30,27 +30,22 @@
             align-items: center; justify-content: center; z-index: 2000;
         }
 
-        .logo { font-size: 2.2rem; letter-spacing: 5px; margin-bottom: 20px; color: var(--cantera); }
+        .logo { font-size: 2.2rem; letter-spacing: 5px; margin-bottom: 20px; }
         .logo strong { color: var(--dorado); }
 
         .pin-dots { display: flex; gap: 18px; margin-bottom: 40px; }
         .dot { width: 16px; height: 16px; border: 2px solid var(--dorado); border-radius: 50%; }
         .dot.filled { background-color: var(--dorado); box-shadow: 0 0 10px var(--dorado); }
 
-        .pinpad {
-            display: grid; grid-template-columns: repeat(3, 85px); gap: 20px;
-        }
+        .pinpad { display: grid; grid-template-columns: repeat(3, 85px); gap: 20px; }
 
         .btn-pin {
             width: 85px; height: 85px; border-radius: 50%;
-            border: 1px solid var(--dorado);
-            background: rgba(212, 175, 55, 0.05);
+            border: 1px solid var(--dorado); background: rgba(212, 175, 55, 0.05);
             color: var(--cantera); font-size: 1.6rem; cursor: pointer;
-            transition: 0.2s;
         }
-        .btn-pin:active { background: var(--dorado); color: var(--verde-bosque); }
 
-        /* --- NAVEGACIÓN (TABS VERDE/DORADO) --- */
+        /* --- NAV --- */
         .tab-bar {
             position: fixed; bottom: 0; width: 100%; max-width: 600px;
             background: var(--verde-oscuro); display: none;
@@ -58,37 +53,14 @@
             border-top: 1px solid var(--dorado); z-index: 1000;
         }
 
-        .tab-item {
-            padding: 15px 5px; text-align: center; font-size: 0.75rem;
-            color: var(--cantera); cursor: pointer; opacity: 0.5;
-        }
-
+        .tab-item { padding: 15px 5px; text-align: center; font-size: 0.75rem; color: var(--cantera); cursor: pointer; opacity: 0.5; }
         .tab-item.active { opacity: 1; color: var(--dorado); border-top: 3px solid var(--dorado); }
 
-        /* --- DASHBOARD Y SECCIONES --- */
-        .container {
-            width: 100%; max-width: 500px; padding: 25px;
-            padding-bottom: 110px; box-sizing: border-box; display: none;
-        }
-
-        .card {
-            background: var(--verde-oscuro); border-radius: 12px;
-            padding: 20px; margin-bottom: 20px;
-            border: 1px solid rgba(217, 212, 199, 0.1);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-        }
-
-        h2 { color: var(--dorado); font-weight: 300; letter-spacing: 1px; }
-
-        .finance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-        /* --- ELEMENTOS DE FORMULARIO --- */
-        input { 
-            width: 100%; padding: 14px; margin: 10px 0; 
-            background: var(--negro); border: 1px solid var(--verde-bosque); 
-            color: var(--cantera); border-radius: 8px; box-sizing: border-box; 
-        }
+        /* --- CONTENEDORES --- */
+        .container { width: 100%; max-width: 500px; padding: 25px; padding-bottom: 110px; box-sizing: border-box; display: none; }
+        .card { background: var(--verde-oscuro); border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid rgba(217, 212, 199, 0.1); }
         
+        input, select { width: 100%; padding: 14px; margin: 10px 0; background: var(--negro); border: 1px solid var(--verde-bosque); color: var(--cantera); border-radius: 8px; box-sizing: border-box; }
         .btn-gold { background: var(--dorado); color: var(--verde-bosque); padding: 14px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
         .btn-red { background: var(--terracota); color: var(--cantera); padding: 14px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
 
@@ -113,7 +85,7 @@
             <button class="btn-pin" onclick="tecleo('7')">7</button>
             <button class="btn-pin" onclick="tecleo('8')">8</button>
             <button class="btn-pin" onclick="tecleo('9')">9</button>
-            <button class="btn-pin" style="color:var(--terracota); border-color:var(--terracota)" onclick="borrar()">C</button>
+            <button class="btn-pin" style="color:var(--terracota)" onclick="borrar()">C</button>
             <button class="btn-pin" onclick="tecleo('0')">0</button>
             <button class="btn-pin" style="color:var(--dorado)" onclick="location.reload()">R</button>
         </div>
@@ -129,191 +101,152 @@
 
     <div id="finanzas" class="container">
         <h2>Finanzas</h2>
-        <div class="finance-grid">
-            <div class="card"><small>INGRESOS</small><h2 id="val-ingresos">$0</h2></div>
-            <div class="card"><small>GASTOS</small><h2 id="val-gastos" style="color:var(--terracota)">$0</h2></div>
-        </div>
         <div class="card" style="border-left: 5px solid var(--dorado);">
             <small>UTILIDAD NETA</small>
             <h2 id="val-utilidad" style="color:var(--dorado); font-size: 2.2rem;">$0</h2>
         </div>
     </div>
 
-    <div id="tareas" class="container"><h2>Checklist</h2></div>
     <div id="reloj" class="container">
-    <h2 style="text-align: center; letter-spacing: 2px;">RELOJ CHECADOR</h2>
-    
-    <div class="card" style="text-align: center; border-bottom: 3px solid var(--dorado);">
-        <div id="current-time" style="font-size: 2.5rem; color: var(--cantera); font-weight: bold;">00:00:00</div>
-        <div id="current-date" style="color: var(--dorado); font-size: 0.9rem;">FECHA</div>
-    </div>
-
-    <div class="card">
-        <div style="display: flex; gap: 15px;">
-            <button onclick="registrarAsistencia('ENTRADA')" style="background: var(--verde-bosque); color: var(--cantera); border: 1px solid var(--dorado); flex: 1; height: 60px; border-radius: 8px; font-weight: bold; cursor: pointer;">ENTRADA</button>
-            <button class="btn-red" onclick="registrarAsistencia('SALIDA')" style="flex: 1; height: 60px;">SALIDA</button>
+        <h2>Reloj Checador</h2>
+        <div class="card" style="text-align: center;">
+            <div id="current-time" style="font-size: 2.5rem; font-weight: bold;">00:00:00</div>
+            <div id="current-date" style="color: var(--dorado);">FECHA</div>
+        </div>
+        <div class="card">
+            <div style="display: flex; gap: 15px;">
+                <button onclick="registrarAsistencia('ENTRADA')" style="background: var(--verde-bosque); color: var(--cantera); border: 1px solid var(--dorado); flex: 1; height: 60px; border-radius: 8px; font-weight: bold;">ENTRADA</button>
+                <button class="btn-red" onclick="registrarAsistencia('SALIDA')" style="flex: 1; height: 60px;">SALIDA</button>
+            </div>
+        </div>
+        <div id="seccion-nomina-socio" style="display:none;" class="card">
+            <h3 style="color: var(--dorado); font-size: 0.8rem;">NÓMINA (Socio)</h3>
+            <div id="lista-nomina"></div>
         </div>
     </div>
 
-    <div id="seccion-nomina-socio" style="display:none;" class="card">
-        <h3 style="color: var(--dorado); font-size: 0.9rem;">💰 NÓMINA Y HORAS (VISTA SOCIO)</h3>
-        <div id="lista-nomina"></div>
-    </div>
-</div>
-    <div id="recetas" class="container"><h2>Recetas</h2></div>
     <div id="admin" class="container">
-    <h2>PANEL ADMIN</h2>
-    <div class="card">
-        <h3>+ REGISTRAR COLABORADOR</h3>
-        <input type="text" id="reg-nombre" placeholder="Nombre del empleado">
-        <input type="number" id="reg-pin" placeholder="PIN de 4 dígitos">
-        <input type="number" id="reg-sueldo" placeholder="Sueldo por hora $ (Ej: 50)">
-        <select id="reg-rol" style="width: 100%; padding: 12px; background: var(--negro); color: var(--cantera); border: 1px solid var(--verde-bosque); border-radius: 8px; margin: 10px 0;">
-            <option value="">Seleccionar Puesto...</option>
-            <option value="Socio">Socio</option>
-            <option value="Barman">Barman</option>
-            <option value="Chef">Chef</option>
-            <option value="Barista">Barista</option>
-            <option value="Staff">Staff</option>
-        </select>
-        <button class="btn-gold" onclick="guardarNuevoUsuario()">GUARDAR</button>
-    </div>
-    <div class="card">
+        <h2>Admin</h2>
+        <div class="card">
+            <input type="text" id="reg-nombre" placeholder="Nombre">
+            <input type="number" id="reg-pin" placeholder="PIN 4 dígitos">
+            <input type="number" id="reg-sueldo" placeholder="Sueldo por hora $">
+            <select id="reg-rol">
+                <option value="Socio">Socio</option>
+                <option value="Barman">Barman</option>
+                <option value="Chef">Chef</option>
+                <option value="Barista">Barista</option>
+                <option value="Staff">Staff</option>
+            </select>
+            <button class="btn-gold" onclick="guardarNuevoUsuario()">GUARDAR</button>
+        </div>
         <div id="lista-personal-db"></div>
     </div>
-</div>
+
+    <div id="tareas" class="container"><h2>Tareas</h2></div>
+    <div id="recetas" class="container"><h2>Recetas</h2></div>
 
     <script type="module">
-    import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, orderBy, limit } from './firebase-config.js';
+        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, orderBy, limit } from './firebase-config.js';
 
-let pinIngresado = "";
-let usuarioActual = null;
+        let pinIngresado = "";
+        let usuarioActual = null;
 
-// ACTUALIZAR RELOJ EN PANTALLA
-setInterval(() => {
-    const now = new Date();
-    if(document.getElementById('current-time')){
-        document.getElementById('current-time').innerText = now.toLocaleTimeString();
-        document.getElementById('current-date').innerText = now.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
-    }
-}, 1000);
+        setInterval(() => {
+            const now = new Date();
+            if(document.getElementById('current-time')){
+                document.getElementById('current-time').innerText = now.toLocaleTimeString();
+                document.getElementById('current-date').innerText = now.toLocaleDateString();
+            }
+        }, 1000);
 
-// NOTIFICACIONES
-window.notificar = (msg, err = false) => {
-    const t = document.createElement("div");
-    t.className = "toast";
-    if(err) t.style.background = "var(--terracota)";
-    t.innerText = msg;
-    document.body.appendChild(t);
-    setTimeout(() => t.remove(), 3000);
-};
+        window.notificar = (msg, err = false) => {
+            const t = document.createElement("div");
+            t.className = "toast";
+            if(err) t.style.background = "var(--terracota)";
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        };
 
-// TECLADO PIN
-window.tecleo = (n) => {
-    if(pinIngresado.length < 4) {
-        pinIngresado += n;
-        updateDots();
-        if(pinIngresado.length === 4) setTimeout(verificarAcceso, 200);
-    }
-};
-window.borrar = () => { pinIngresado = ""; updateDots(); };
-function updateDots() {
-    for(let i=0; i<4; i++) document.getElementById(`dot-${i}`).classList.toggle('filled', i < pinIngresado.length);
-}
+        window.tecleo = (n) => {
+            if(pinIngresado.length < 4) {
+                pinIngresado += n;
+                updateDots();
+                if(pinIngresado.length === 4) setTimeout(verificarAcceso, 200);
+            }
+        };
 
-// CAMBIAR PESTAÑAS
-window.showTab = (tabId) => {
-    document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
-    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-    document.getElementById(tabId).style.display = 'block';
-    if(event) event.currentTarget.classList.add('active');
-};
+        window.borrar = () => { pinIngresado = ""; updateDots(); };
 
-// VERIFICAR QUIÉN ENTRA
-async function verificarAcceso() {
-    const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
-    const snap = await getDocs(q);
-    if(!snap.empty) {
-        const d = snap.docs[0];
-        usuarioActual = { id: d.id, ...d.data() };
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-nav').style.display = 'grid';
-        showTab('finanzas');
-        
-        if(usuarioActual.rol === 'Socio') {
-            document.getElementById('seccion-nomina-socio').style.display = 'block';
-            window.calcularFinanzasReales();
-            window.cargarPersonal();
+        function updateDots() {
+            for(let i=0; i<4; i++) document.getElementById(`dot-${i}`).classList.toggle('filled', i < pinIngresado.length);
         }
-    } else {
-        window.notificar("PIN Incorrecto", true);
-        window.borrar();
-    }
-}
 
-// GUARDAR USUARIO CON SUELDO
-window.guardarNuevoUsuario = async () => {
-    const n = document.getElementById('reg-nombre').value;
-    const p = document.getElementById('reg-pin').value;
-    const r = document.getElementById('reg-rol').value;
-    const s = document.getElementById('reg-sueldo').value;
-    if(!n || p.length!==4 || !r || !s) return window.notificar("Faltan datos", true);
-    await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, rol: r, sueldo: Number(s) });
-    window.notificar("✅ Guardado");
-    window.cargarPersonal();
-};
+        window.showTab = (tabId) => {
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabId).style.display = 'block';
+        };
 
-// REGISTRAR ENTRADA/SALIDA (CON REGLAS)
-window.registrarAsistencia = async (tipo) => {
-    if(!usuarioActual) return;
+        async function verificarAcceso() {
+            const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
+            const snap = await getDocs(q);
+            if(!snap.empty) {
+                const d = snap.docs[0];
+                usuarioActual = { id: d.id, ...d.data() };
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-nav').style.display = 'grid';
+                showTab('finanzas');
+                if(usuarioActual.rol === 'Socio') {
+                    document.getElementById('seccion-nomina-socio').style.display = 'block';
+                    window.cargarPersonal();
+                }
+            } else {
+                window.notificar("PIN Incorrecto", true);
+                window.borrar();
+            }
+        }
 
-    // REGLA: No repetir entrada o salida
-    const q = query(collection(db, "asistencias"), where("uid", "==", usuarioActual.id), orderBy("timestamp", "desc"), limit(1));
-    const lastSnap = await getDocs(q);
-    const ultimo = !lastSnap.empty ? lastSnap.docs[0].data().tipo : 'SALIDA';
+        window.guardarNuevoUsuario = async () => {
+            const n = document.getElementById('reg-nombre').value;
+            const p = document.getElementById('reg-pin').value;
+            const r = document.getElementById('reg-rol').value;
+            const s = document.getElementById('reg-sueldo').value;
+            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, rol: r, sueldo: Number(s) });
+            window.notificar("✅ Guardado");
+            window.cargarPersonal();
+        };
 
-    if(tipo === ultimo) return window.notificar(`⚠️ Ya marcaste ${tipo}`, true);
+        window.registrarAsistencia = async (tipo) => {
+            if(!usuarioActual) return;
+            const q = query(collection(db, "asistencias"), where("uid", "==", usuarioActual.id), orderBy("timestamp", "desc"), limit(1));
+            const lastSnap = await getDocs(q);
+            const ultimo = !lastSnap.empty ? lastSnap.docs[0].data().tipo : 'SALIDA';
+            if(tipo === ultimo) return window.notificar(`⚠️ Ya marcaste ${tipo}`, true);
 
-    await addDoc(collection(db, "asistencias"), {
-        uid: usuarioActual.id, nombre: usuarioActual.nombre, tipo, timestamp: new Date().toISOString(), fecha: new Date().toLocaleDateString()
-    });
-    window.notificar(`✅ ${tipo} registrada`);
-};
+            await addDoc(collection(db, "asistencias"), {
+                uid: usuarioActual.id, nombre: usuarioActual.nombre, tipo, timestamp: new Date().toISOString()
+            });
+            window.notificar(`✅ ${tipo} registrada`);
+        };
 
-// LISTA DE PERSONAL
-window.cargarPersonal = async () => {
-    const snap = await getDocs(collection(db, "usuarios"));
-    const cont = document.getElementById('lista-personal-db');
-    cont.innerHTML = "";
-    snap.forEach(d => {
-        const u = d.data();
-        cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #333;">
-            <span>${u.nombre} (${u.rol}) - $${u.sueldo}/hr</span>
-            <button onclick="eliminarUsuario('${d.id}')" style="background:none; color:var(--terracota); border:none;">✕</button>
-        </div>`;
-    });
-};
+        window.cargarPersonal = async () => {
+            const snap = await getDocs(collection(db, "usuarios"));
+            const cont = document.getElementById('lista-personal-db');
+            cont.innerHTML = "";
+            snap.forEach(d => {
+                const u = d.data();
+                cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #333;">
+                    <span>${u.nombre} ($${u.sueldo}/hr)</span>
+                    <button onclick="eliminarUsuario('${d.id}')" style="background:none; color:var(--terracota); border:none;">✕</button>
+                </div>`;
+            });
+        };
 
-window.eliminarUsuario = async (id) => {
-    if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, "usuarios", id)); window.cargarPersonal(); }
-};
-
-// CALCULAR FINANZAS
-window.calcularFinanzasReales = async () => {
-    let i=0, g=0;
-    const qI = await getDocs(collection(db, "pagos"));
-    qI.forEach(d => i += Number(d.data().monto || 0));
-    const qG = await getDocs(collection(db, "gastos"));
-    qG.forEach(d => g += Number(d.data().monto || 0));
-    document.getElementById('val-ingresos').innerText = `$${i}`;
-    document.getElementById('val-gastos').innerText = `$${g}`;
-    document.getElementById('val-utilidad').innerText = `$${i-g}`;
-};
+        window.eliminarUsuario = async (id) => {
+            if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, "usuarios", id)); window.cargarPersonal(); }
+        };
     </script>
 </body>
 </html>
-
-
-
-
-
