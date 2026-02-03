@@ -301,13 +301,15 @@
         }
         setInterval(actualizarReloj, 1000);
 
-        // 2. CONTROL DEL PINPAD
+        // 2. CONTROL DEL PINPAD (CORREGIDO)
         window.tecleo = (n) => {
             if (pinIngresado.length < 4) {
                 pinIngresado += n;
                 actualizarPuntosPin();
                 if (pinIngresado.length === 4) {
-                    setTimeout(verificarCredenciales, 250);
+                    setTimeout(() => {
+                        window.verificarCredenciales();
+                    }, 250);
                 }
             }
         };
@@ -575,5 +577,6 @@
     </script>
 </body>
 </html>
+
 
 
