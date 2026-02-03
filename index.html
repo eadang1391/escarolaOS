@@ -280,3 +280,155 @@
             <div id="modal-body"></div>
         </div>
     </div>
+<script type="module">
+        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, setDoc, orderBy, limit } from './firebase-config.js';
+
+        // VARIABLES GLOBALES DE ESTADO
+        let pinIngresado = "";
+        let usuarioActual = null;
+        let tareasLimpiezaActuales = [];
+
+        // 1. RELOJ Y FECHA EN TIEMPO REAL
+        function actualizarReloj() {
+            const ahora = new Date();
+            const tiempoStr = ahora.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const fechaStr = ahora.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            
+            if(document.getElementById('current-time')) {
+                document.getElementById('current-time').innerText = tiempoStr;
+                document.getElementById('current-date').innerText = fechaStr.toUpperCase();
+            }
+        }
+        setInterval(actualizarReloj, 1000);
+
+        // 2. CONTROL DEL PINPAD
+        window.tecleo = (n) => {
+            if (pinIngresado.length < 4) {
+                pinIngresado += n;
+                actualizarPuntosPin();
+                if (pinIngresado.length === 4) {
+                    setTimeout(verificarCredenciales, 250);
+                }
+            }
+        };
+
+        window.borrarPin = () => {
+            pinIngresado = "";
+            actualizarPuntosPin();
+        };
+
+        function actualizarPuntosPin() {
+            for (let i = 0; i < 4; i++) {
+                const dot = document.getElementById(`dot-${i}`);
+                if (dot) {
+                    dot.classList.toggle('filled', i < pinIngresado.length);
+                }
+            }
+        }
+
+        // 3. VERIFICACIÓN DE ACCESO Y ROLES
+        async function verificarCredenciales() {
+            try {
+                const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
+                const snap = await getDocs(q);
+
+                if (!snap.empty) {
+                    const docUser = snap.docs[0];
+                    usuarioActual = { id: docUser.id, ...docUser.data() };
+                    
+                    // Configurar entorno según Rol
+                    aplicarPermisosRol();
+                    
+                    // Animación de salida del login
+                    document.getElementById('login-screen').style.transition = "0.5s";
+                    document.getElementById('login-screen').style.opacity = "0";
+                    setTimeout(() => {
+                        document.getElementById('login-screen').style.display = 'none';
+                        document.getElementById('main-nav').style.display = 'grid';
+                        
+                        // Ir a la pestaña principal del rol
+                        const tabInicial = (usuarioActual.rol === 'Socio') ? 'finanzas' : 'reloj';
+                        showTab(tabInicial);
+                        notificar(`¡Bienvenido, ${usuarioActual.nombre}!`, false);
+                        
+                        // Carga inicial de datos
+                        inicializarDatosApp();
+                    }, 500);
+                } else {
+                    notificar("PIN INCORRECTO", true);
+                    borrarPin();
+                }
+            } catch (error) {
+                console.error("Error Login:", error);
+                notificar("ERROR DE CONEXIÓN", true);
+            }
+        }
+
+        function aplicarPermisosRol() {
+            const esSocio = usuarioActual.rol === 'Socio';
+            
+            // Mostrar u ocultar elementos de admin
+            document.getElementById('area-nomina-socio').style.display = esSocio ? 'block' : 'none';
+            document.getElementById('btn-admin-evento').style.display = esSocio ? 'block' : 'none';
+            
+            // Ocultar botones de navegación restringida si no es socio
+            const tabs = document.querySelectorAll('.tab-item');
+            tabs.forEach(tab => {
+                const destino = tab.getAttribute('onclick').match(/'([^']+)'/)[1];
+                if ((destino === 'finanzas' || destino === 'admin') && !esSocio) {
+                    tab.style.display = 'none';
+                    // Reajustar grid de la barra para staff (solo 3 botones)
+                    document.getElementById('main-nav').style.gridTemplateColumns = 'repeat(3, 1fr)';
+                }
+            });
+        }
+
+        // 4. SISTEMA DE NAVEGACIÓN PROTEGIDA
+        window.showTab = (tabId) => {
+            // Protección extra por si intentan llamar la función desde consola
+            if ((tabId === 'finanzas' || tabId === 'admin') && usuarioActual.rol !== 'Socio') {
+                notificar("ACCESO DENEGADO", true);
+                return;
+            }
+
+            // Cambiar visibilidad
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            document.getElementById(tabId).style.display = 'block';
+
+            // Actualizar estado visual de la barra
+            document.querySelectorAll('.tab-item').forEach(t => {
+                t.classList.remove('active');
+                if (t.getAttribute('onclick').includes(tabId)) t.classList.add('active');
+            });
+            
+            window.scrollTo(0,0);
+        };
+
+        // 5. NOTIFICACIONES PREMIUM (TOASTS)
+        window.notificar = (msg, esError) => {
+            const toast = document.createElement("div");
+            toast.style.cssText = `
+                position: fixed; bottom: 120px; left: 50%; transform: translateX(-50%);
+                background: ${esError ? 'var(--terracota)' : 'var(--dorado)'};
+                color: var(--verde-oscuro); padding: 15px 30px; border-radius: 50px;
+                font-weight: bold; z-index: 9999; box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+                animation: slideUp 0.3s ease-out; font-size: 0.9rem; letter-spacing: 1px;
+            `;
+            toast.innerText = msg.toUpperCase();
+            document.body.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = "0";
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        };
+
+        // 6. FUNCIÓN DE CARGA INICIAL (Se completará en las siguientes partes)
+        function inicializarDatosApp() {
+            console.log("EscarolaOS inicializando módulos...");
+            // Aquí llamaremos a las cargas de eventos, nóminas y stock
+        }
+        
+        // Exportar funciones necesarias al objeto window
+        window.verificarCredenciales = verificarCredenciales;
+        window.borrarPin = borrarPin;
+    </script>
