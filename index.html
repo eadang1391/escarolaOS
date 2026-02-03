@@ -183,205 +183,135 @@
     </div>
 </div>
 
-    <script type="module">
-        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc } from './firebase-config.js';
+    import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, orderBy, limit } from './firebase-config.js';
 
-        let pinIngresado = "";
+let pinIngresado = "";
+let usuarioActual = null;
 
-        window.notificar = (msg, err = false) => {
-            const t = document.createElement("div");
-            t.className = "toast";
-            if(err) t.style.background = "var(--terracota)";
-            t.innerText = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        };
+// ACTUALIZAR RELOJ EN PANTALLA
+setInterval(() => {
+    const now = new Date();
+    if(document.getElementById('current-time')){
+        document.getElementById('current-time').innerText = now.toLocaleTimeString();
+        document.getElementById('current-date').innerText = now.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+    }
+}, 1000);
 
-        window.tecleo = (n) => {
-            if(pinIngresado.length < 4) {
-                pinIngresado += n;
-                updateDots();
-                if(pinIngresado.length === 4) setTimeout(verificarAcceso, 200);
-            }
-        };
+// NOTIFICACIONES
+window.notificar = (msg, err = false) => {
+    const t = document.createElement("div");
+    t.className = "toast";
+    if(err) t.style.background = "var(--terracota)";
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+};
 
-        window.borrar = () => { pinIngresado = ""; updateDots(); };
+// TECLADO PIN
+window.tecleo = (n) => {
+    if(pinIngresado.length < 4) {
+        pinIngresado += n;
+        updateDots();
+        if(pinIngresado.length === 4) setTimeout(verificarAcceso, 200);
+    }
+};
+window.borrar = () => { pinIngresado = ""; updateDots(); };
+function updateDots() {
+    for(let i=0; i<4; i++) document.getElementById(`dot-${i}`).classList.toggle('filled', i < pinIngresado.length);
+}
 
-        function updateDots() {
-            for(let i=0; i<4; i++) {
-                document.getElementById(`dot-${i}`).classList.toggle('filled', i < pinIngresado.length);
-            }
-        }
+// CAMBIAR PESTAÑAS
+window.showTab = (tabId) => {
+    document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).style.display = 'block';
+    if(event) event.currentTarget.classList.add('active');
+};
 
-        window.showTab = (tabId) => {
-            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).style.display = 'block';
-            if (event) event.currentTarget.classList.add('active');
-        };
-
-        async function verificarAcceso() {
-            try {
-                const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
-                const snap = await getDocs(q);
-                if(!snap.empty) {
-    const docUser = snap.docs[0];
-    usuarioActual = { id: docUser.id, ...docUser.data() }; // <-- GUARDAMOS AL USUARIO
-    
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-nav').style.display = 'grid';
-    showTab('finanzas');
-                    window.cargarHistorialReloj();
-                    if(u.rol === 'Socio') window.calcularFinanzasReales();
-                    window.cargarPersonal();
-                } else {
-                    window.notificar("PIN Incorrecto", true);
-                    window.borrar();
-                }
-            } catch(e) { window.notificar("Error de red", true); }
-        }
-
-        window.calcularFinanzasReales = async () => {
-            let i = 0, g = 0;
-            const qI = await getDocs(collection(db, "pagos"));
-            qI.forEach(d => i += Number(d.data().monto || 0));
-            const qG = await getDocs(collection(db, "gastos"));
-            qG.forEach(d => g += Number(d.data().monto || 0));
-            document.getElementById('val-ingresos').innerText = `$${i.toLocaleString()}`;
-            document.getElementById('val-gastos').innerText = `$${g.toLocaleString()}`;
-            document.getElementById('val-utilidad').innerText = `$${(i-g).toLocaleString()}`;
-        };
-        // --- LÓGICA DE ADMINISTRACIÓN ---
-
-        // Función para guardar en Firebase
-        window.guardarNuevoUsuario = async () => {
-            const nombre = document.getElementById('reg-nombre').value;
-            const pin = document.getElementById('reg-pin').value;
-            const rol = document.getElementById('reg-rol').value;
-
-            if(!nombre || pin.length !== 4 || !rol) {
-                window.notificar("⚠️ Completa todos los campos (PIN de 4 dígitos)", true);
-                return;
-            }
-
-            try {
-                await addDoc(collection(db, "usuarios"), {
-                    nombre: nombre,
-                    pin: pin,
-                    rol: rol,
-                    fechaRegistro: new Date().toISOString()
-                });
-                window.notificar("✅ Usuario registrado con éxito");
-                
-                // Limpiar campos
-                document.getElementById('reg-nombre').value = "";
-                document.getElementById('reg-pin').value = "";
-                document.getElementById('reg-rol').value = "";
-                
-                window.cargarPersonal(); // Recargar la lista
-            } catch (error) {
-                window.notificar("❌ Error al guardar", true);
-            }
-        };
-
-        // Función para cargar la lista de usuarios
-        window.cargarPersonal = async () => {
-            const listaContenedor = document.getElementById('lista-personal-db');
-            if (!listaContenedor) return;
-
-            const snap = await getDocs(collection(db, "usuarios"));
-            listaContenedor.innerHTML = ""; // Limpiar antes de cargar
-
-            snap.forEach(docSnap => {
-                const u = docSnap.data();
-                const id = docSnap.id;
-
-                listaContenedor.innerHTML += `
-                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(217,212,199,0.1);">
-                        <div>
-                            <strong style="color: var(--cantera)">${u.nombre}</strong><br>
-                            <small style="color: var(--dorado)">${u.rol}</small>
-                        </div>
-                        <button onclick="eliminarUsuario('${id}')" style="background: none; color: var(--terracota); border: none; cursor: pointer; font-size: 1.2rem;">✕</button>
-                    </div>
-                `;
-            });
-        };
-
-        // Función para eliminar usuario
-        window.eliminarUsuario = async (id) => {
-            if(confirm("¿Estás seguro de eliminar a este colaborador?")) {
-                try {
-                    await deleteDoc(doc(db, "usuarios", id));
-                    window.notificar("🗑️ Usuario eliminado");
-                    window.cargarPersonal();
-                } catch (error) {
-                    window.notificar("❌ Error al eliminar", true);
-                }
-            }
-        };
+// VERIFICAR QUIÉN ENTRA
+async function verificarAcceso() {
+    const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
+    const snap = await getDocs(q);
+    if(!snap.empty) {
+        const d = snap.docs[0];
+        usuarioActual = { id: d.id, ...d.data() };
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-nav').style.display = 'grid';
+        showTab('finanzas');
         
-        // Hacer que la lista se cargue si el socio entra al admin
-        // (Esto se dispara en la función verificarAcceso que ya tienes)
-        // --- LÓGICA DEL RELOJ CHECADOR ---
-        let usuarioActual = null; // Guardará los datos del que hizo login
+        if(usuarioActual.rol === 'Socio') {
+            document.getElementById('seccion-nomina-socio').style.display = 'block';
+            window.calcularFinanzasReales();
+            window.cargarPersonal();
+        }
+    } else {
+        window.notificar("PIN Incorrecto", true);
+        window.borrar();
+    }
+}
 
-        // Actualizador de hora en pantalla
-        setInterval(() => {
-            const now = new Date();
-            if(document.getElementById('current-time')) {
-                document.getElementById('current-time').innerText = now.toLocaleTimeString();
-                document.getElementById('current-date').innerText = now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
-            }
-        }, 1000);
+// GUARDAR USUARIO CON SUELDO
+window.guardarNuevoUsuario = async () => {
+    const n = document.getElementById('reg-nombre').value;
+    const p = document.getElementById('reg-pin').value;
+    const r = document.getElementById('reg-rol').value;
+    const s = document.getElementById('reg-sueldo').value;
+    if(!n || p.length!==4 || !r || !s) return window.notificar("Faltan datos", true);
+    await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, rol: r, sueldo: Number(s) });
+    window.notificar("✅ Guardado");
+    window.cargarPersonal();
+};
 
-        window.registrarAsistencia = async (tipo) => {
-            if (!usuarioActual) return window.notificar("⚠️ Error de sesión", true);
+// REGISTRAR ENTRADA/SALIDA (CON REGLAS)
+window.registrarAsistencia = async (tipo) => {
+    if(!usuarioActual) return;
 
-            try {
-                await addDoc(collection(db, "asistencias"), {
-                    uid: usuarioActual.id,
-                    nombre: usuarioActual.nombre,
-                    rol: usuarioActual.rol,
-                    tipo: tipo, // ENTRADA o SALIDA
-                    timestamp: new Date().toISOString(),
-                    fechaCorta: new Date().toLocaleDateString()
-                });
+    // REGLA: No repetir entrada o salida
+    const q = query(collection(db, "asistencias"), where("uid", "==", usuarioActual.id), orderBy("timestamp", "desc"), limit(1));
+    const lastSnap = await getDocs(q);
+    const ultimo = !lastSnap.empty ? lastSnap.docs[0].data().tipo : 'SALIDA';
 
-                window.notificar(`✅ ${tipo} registrada: ${usuarioActual.nombre}`);
-                window.cargarHistorialReloj();
-            } catch (error) {
-                window.notificar("❌ Error al registrar", true);
-            }
-        };
+    if(tipo === ultimo) return window.notificar(`⚠️ Ya marcaste ${tipo}`, true);
 
-        window.cargarHistorialReloj = async () => {
-            const contenedor = document.getElementById('historial-reloj-hoy');
-            if (!contenedor || !usuarioActual) return;
+    await addDoc(collection(db, "asistencias"), {
+        uid: usuarioActual.id, nombre: usuarioActual.nombre, tipo, timestamp: new Date().toISOString(), fecha: new Date().toLocaleDateString()
+    });
+    window.notificar(`✅ ${tipo} registrada`);
+};
 
-            const q = query(
-                collection(db, "asistencias"), 
-                where("uid", "==", usuarioActual.id),
-                where("fechaCorta", "==", new Date().toLocaleDateString())
-            );
+// LISTA DE PERSONAL
+window.cargarPersonal = async () => {
+    const snap = await getDocs(collection(db, "usuarios"));
+    const cont = document.getElementById('lista-personal-db');
+    cont.innerHTML = "";
+    snap.forEach(d => {
+        const u = d.data();
+        cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #333;">
+            <span>${u.nombre} (${u.rol}) - $${u.sueldo}/hr</span>
+            <button onclick="eliminarUsuario('${d.id}')" style="background:none; color:var(--terracota); border:none;">✕</button>
+        </div>`;
+    });
+};
 
-            const snap = await getDocs(q);
-            contenedor.innerHTML = "";
-            
-            snap.forEach(docSnap => {
-                const data = docSnap.data();
-                const hora = new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                contenedor.innerHTML += `
-                    <div style="display:flex; justify-content:space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
-                        <span>${data.tipo}</span>
-                        <span style="color:var(--dorado)">${hora}</span>
-                    </div>
-                `;
-            });
-        };
+window.eliminarUsuario = async (id) => {
+    if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, "usuarios", id)); window.cargarPersonal(); }
+};
+
+// CALCULAR FINANZAS
+window.calcularFinanzasReales = async () => {
+    let i=0, g=0;
+    const qI = await getDocs(collection(db, "pagos"));
+    qI.forEach(d => i += Number(d.data().monto || 0));
+    const qG = await getDocs(collection(db, "gastos"));
+    qG.forEach(d => g += Number(d.data().monto || 0));
+    document.getElementById('val-ingresos').innerText = `$${i}`;
+    document.getElementById('val-gastos').innerText = `$${g}`;
+    document.getElementById('val-utilidad').innerText = `$${i-g}`;
+};
     </script>
 </body>
 </html>
+
 
 
 
