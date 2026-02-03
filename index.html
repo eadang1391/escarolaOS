@@ -157,6 +157,105 @@
             t.style.background = error ? '#b0413e' : '#c5a059';
             setTimeout(() => { t.style.display = 'none'; }, 2000);
         }
+        // --- 1. LÓGICA DE NAVEGACIÓN Y ROLES ---
+        window.usuarioActual = null;
+
+        window.showTab = (tabId) => {
+            // Protección de Roles: Solo el Socio entra a Capital y Admin
+            if ((tabId === 'finanzas' || tabId === 'admin') && window.usuarioActual?.rol !== 'Socio') {
+                showToast("ACCESO RESTRINGIDO A SOCIOS", true);
+                return;
+            }
+
+            // Ocultar todas las secciones y quitar clase activa de los iconos
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+
+            // Mostrar la sección elegida
+            document.getElementById(tabId).style.display = 'block';
+            
+            // Poner el icono seleccionado en Dorado
+            const activeTab = Array.from(document.querySelectorAll('.tab-item')).find(t => t.onclick.toString().includes(tabId));
+            if(activeTab) activeTab.classList.add('active');
+            
+            window.scrollTo(0,0);
+        };
+
+        // --- 2. RELOJ DE ALTA PRECISIÓN ---
+        function iniciarReloj() {
+            setInterval(() => {
+                const ahora = new Date();
+                if(document.getElementById('clock-display')) {
+                    document.getElementById('clock-display').innerText = ahora.toLocaleTimeString('es-MX');
+                    document.getElementById('date-display').innerText = ahora.toLocaleDateString('es-MX', { 
+                        weekday: 'long', day: 'numeric', month: 'long' 
+                    }).toUpperCase();
+                }
+            }, 1000);
+        }
+
+        // --- 3. MODIFICACIÓN DEL ACCESO (REEMPLAZA TU FUNCIÓN checkAccess ANTERIOR) ---
+        window.checkAccess = async () => {
+            try {
+                showToast("VERIFICANDO...");
+                const q = query(collection(db, "usuarios"), where("pin", "==", currentPin));
+                const snap = await getDocs(q);
+
+                if (!snap.empty) {
+                    const docUser = snap.docs[0];
+                    window.usuarioActual = { id: docUser.id, ...docUser.data() };
+                    
+                    showToast(`¡HOLA, ${window.usuarioActual.nombre}!`);
+                    
+                    // 1. Ocultar Login
+                    document.getElementById('login-screen').style.display = 'none';
+                    // 2. Mostrar Barra de Navegación
+                    document.getElementById('main-nav').style.display = 'grid';
+                    
+                    // 3. Iniciar sistemas base
+                    iniciarReloj();
+                    
+                    // 4. Ir a la pestaña correspondiente según Rol
+                    if(window.usuarioActual.rol === 'Socio') {
+                        showTab('finanzas');
+                    } else {
+                        showTab('reloj');
+                        // Ajuste visual: Ocultar botones que el Staff no debe ver en la barra
+                        document.querySelectorAll('.tab-item').forEach(t => {
+                            if(t.onclick.toString().includes('finanzas') || t.onclick.toString().includes('admin')) {
+                                t.style.display = 'none';
+                            }
+                        });
+                        document.getElementById('main-nav').style.gridTemplateColumns = 'repeat(3, 1fr)';
+                    }
+                } else {
+                    showToast("PIN INCORRECTO", true);
+                    resetPin();
+                }
+            } catch (err) {
+                console.error(err);
+                showToast("ERROR DE CONEXIÓN", true);
+                resetPin();
+            }
+        };
+
+        // --- 4. UTILIDADES DE MODAL ---
+        window.openModal = (tipo) => {
+            const container = document.getElementById('modal-container');
+            const content = document.getElementById('modal-content');
+            container.style.display = 'flex';
+            
+            if(tipo === 'evento') {
+                content.innerHTML = `<h3 class="text-gold">Nuevo Evento</h3><input type="text" placeholder="Nombre Evento"><input type="date"><button class="btn-pill btn-gold">GUARDAR</button>`;
+            }
+            if(tipo === 'excel') {
+                content.innerHTML = `<h3 class="text-gold">Importar Recetario</h3><p class="text-small">Selecciona tu archivo Excel (.xlsx o .csv)</p><input type="file" accept=".csv, .xlsx"><button class="btn-pill btn-gold">CARGAR DATOS</button>`;
+            }
+        };
+
+        window.closeModal = () => {
+            document.getElementById('modal-container').style.display = 'none';
+        };
     </script>
     <nav id="main-nav" style="display:none; position:fixed; bottom:25px; left:50%; transform:translateX(-50%); width:92%; max-width:450px; background:rgba(20, 36, 26, 0.95); backdrop-filter:blur(15px); grid-template-columns:repeat(5, 1fr); border-radius:50px; border:1px solid var(--dorado); padding:12px; z-index:1000; box-shadow:0 15px 45px rgba(0,0,0,0.7);">
         <div class="tab-item active" onclick="showTab('finanzas')"><i class="fa-solid fa-vault"></i><small>Capital</small></div>
@@ -249,4 +348,5 @@
     </div>
 </body>
 </html>
+
 
