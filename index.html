@@ -165,3 +165,121 @@
             <div id="modal-content"></div>
         </div>
     </div>
+<script type="module">
+        // 1. CONFIGURACIÓN Y CONEXIÓN
+        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
+
+        let currentPin = "";
+        window.usuarioActual = null;
+        let tareasLimpieza = [];
+
+        // 2. LÓGICA DEL PINPAD (REFORZADA)
+        document.getElementById('pin-board').addEventListener('click', (e) => {
+            const val = e.target.closest('button')?.dataset.val;
+            if (!val) return;
+
+            if (val === 'C') { 
+                currentPin = ""; 
+                updateDots(); 
+            } else if (val === 'R') { 
+                location.reload(); 
+            } else {
+                if (currentPin.length < 4) {
+                    currentPin += val;
+                    updateDots();
+                    if (currentPin.length === 4) {
+                        setTimeout(checkAccess, 200);
+                    }
+                }
+            }
+        });
+
+        function updateDots() {
+            for (let i = 0; i < 4; i++) {
+                document.getElementById(`d${i}`).classList.toggle('active', i < currentPin.length);
+            }
+        }
+
+        // 3. CONTROL DE ACCESO Y SEGURIDAD
+        async function checkAccess() {
+            showToast("VERIFICANDO...");
+            try {
+                const q = query(collection(db, "usuarios"), where("pin", "==", currentPin));
+                const snap = await getDocs(q);
+
+                if (!snap.empty) {
+                    const docUser = snap.docs[0];
+                    window.usuarioActual = { id: docUser.id, ...docUser.data() };
+                    
+                    showToast(`¡HOLA, ${window.usuarioActual.nombre.toUpperCase()}!`);
+                    
+                    // Transición al Dashboard
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('main-nav').style.display = 'grid';
+                    
+                    iniciarReloj();
+                    configurarEntornoPorRol();
+                } else {
+                    showToast("PIN INCORRECTO", true);
+                    currentPin = "";
+                    updateDots();
+                }
+            } catch (err) {
+                showToast("ERROR DE CONEXIÓN", true);
+                currentPin = "";
+                updateDots();
+            }
+        }
+
+        function configurarEntornoPorRol() {
+            const esSocio = window.usuarioActual.rol === 'Socio';
+            
+            if (esSocio) {
+                showTab('finanzas');
+                cargarConfiguracionAdmin();
+            } else {
+                showTab('reloj');
+                // Ocultar pestañas restringidas
+                document.getElementById('tab-finanzas').style.display = 'none';
+                document.getElementById('tab-admin').style.display = 'none';
+                document.getElementById('main-nav').style.gridTemplateColumns = 'repeat(3, 1fr)';
+            }
+        }
+
+        // 4. NAVEGACIÓN ENTRE MÓDULOS
+        window.showTab = (tabId) => {
+            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+            
+            document.getElementById(tabId).style.display = 'block';
+            document.getElementById('tab-' + tabId).classList.add('active');
+            window.scrollTo(0,0);
+        };
+
+        // 5. RELOJ Y FECHA EN TIEMPO REAL
+        function iniciarReloj() {
+            setInterval(() => {
+                const ahora = new Date();
+                document.getElementById('live-clock').innerText = ahora.toLocaleTimeString('es-MX', { hour12: false });
+                document.getElementById('live-date').innerText = ahora.toLocaleDateString('es-MX', { 
+                    weekday: 'long', day: 'numeric', month: 'long' 
+                }).toUpperCase();
+            }, 1000);
+        }
+
+        // 6. UTILIDADES DE NOTIFICACIÓN (TOAST)
+        window.showToast = (msg, error = false) => {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            t.style.background = error ? 'var(--terracota)' : 'var(--dorado)';
+            setTimeout(() => { t.style.display = 'none'; }, 2500);
+        };
+
+        window.closeModal = () => {
+            document.getElementById('modal-container').style.display = 'none';
+        };
+
+        // Exportar funciones para uso en HTML
+        window.checkAccess = checkAccess;
+    </script>
