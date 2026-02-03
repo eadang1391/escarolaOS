@@ -390,5 +390,90 @@
             await deleteDoc(doc(db, "checklist", id));
             cargarConfiguracionAdmin();
         };
+    // --- 9. MÓDULO DE NÓMINA (PARA EL SOCIO) ---
+        window.cargarNominaSocio = async () => {
+            const cont = document.getElementById('finanzas'); // O un contenedor específico en Finanzas
+            const snap = await getDocs(query(collection(db, "asistencias"), where("pagado", "==", false)));
+            
+            let resumen = {};
+            snap.forEach(d => {
+                const a = d.data();
+                if(!resumen[a.uid]) resumen[a.uid] = { nombre: a.nombre, total: 0, registros: [] };
+                resumen[a.uid].registros.push({id: d.id, ...a});
+            });
+
+            let html = `<h4 style="margin-top:25px; color:var(--dorado)">Nómina Pendiente</h4>`;
+            for(let id in resumen) {
+                html += `<div class="card" style="background:var(--blanco-trans)">
+                    <div style="display:flex; justify-content:space-between; align-items:center">
+                        <div><b>${resumen[id].nombre}</b><br><small>Turnos pendientes</small></div>
+                        <button class="btn-pill btn-gold" style="width:auto; padding:5px 15px" onclick="pagarNomina('${id}')">PAGAR</button>
+                    </div>
+                </div>`;
+            }
+            // Insertar después del balance en la pestaña finanzas
+            const nominaDiv = document.createElement('div');
+            nominaDiv.innerHTML = html;
+            cont.appendChild(nominaDiv);
+        };
+
+        window.pagarNomina = async (uid) => {
+            if(!confirm("¿Confirmas que has pagado este periodo?")) return;
+            const q = query(collection(db, "asistencias"), where("uid", "==", uid), where("pagado", "==", false));
+            const snap = await getDocs(q);
+            const promesas = snap.docs.map(d => updateDoc(doc(db, "asistencias", d.id), { pagado: true }));
+            await Promise.all(promesas);
+            showToast("PAGO REGISTRADO CORRECTAMENTE");
+            location.reload(); // Refrescar para limpiar vista
+        };
+
+        // --- 10. RECETARIO Y EXCEL ---
+        document.getElementById('excel-input')?.addEventListener('change', function(e) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const data = new Uint8Array(event.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                const json = XLSX.utils.sheet_to_json(sheet);
+                procesarRecetasExcel(json);
+            };
+            reader.readAsArrayBuffer(e.target.files[0]);
+        });
+
+        async function procesarRecetasExcel(datos) {
+            showToast("PROCESANDO EXCEL...");
+            for(let fila of datos) {
+                await addDoc(collection(db, "recetas"), {
+                    nombre: fila.Nombre || fila.item,
+                    costo: fila.Costo || 0,
+                    unidad: fila.Unidad || 'pz',
+                    timestamp: new Date().toISOString()
+                });
+            }
+            showToast("RECETARIO ACTUALIZADO");
+        }
+
+        // --- 11. INICIALIZADOR FINAL ---
+        // Modificamos la función que se ejecuta al entrar
+        const originalConfigRol = configurarEntornoPorRol;
+        window.configurarEntornoPorRol = () => {
+            originalConfigRol();
+            if(window.usuarioActual.rol === 'Socio') {
+                cargarNominaSocio();
+                cargarConfiguracionAdmin();
+            }
+        };
+
+        // Exportar funciones globales
+        window.validarYSalir = validarYSalir;
+        window.addChecklistTask = addChecklistTask;
+        window.eliminarTarea = eliminarTarea;
+        window.pagarNomina = pagarNomina;
+        window.marcarEntrada = marcarEntrada;
+        window.marcarSalida = marcarSalida;
     </script>
+</body>
+</html>
+    </script>
+
 
