@@ -47,6 +47,20 @@
                 <div class="stat-amount" id="val-ingresos">$0.00</div>
             </div>
             <button class="mini-edit-btn" onclick="abrirEditor('ingresos')">✎</button>
+            <div id="dashboard" style="display:none;">
+    
+    <div id="registro-caja" class="card" style="margin-top: 20px; border: 1px solid rgba(212,175,55,0.2);">
+        <h3 style="color: var(--dorado);">Registro de Movimiento</h3>
+        <input type="text" id="mov-concepto" placeholder="Concepto (Ej. Insumos Café)" style="width:100%; margin-bottom:10px;">
+        <input type="number" id="mov-monto" placeholder="Monto $" style="width:100%; margin-bottom:10px;">
+        
+        <div style="display: flex; gap: 10px;">
+            <button onclick="registrarMovimiento('pagos')" style="background-color: var(--dorado); color: black; flex: 1; padding: 10px; border-radius: 8px;">+ Ingreso</button>
+            <button onclick="registrarMovimiento('gastos')" style="background-color: var(--terracota); color: white; flex: 1; padding: 10px; border-radius: 8px;">- Gasto</button>
+        </div>
+    </div>
+
+</div>
         </div>
 
         <div class="stat-card-premium" id="card-gastos">
@@ -263,12 +277,43 @@
             window.borrar();
         }
     }
+window.registrarMovimiento = async (coleccion) => {
+        const concepto = document.getElementById('mov-concepto').value;
+        const monto = document.getElementById('mov-monto').value;
+
+        if (!concepto || !monto) {
+            window.notificar("⚠️ Ingresa concepto y monto", true);
+            return;
+        }
+
+        try {
+            await addDoc(collection(db, coleccion), {
+                concepto: concepto,
+                monto: Number(monto),
+                fecha: new Date().toISOString()
+            });
+
+            window.notificar(`✅ Registrado en ${coleccion}`);
+            
+            // Limpiar campos
+            document.getElementById('mov-concepto').value = "";
+            document.getElementById('mov-monto').value = "";
+            
+            // Refrescar los números del dashboard automáticamente
+            window.calcularFinanzasReales(); 
+
+        } catch (error) {
+            window.notificar("❌ Error al registrar", true);
+        }
+    };
+
 </script>
 
 </script>
 </script>
 </body>
 </html>
+
 
 
 
