@@ -14,12 +14,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-    apiKey: "TU_API_KEY",
-    authDomain: "TU_PROYECTO.firebaseapp.com",
-    projectId: "TU_PROYECTO",
-    storageBucket: "TU_PROYECTO.appspot.com",
-    messagingSenderId: "TU_ID",
-    appId: "TU_APP_ID"
+  apiKey: "AIzaSyAqnPu5uInhoWBTwPs46asfm4ecotShfHY",
+  authDomain: "escarolaos-ed7e8.firebaseapp.com",
+  projectId: "escarolaos-ed7e8",
+  storageBucket: "escarolaos-ed7e8.firebasestorage.app",
+  messagingSenderId: "211000066025",
+  appId: "1:211000066025:web:d71791f51acb571414d578"
 };
 
 const app = initializeApp(firebaseConfig);
