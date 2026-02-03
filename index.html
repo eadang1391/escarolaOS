@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EscarolaOS - Testing Phase</title>
+    <title>EscarolaOS</title>
     <style>
         :root {
             --verde-bosque: #1b3022;
@@ -13,84 +13,100 @@
             --negro: #0a0a0a;
             --tarjeta: #1a1a1a;
             --texto: #f5f5f5;
-            --font-main: 'Segoe UI', sans-serif; /* Aquí podrás cambiar la tipografía después */
         }
 
         body {
-            font-family: var(--font-main);
+            font-family: 'Segoe UI', sans-serif;
             background-color: var(--negro);
             color: var(--texto);
             margin: 0; padding: 0;
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* --- LOGIN SCREEN --- */
+        /* --- PANTALLA DE LOGIN (PINPAD RESTAURADO) --- */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--negro); display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 2000;
         }
 
-        /* --- NAVEGACIÓN POR PESTAÑAS (TABS) --- */
+        .logo { font-size: 2rem; letter-spacing: 5px; margin-bottom: 20px; }
+        .logo strong { color: var(--dorado); }
+
+        .pin-dots { display: flex; gap: 15px; margin-bottom: 30px; }
+        .dot { width: 15px; height: 15px; border: 2px solid var(--dorado); border-radius: 50%; }
+        .dot.filled { background-color: var(--dorado); }
+
+        .pinpad {
+            display: grid; grid-template-columns: repeat(3, 80px); gap: 15px;
+        }
+
+        .btn-pin {
+            width: 80px; height: 80px; border-radius: 50%;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            background: rgba(255,255,255,0.05);
+            color: white; font-size: 1.5rem; cursor: pointer;
+        }
+
+        /* --- NAVEGACIÓN (TABS) --- */
         .tab-bar {
             position: fixed; bottom: 0; width: 100%; max-width: 600px;
             background: var(--verde-bosque); display: none;
             grid-template-columns: repeat(5, 1fr);
-            border-top: 2px solid var(--dorado); z-index: 1000;
+            border-top: 1px solid var(--dorado); z-index: 1000;
         }
 
         .tab-item {
-            padding: 15px 5px; text-align: center; font-size: 0.7rem;
+            padding: 12px 5px; text-align: center; font-size: 0.7rem;
             color: var(--cantera); cursor: pointer; opacity: 0.6;
         }
 
         .tab-item.active { opacity: 1; color: var(--dorado); font-weight: bold; }
 
-        /* --- CONTENEDORES --- */
+        /* --- DASHBOARD Y SECCIONES --- */
         .container {
-            width: 100%; max-width: 600px; padding: 20px;
+            width: 100%; max-width: 500px; padding: 20px;
             padding-bottom: 100px; box-sizing: border-box; display: none;
         }
 
         .card {
-            background: var(--tarjeta); border-radius: 12px;
+            background: var(--tarjeta); border-radius: 15px;
             padding: 20px; margin-bottom: 20px;
-            border-left: 4px solid var(--dorado);
+            border: 1px solid rgba(255,255,255,0.05);
         }
 
-        /* --- ESTILOS COMUNES --- */
-        h1, h2, h3 { color: var(--dorado); margin-top: 0; }
-        input, select {
-            width: 100%; padding: 12px; margin: 10px 0;
-            background: #000; border: 1px solid var(--verde-bosque);
-            color: white; border-radius: 8px;
-        }
-        button {
-            width: 100%; padding: 12px; border-radius: 8px; border: none;
-            font-weight: bold; cursor: pointer;
-        }
-        .btn-gold { background: var(--dorado); color: black; }
-        .btn-verde { background: var(--verde-bosque); color: var(--cantera); }
+        .finance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-        /* PINPAD DOTS */
-        .pin-dots { display: flex; gap: 15px; margin: 20px 0; }
-        .dot { width: 15px; height: 15px; border: 2px solid var(--dorado); border-radius: 50%; }
-        .dot.filled { background: var(--dorado); }
+        /* --- BOTONES Y INPUTS --- */
+        input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
+        .btn-gold { background: var(--dorado); color: black; padding: 12px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
+        .btn-red { background: var(--terracota); color: white; padding: 12px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
+
+        .toast { position: fixed; bottom: 80px; background: var(--dorado); color: black; padding: 10px 20px; border-radius: 20px; z-index: 2000; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <h1 style="letter-spacing: 5px;">ESCAROLA<span style="color:var(--cantera)">OS</span></h1>
+        <div class="logo">ESCAROLA<strong>OS</strong></div>
         <div class="pin-dots">
             <div class="dot" id="dot-0"></div><div class="dot" id="dot-1"></div>
             <div class="dot" id="dot-2"></div><div class="dot" id="dot-3"></div>
         </div>
-        <div id="pinpad" style="display: grid; grid-template-columns: repeat(3, 80px); gap: 15px;">
-            <button onclick="tecleo('1')" style="height:80px; border-radius:50%; background:rgba(255,255,255,0.05); color:white; font-size:1.5rem;">1</button>
-            <button onclick="tecleo('2')" style="height:80px; border-radius:50%; background:rgba(255,255,255,0.05); color:white; font-size:1.5rem;">2</button>
-            <button onclick="tecleo('3')" style="height:80px; border-radius:50%; background:rgba(255,255,255,0.05); color:white; font-size:1.5rem;">3</button>
-            </div>
+        <div class="pinpad">
+            <button class="btn-pin" onclick="tecleo('1')">1</button>
+            <button class="btn-pin" onclick="tecleo('2')">2</button>
+            <button class="btn-pin" onclick="tecleo('3')">3</button>
+            <button class="btn-pin" onclick="tecleo('4')">4</button>
+            <button class="btn-pin" onclick="tecleo('5')">5</button>
+            <button class="btn-pin" onclick="tecleo('6')">6</button>
+            <button class="btn-pin" onclick="tecleo('7')">7</button>
+            <button class="btn-pin" onclick="tecleo('8')">8</button>
+            <button class="btn-pin" onclick="tecleo('9')">9</button>
+            <button class="btn-pin" onclick="borrar()">C</button>
+            <button class="btn-pin" onclick="tecleo('0')">0</button>
+            <button class="btn-pin" onclick="location.reload()">R</button>
+        </div>
     </div>
 
     <div class="tab-bar" id="main-nav">
@@ -102,37 +118,41 @@
     </div>
 
     <div id="finanzas" class="container">
-        <h1>Tablero Financiero</h1>
+        <h2>Tablero Financiero</h2>
+        <div class="finance-grid">
+            <div class="card">
+                <small>INGRESOS</small>
+                <h2 id="val-ingresos">$0</h2>
+            </div>
+            <div class="card">
+                <small>GASTOS</small>
+                <h2 id="val-gastos" style="color:var(--terracota)">$0</h2>
+            </div>
+        </div>
         <div class="card">
-            <p>Utilidad Neta</p>
-            <h2 id="val-utilidad" style="font-size: 2.5rem;">$0.00</h2>
+            <small>UTILIDAD NETA</small>
+            <h2 id="val-utilidad" style="color:var(--dorado)">$0</h2>
         </div>
-        </div>
-
-    <div id="tareas" class="container">
-        <h1>Checklist de Limpieza</h1>
-        <div id="lista-tareas"></div>
     </div>
 
-    <div id="reloj" class="container">
-        <h1>Reloj Checador</h1>
-        <div class="card">
-            <button class="btn-gold">MARCAR ENTRADA</button>
-        </div>
-    </div>
-
-    <div id="recetas" class="container">
-        <h1>Recetario & Costeo</h1>
-        </div>
-
-    <div id="admin" class="container">
-        <h1>Configuración</h1>
-        </div>
+    <div id="tareas" class="container"><h2>Checklist</h2></div>
+    <div id="reloj" class="container"><h2>Reloj Checador</h2></div>
+    <div id="recetas" class="container"><h2>Recetas e Insumos</h2></div>
+    <div id="admin" class="container"><h2>Administración</h2></div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc } from './firebase-config.js';
 
         let pinIngresado = "";
+
+        window.notificar = (msg, err = false) => {
+            const t = document.createElement("div");
+            t.className = "toast";
+            if(err) t.style.background = "var(--terracota)";
+            t.innerText = msg;
+            document.body.appendChild(t);
+            setTimeout(() => t.remove(), 3000);
+        };
 
         window.tecleo = (n) => {
             if(pinIngresado.length < 4) {
@@ -142,6 +162,14 @@
             }
         };
 
+        window.borrar = () => { pinIngresado = ""; updateDots(); };
+
+        function updateDots() {
+            for(let i=0; i<4; i++) {
+                document.getElementById(`dot-${i}`).classList.toggle('filled', i < pinIngresado.length);
+            }
+        }
+
         window.showTab = (tabId) => {
             document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
@@ -150,18 +178,32 @@
         };
 
         async function verificarAcceso() {
-            // Lógica de Firebase para validar PIN
-            // Si es correcto:
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-nav').style.display = 'grid';
-            showTab('finanzas');
+            try {
+                const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
+                const snap = await getDocs(q);
+                if(!snap.empty) {
+                    const u = snap.docs[0].data();
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('main-nav').style.display = 'grid';
+                    showTab('finanzas');
+                    if(u.rol === 'Socio') window.calcularFinanzasReales();
+                } else {
+                    window.notificar("PIN Incorrecto", true);
+                    window.borrar();
+                }
+            } catch(e) { window.notificar("Error de red", true); }
         }
 
-        function updateDots() {
-            for(let i=0; i<4; i++) {
-                document.getElementById(`dot-${i}`).classList.toggle('filled', i < pinIngresado.length);
-            }
-        }
+        window.calcularFinanzasReales = async () => {
+            let i = 0, g = 0;
+            const qI = await getDocs(collection(db, "pagos"));
+            qI.forEach(d => i += Number(d.data().monto || 0));
+            const qG = await getDocs(collection(db, "gastos"));
+            qG.forEach(d => g += Number(d.data().monto || 0));
+            document.getElementById('val-ingresos').innerText = `$${i.toLocaleString()}`;
+            document.getElementById('val-gastos').innerText = `$${g.toLocaleString()}`;
+            document.getElementById('val-utilidad').innerText = `$${(i-g).toLocaleString()}`;
+        };
     </script>
 </body>
 </html>
