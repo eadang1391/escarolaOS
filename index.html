@@ -282,4 +282,113 @@
 
         // Exportar funciones para uso en HTML
         window.checkAccess = checkAccess;
+    // --- 7. LÓGICA DE ASISTENCIA (RRHH) ---
+        window.marcarEntrada = async () => {
+            if(!window.usuarioActual) return;
+            try {
+                // Verificar último registro para evitar doble entrada
+                const q = query(collection(db, "asistencias"), where("uid", "==", window.usuarioActual.id), orderBy("hora", "desc"), limit(1));
+                const snap = await getDocs(q);
+                const ultimo = snap.empty ? null : snap.docs[0].data();
+
+                if(ultimo && ultimo.tipo === "ENTRADA") {
+                    showToast("YA TIENES UNA ENTRADA ACTIVA", true);
+                    return;
+                }
+
+                await addDoc(collection(db, "asistencias"), {
+                    uid: window.usuarioActual.id,
+                    nombre: window.usuarioActual.nombre,
+                    tipo: "ENTRADA",
+                    hora: new Date().toISOString(),
+                    sueldoBase: window.usuarioActual.sueldo || 0,
+                    pagado: false
+                });
+                showToast("ENTRADA REGISTRADA");
+            } catch (e) { showToast("ERROR AL REGISTRAR", true); }
+        };
+
+        window.marcarSalida = async () => {
+            // 1. Cargar tareas de limpieza vigentes
+            const snap = await getDocs(collection(db, "checklist"));
+            if(snap.empty) {
+                ejecutarSalida();
+                return;
+            }
+
+            // 2. Mostrar Checklist Obligatorio en Modal
+            let html = `<h3 style="color:var(--dorado); margin-top:0">Checklist de Cierre</h3>
+                        <p style="font-size:0.8rem; margin-bottom:15px">Debes completar todo para finalizar turno:</p>`;
+            
+            snap.forEach((d, i) => {
+                const t = d.data();
+                html += `<div class="check-row" onclick="document.getElementById('task-${i}').click()">
+                            <input type="checkbox" id="task-${i}" class="task-confirm">
+                            <span>${t.tarea}</span>
+                         </div>`;
+            });
+
+            html += `<button class="btn-pill btn-gold" style="margin-top:15px" onclick="validarYSalir()">CONFIRMAR Y SALIR</button>`;
+            
+            document.getElementById('modal-content').innerHTML = html;
+            document.getElementById('modal-container').style.display = 'flex';
+        };
+
+        window.validarYSalir = () => {
+            const total = document.querySelectorAll('.task-confirm').length;
+            const marcadas = document.querySelectorAll('.task-confirm:checked').length;
+
+            if(marcadas < total) {
+                showToast("FALTAN TAREAS POR COMPLETAR", true);
+                return;
+            }
+            closeModal();
+            ejecutarSalida();
+        };
+
+        async function ejecutarSalida() {
+            try {
+                await addDoc(collection(db, "asistencias"), {
+                    uid: window.usuarioActual.id,
+                    nombre: window.usuarioActual.nombre,
+                    tipo: "SALIDA",
+                    hora: new Date().toISOString(),
+                    pagado: false
+                });
+                showToast("SALIDA REGISTRADA. ¡BUEN DESCANSO!");
+            } catch (e) { showToast("ERROR AL SALIR", true); }
+        }
+
+        // --- 8. CONFIGURACIÓN DE TAREAS (ADMIN) ---
+        window.cargarConfiguracionAdmin = async () => {
+            const cont = document.getElementById('admin-tasks-list');
+            if(!cont) return;
+            
+            const snap = await getDocs(collection(db, "checklist"));
+            cont.innerHTML = "";
+            snap.forEach(d => {
+                const t = d.data();
+                cont.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid var(--blanco-trans)">
+                    <span>${t.tarea}</span>
+                    <button onclick="eliminarTarea('${d.id}')" style="background:none; border:none; color:var(--terracota); cursor:pointer"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
+        };
+
+        window.addChecklistTask = async () => {
+            const input = document.getElementById('new-task-input');
+            if(!input.value) return;
+            
+            await addDoc(collection(db, "checklist"), { tarea: input.value });
+            input.value = "";
+            showToast("TAREA AGREGADA");
+            cargarConfiguracionAdmin();
+        };
+
+        window.eliminarTarea = async (id) => {
+            if(!confirm("¿Eliminar esta tarea del checklist?")) return;
+            await deleteDoc(doc(db, "checklist", id));
+            cargarConfiguracionAdmin();
+        };
     </script>
+
