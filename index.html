@@ -6,83 +6,93 @@
     <title>EscarolaOS</title>
     <style>
         :root {
-            --verde-bosque: #1b3022;
-            --terracota: #b0413e;
-            --cantera: #d9d4c7;
-            --dorado: #d4af37;
+            --verde-bosque: #1b3022; /* Fondo principal */
+            --verde-oscuro: #14241a; /* Variación para tarjetas */
+            --terracota: #b0413e;    /* Alertas y gastos */
+            --cantera: #d9d4c7;      /* Textos y detalles */
+            --dorado: #d4af37;       /* Acentos y títulos */
             --negro: #0a0a0a;
-            --tarjeta: #1a1a1a;
-            --texto: #f5f5f5;
         }
 
         body {
             font-family: 'Segoe UI', sans-serif;
-            background-color: var(--negro);
-            color: var(--texto);
+            background-color: var(--verde-bosque);
+            color: var(--cantera);
             margin: 0; padding: 0;
             display: flex; flex-direction: column; align-items: center;
         }
 
-        /* --- PANTALLA DE LOGIN (PINPAD RESTAURADO) --- */
+        /* --- LOGIN SCREEN (PALETA ESCAROLA) --- */
         #login-screen {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--negro); display: flex; flex-direction: column;
+            background: var(--verde-bosque);
+            display: flex; flex-direction: column;
             align-items: center; justify-content: center; z-index: 2000;
         }
 
-        .logo { font-size: 2rem; letter-spacing: 5px; margin-bottom: 20px; }
+        .logo { font-size: 2.2rem; letter-spacing: 5px; margin-bottom: 20px; color: var(--cantera); }
         .logo strong { color: var(--dorado); }
 
-        .pin-dots { display: flex; gap: 15px; margin-bottom: 30px; }
-        .dot { width: 15px; height: 15px; border: 2px solid var(--dorado); border-radius: 50%; }
-        .dot.filled { background-color: var(--dorado); }
+        .pin-dots { display: flex; gap: 18px; margin-bottom: 40px; }
+        .dot { width: 16px; height: 16px; border: 2px solid var(--dorado); border-radius: 50%; }
+        .dot.filled { background-color: var(--dorado); box-shadow: 0 0 10px var(--dorado); }
 
         .pinpad {
-            display: grid; grid-template-columns: repeat(3, 80px); gap: 15px;
+            display: grid; grid-template-columns: repeat(3, 85px); gap: 20px;
         }
 
         .btn-pin {
-            width: 80px; height: 80px; border-radius: 50%;
-            border: 1px solid rgba(212, 175, 55, 0.3);
-            background: rgba(255,255,255,0.05);
-            color: white; font-size: 1.5rem; cursor: pointer;
+            width: 85px; height: 85px; border-radius: 50%;
+            border: 1px solid var(--dorado);
+            background: rgba(212, 175, 55, 0.05);
+            color: var(--cantera); font-size: 1.6rem; cursor: pointer;
+            transition: 0.2s;
         }
+        .btn-pin:active { background: var(--dorado); color: var(--verde-bosque); }
 
-        /* --- NAVEGACIÓN (TABS) --- */
+        /* --- NAVEGACIÓN (TABS VERDE/DORADO) --- */
         .tab-bar {
             position: fixed; bottom: 0; width: 100%; max-width: 600px;
-            background: var(--verde-bosque); display: none;
+            background: var(--verde-oscuro); display: none;
             grid-template-columns: repeat(5, 1fr);
             border-top: 1px solid var(--dorado); z-index: 1000;
         }
 
         .tab-item {
-            padding: 12px 5px; text-align: center; font-size: 0.7rem;
-            color: var(--cantera); cursor: pointer; opacity: 0.6;
+            padding: 15px 5px; text-align: center; font-size: 0.75rem;
+            color: var(--cantera); cursor: pointer; opacity: 0.5;
         }
 
-        .tab-item.active { opacity: 1; color: var(--dorado); font-weight: bold; }
+        .tab-item.active { opacity: 1; color: var(--dorado); border-top: 3px solid var(--dorado); }
 
         /* --- DASHBOARD Y SECCIONES --- */
         .container {
-            width: 100%; max-width: 500px; padding: 20px;
-            padding-bottom: 100px; box-sizing: border-box; display: none;
+            width: 100%; max-width: 500px; padding: 25px;
+            padding-bottom: 110px; box-sizing: border-box; display: none;
         }
 
         .card {
-            background: var(--tarjeta); border-radius: 15px;
+            background: var(--verde-oscuro); border-radius: 12px;
             padding: 20px; margin-bottom: 20px;
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(217, 212, 199, 0.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
         }
+
+        h2 { color: var(--dorado); font-weight: 300; letter-spacing: 1px; }
 
         .finance-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-        /* --- BOTONES Y INPUTS --- */
-        input { width: 100%; padding: 12px; margin: 8px 0; background: #000; border: 1px solid #333; color: white; border-radius: 8px; box-sizing: border-box; }
-        .btn-gold { background: var(--dorado); color: black; padding: 12px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
-        .btn-red { background: var(--terracota); color: white; padding: 12px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
+        /* --- ELEMENTOS DE FORMULARIO --- */
+        input { 
+            width: 100%; padding: 14px; margin: 10px 0; 
+            background: var(--negro); border: 1px solid var(--verde-bosque); 
+            color: var(--cantera); border-radius: 8px; box-sizing: border-box; 
+        }
+        
+        .btn-gold { background: var(--dorado); color: var(--verde-bosque); padding: 14px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
+        .btn-red { background: var(--terracota); color: var(--cantera); padding: 14px; border-radius: 8px; border: none; font-weight: bold; width: 100%; cursor: pointer; }
 
-        .toast { position: fixed; bottom: 80px; background: var(--dorado); color: black; padding: 10px 20px; border-radius: 20px; z-index: 2000; }
+        .toast { position: fixed; bottom: 90px; background: var(--cantera); color: var(--verde-bosque); padding: 12px 25px; border-radius: 30px; font-weight: bold; z-index: 2000; }
     </style>
 </head>
 <body>
@@ -103,9 +113,9 @@
             <button class="btn-pin" onclick="tecleo('7')">7</button>
             <button class="btn-pin" onclick="tecleo('8')">8</button>
             <button class="btn-pin" onclick="tecleo('9')">9</button>
-            <button class="btn-pin" onclick="borrar()">C</button>
+            <button class="btn-pin" style="color:var(--terracota); border-color:var(--terracota)" onclick="borrar()">C</button>
             <button class="btn-pin" onclick="tecleo('0')">0</button>
-            <button class="btn-pin" onclick="location.reload()">R</button>
+            <button class="btn-pin" style="color:var(--dorado)" onclick="location.reload()">R</button>
         </div>
     </div>
 
@@ -118,27 +128,21 @@
     </div>
 
     <div id="finanzas" class="container">
-        <h2>Tablero Financiero</h2>
+        <h2>Finanzas</h2>
         <div class="finance-grid">
-            <div class="card">
-                <small>INGRESOS</small>
-                <h2 id="val-ingresos">$0</h2>
-            </div>
-            <div class="card">
-                <small>GASTOS</small>
-                <h2 id="val-gastos" style="color:var(--terracota)">$0</h2>
-            </div>
+            <div class="card"><small>INGRESOS</small><h2 id="val-ingresos">$0</h2></div>
+            <div class="card"><small>GASTOS</small><h2 id="val-gastos" style="color:var(--terracota)">$0</h2></div>
         </div>
-        <div class="card">
+        <div class="card" style="border-left: 5px solid var(--dorado);">
             <small>UTILIDAD NETA</small>
-            <h2 id="val-utilidad" style="color:var(--dorado)">$0</h2>
+            <h2 id="val-utilidad" style="color:var(--dorado); font-size: 2.2rem;">$0</h2>
         </div>
     </div>
 
     <div id="tareas" class="container"><h2>Checklist</h2></div>
     <div id="reloj" class="container"><h2>Reloj Checador</h2></div>
-    <div id="recetas" class="container"><h2>Recetas e Insumos</h2></div>
-    <div id="admin" class="container"><h2>Administración</h2></div>
+    <div id="recetas" class="container"><h2>Recetas</h2></div>
+    <div id="admin" class="container"><h2>Panel Admin</h2></div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc } from './firebase-config.js';
@@ -174,7 +178,7 @@
             document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             document.getElementById(tabId).style.display = 'block';
-            event.currentTarget.classList.add('active');
+            if (event) event.currentTarget.classList.add('active');
         };
 
         async function verificarAcceso() {
