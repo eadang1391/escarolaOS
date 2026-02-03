@@ -195,7 +195,7 @@
         }
 
         // --- 3. MODIFICACIÓN DEL ACCESO (REEMPLAZA TU FUNCIÓN checkAccess ANTERIOR) ---
-        window.checkAccess = async () => {
+        async function checkAccess() {
             try {
                 showToast("VERIFICANDO...");
                 const q = query(collection(db, "usuarios"), where("pin", "==", currentPin));
@@ -205,25 +205,28 @@
                     const docUser = snap.docs[0];
                     window.usuarioActual = { id: docUser.id, ...docUser.data() };
                     
-                    showToast(`¡HOLA, ${window.usuarioActual.nombre}!`);
+                    showToast(`¡HOLA, ${window.usuarioActual.nombre.toUpperCase()}!`);
                     
-                    // 1. Ocultar Login
+                    // 1. Ocultar la pantalla de PIN
                     document.getElementById('login-screen').style.display = 'none';
-                    // 2. Mostrar Barra de Navegación
+                    
+                    // 2. Mostrar la barra de navegación
                     document.getElementById('main-nav').style.display = 'grid';
                     
-                    // 3. Iniciar sistemas base
+                    // 3. Iniciar el reloj y sistemas
                     iniciarReloj();
                     
-                    // 4. Ir a la pestaña correspondiente según Rol
+                    // 4. Decidir a qué pestaña ir según el nivel (Socio o Staff)
                     if(window.usuarioActual.rol === 'Socio') {
                         showTab('finanzas');
                     } else {
                         showTab('reloj');
-                        // Ajuste visual: Ocultar botones que el Staff no debe ver en la barra
-                        document.querySelectorAll('.tab-item').forEach(t => {
-                            if(t.onclick.toString().includes('finanzas') || t.onclick.toString().includes('admin')) {
-                                t.style.display = 'none';
+                        // Ocultar pestañas prohibidas para Staff
+                        const items = document.querySelectorAll('.tab-item');
+                        items.forEach(item => {
+                            const texto = item.innerText.toLowerCase();
+                            if(texto.includes('capital') || texto.includes('admin')) {
+                                item.style.display = 'none';
                             }
                         });
                         document.getElementById('main-nav').style.gridTemplateColumns = 'repeat(3, 1fr)';
@@ -348,5 +351,6 @@
     </div>
 </body>
 </html>
+
 
 
