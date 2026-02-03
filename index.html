@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EscarolaOS - Full Master System</title>
+    <title>EscarolaOS v2.0 - Full Integrated System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -13,460 +13,389 @@
         :root {
             --verde-bosque: #1b3022; --verde-oscuro: #14241a; --terracota: #b0413e;
             --cantera: #d9d4c7; --dorado: #c5a059; --negro: #0a0a0a;
-            --blanco-trans: rgba(217, 212, 199, 0.15); --shadow: 0 10px 40px rgba(0,0,0,0.8);
+            --blanco-trans: rgba(217, 212, 199, 0.1); --shadow: 0 10px 40px rgba(0,0,0,0.6);
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; transition: all 0.2s ease; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--verde-bosque); color: var(--cantera); margin: 0; overflow-x: hidden; height: 100vh; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--verde-bosque); color: var(--cantera); margin: 0; overflow-x: hidden; }
         
-        /* Estructura de Contenedores */
-        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 25px; display: none; padding-bottom: 140px; animation: slideUp 0.4s ease; }
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        /* Contenedores Principales */
+        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 20px; display: none; padding-bottom: 140px; }
+        .card { background: var(--verde-oscuro); border-radius: 25px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--blanco-trans); box-shadow: var(--shadow); position: relative; }
         
-        .card { background: var(--verde-oscuro); border-radius: 30px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--blanco-trans); box-shadow: var(--shadow); position: relative; }
-        
-        /* UI Elements */
-        .btn-pill { border-radius: 50px; border: none; padding: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; font-size: 0.85rem; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        /* Botonera y UI */
+        .btn-pill { border-radius: 50px; border: none; padding: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; font-size: 0.8rem; width: 100%; }
         .btn-gold { background: var(--dorado); color: var(--verde-oscuro); }
         .btn-green { background: var(--verde-oscuro); color: var(--dorado); border: 1px solid var(--dorado); }
         .btn-red { background: var(--terracota); color: white; }
-        .btn-delete { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--terracota); cursor: pointer; font-size: 1.1rem; }
-
-        input, select, textarea { width: 100%; padding: 15px; margin: 10px 0; background: var(--negro); border: 1px solid var(--blanco-trans); border-radius: 15px; color: white; font-size: 1rem; }
         
-        /* Navegación Inferior */
-        #main-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 600px; background: rgba(20, 36, 26, 0.98); border-radius: 60px; border: 1px solid var(--dorado); display: none; grid-template-columns: repeat(5, 1fr); padding: 12px; z-index: 5000; box-shadow: var(--shadow); backdrop-filter: blur(15px); }
-        .tab-item { text-align: center; color: var(--cantera); opacity: 0.4; cursor: pointer; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
-        .tab-item.active { opacity: 1; color: var(--dorado); font-weight: bold; }
-        .tab-item i { font-size: 1.5rem; display: block; margin-bottom: 5px; }
+        input, select, textarea { width: 100%; padding: 15px; margin: 10px 0; background: var(--negro); border: 1px solid var(--blanco-trans); border-radius: 12px; color: white; font-size: 1rem; }
+
+        /* Navegación */
+        #main-nav { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 95%; max-width: 600px; background: rgba(20, 36, 26, 0.98); border-radius: 50px; border: 1px solid var(--dorado); display: none; grid-template-columns: repeat(5, 1fr); padding: 10px; z-index: 5000; box-shadow: var(--shadow); }
+        .tab-item { text-align: center; color: var(--cantera); opacity: 0.4; cursor: pointer; font-size: 0.6rem; }
+        .tab-item.active { opacity: 1; color: var(--dorado); }
+        .tab-item i { font-size: 1.4rem; display: block; margin-bottom: 4px; }
 
         /* Login Screen */
         #login-screen { position: fixed; inset: 0; background: var(--verde-bosque); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
-        .btn-pin { width: 85px; height: 85px; border-radius: 50%; border: 1px solid var(--dorado); background: var(--verde-oscuro); color: var(--dorado); font-size: 1.8rem; font-weight: bold; }
-        .btn-pin:active { background: var(--dorado); color: var(--verde-oscuro); transform: scale(0.9); }
+        .grid-pin { display: grid; grid-template-columns: repeat(3, 85px); gap: 15px; }
+        .btn-pin { width: 85px; height: 85px; border-radius: 50%; border: 1px solid var(--dorado); background: var(--verde-oscuro); color: var(--dorado); font-size: 1.6rem; font-weight: bold; cursor: pointer; }
+        .dot-box { display: flex; margin-bottom: 40px; }
+        .dot { width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; margin: 0 10px; }
+        .dot.active { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); }
 
         /* Calendario */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
-        .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; background: var(--blanco-trans); font-size: 0.9rem; cursor: pointer; position: relative; }
-        .cal-day.today { border: 2px solid var(--dorado); background: rgba(197, 160, 89, 0.1); }
-        .cal-dot { width: 6px; height: 6px; background: var(--dorado); border-radius: 50%; position: absolute; bottom: 8px; }
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
+        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--blanco-trans); border-radius: 10px; font-size: 0.8rem; cursor: pointer; position: relative; }
+        .event-mark { width: 5px; height: 5px; background: var(--dorado); border-radius: 50%; position: absolute; bottom: 4px; }
 
-        /* Checklist Style */
-        .check-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--blanco-trans); border-radius: 15px; margin-bottom: 10px; cursor: pointer; }
-        .check-item input { width: 22px; height: 22px; accent-color: var(--dorado); }
-
-        /* Utilitarios */
-        .text-gold { color: var(--dorado); }
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); padding: 15px 40px; border-radius: 50px; font-weight: bold; display: none; z-index: 11000; box-shadow: var(--shadow); }
+        /* Listas y Checklist */
+        .row-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--blanco-trans); }
+        .check-row { display: flex; align-items: center; gap: 12px; padding: 15px; background: var(--blanco-trans); border-radius: 12px; margin-bottom: 10px; }
+        .check-row input { width: 20px; height: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="toast"></div>
+    <div id="toast" style="position:fixed; top:20px; left:50%; transform:translateX(-50%); background:var(--dorado); color:var(--verde-oscuro); padding:12px 30px; border-radius:50px; font-weight:bold; display:none; z-index:11000;"></div>
 
     <div id="login-screen">
-        <h1 style="letter-spacing:15px; margin-bottom:10px">ESCAROLA<span>OS</span></h1>
-        <p style="color:var(--dorado); font-size:0.7rem; letter-spacing:5px; margin-bottom:30px">SISTEMA INTEGRAL DE CONTROL</p>
-        <div style="display:flex; margin-bottom: 50px;">
-            <div id="dot0" class="dot" style="width:20px; height:20px; border:2px solid var(--dorado); border-radius:50%; margin:0 12px;"></div>
-            <div id="dot1" class="dot" style="width:20px; height:20px; border:2px solid var(--dorado); border-radius:50%; margin:0 12px;"></div>
-            <div id="dot2" class="dot" style="width:20px; height:20px; border:2px solid var(--dorado); border-radius:50%; margin:0 12px;"></div>
-            <div id="dot3" class="dot" style="width:20px; height:20px; border:2px solid var(--dorado); border-radius:50%; margin:0 12px;"></div>
+        <h1 style="letter-spacing:10px">ESCAROLA<span style="color:var(--dorado)">OS</span></h1>
+        <div class="dot-box">
+            <div id="d0" class="dot"></div><div id="d1" class="dot"></div><div id="d2" class="dot"></div><div id="d3" class="dot"></div>
         </div>
-        <div style="display:grid; grid-template-columns: repeat(3, 90px); gap: 20px;">
-            <button class="btn-pin" onclick="press('1')">1</button><button class="btn-pin" onclick="press('2')">2</button><button class="btn-pin" onclick="press('3')">3</button>
-            <button class="btn-pin" onclick="press('4')">4</button><button class="btn-pin" onclick="press('5')">5</button><button class="btn-pin" onclick="press('6')">6</button>
-            <button class="btn-pin" onclick="press('7')">7</button><button class="btn-pin" onclick="press('8')">8</button><button class="btn-pin" onclick="press('9')">9</button>
-            <button class="btn-pin" onclick="resetPin()" style="color:var(--terracota)">C</button><button class="btn-pin" onclick="press('0')">0</button><button class="btn-pin" onclick="location.reload()"><i class="fa-solid fa-rotate"></i></button>
+        <div class="grid-pin">
+            <button class="btn-pin" onclick="t_pin('1')">1</button><button class="btn-pin" onclick="t_pin('2')">2</button><button class="btn-pin" onclick="t_pin('3')">3</button>
+            <button class="btn-pin" onclick="t_pin('4')">4</button><button class="btn-pin" onclick="t_pin('5')">5</button><button class="btn-pin" onclick="t_pin('6')">6</button>
+            <button class="btn-pin" onclick="t_pin('7')">7</button><button class="btn-pin" onclick="t_pin('8')">8</button><button class="btn-pin" onclick="t_pin('9')">9</button>
+            <button class="btn-pin" onclick="c_pin()" style="color:var(--terracota)">C</button><button class="btn-pin" onclick="t_pin('0')">0</button><button class="btn-pin" onclick="location.reload()"><i class="fa-solid fa-rotate"></i></button>
         </div>
     </div>
 
     <div id="finanzas" class="container">
-        <h2 class="text-gold">Estado de Capital</h2>
-        <div class="card" style="border-left: 8px solid var(--dorado)">
-            <small>BALANCE TOTAL (Bancos + POS - Gastos)</small>
-            <h1 id="balance-num" style="font-size:3.8rem; margin:10px 0">$0.00</h1>
-            <div class="flex-between">
-                <span>Ingresos: <b id="total-ing">$0</b></span>
-                <span>Gastos: <b id="total-gas" style="color:var(--terracota)">$0</b></span>
+        <h2 style="color:var(--dorado)">Gestión de Capital</h2>
+        <div class="card">
+            <small>UTILIDAD ACUMULADA</small>
+            <h1 id="f-balance" style="font-size:3.5rem; margin:10px 0">$0.00</h1>
+            <div style="display:flex; gap:10px">
+                <input type="number" id="f-ing-manual" placeholder="+ Ingreso">
+                <input type="number" id="f-gas-manual" placeholder="- Gasto">
             </div>
+            <button class="btn-pill btn-gold" onclick="manualFinanzas()">REGISTRAR MOVIMIENTO</button>
         </div>
-        
         <div class="card">
-            <h4><i class="fa-solid fa-camera"></i> Escáner de Gastos (IA OCR)</h4>
-            <p style="font-size:0.8rem; opacity:0.7">Sube la foto de tu ticket para procesar el gasto automáticamente.</p>
-            <input type="file" id="ocr-upload" accept="image/*" hidden onchange="scanTicket(this)">
-            <button class="btn-pill btn-green" onclick="document.getElementById('ocr-upload').click()">ESCANEAR FACTURA / TICKET</button>
+            <h4>Escáner OCR de Facturas</h4>
+            <input type="file" id="ocr-file" accept="image/*" onchange="scanDoc(this)">
+            <div id="ocr-status" style="font-size:0.8rem; margin-top:10px; color:var(--dorado)"></div>
         </div>
-
-        <div class="card">
-            <h4>Registro de Movimientos</h4>
-            <div id="movimientos-lista"></div>
-            <button class="btn-pill btn-gold" style="margin-top:15px" onclick="exportToExcel('finanzas')">DESCARGAR EXCEL FINANCIERO</button>
-        </div>
+        <div id="f-historial" class="card"><h4>Historial de Movimientos</h4><div id="f-list"></div></div>
     </div>
 
     <div id="agenda" class="container">
-        <h2 class="text-gold">Agenda de Eventos</h2>
+        <h2 style="color:var(--dorado)">Reservaciones y Eventos</h2>
         <div class="card">
-            <div class="flex-between">
-                <button onclick="changeMonth(-1)" class="btn-pill" style="width:40px">◀</button>
-                <h3 id="cal-month-name">Febrero 2026</h3>
-                <button onclick="changeMonth(1)" class="btn-pill" style="width:40px">▶</button>
+            <div style="display:flex; justify-content:space-between; align-items:center">
+                <button onclick="cal_move(-1)">◀</button>
+                <h3 id="cal-label">Mes Año</h3>
+                <button onclick="cal_move(1)">▶</button>
             </div>
-            <div class="cal-grid" id="calendar-render"></div>
+            <div class="cal-grid" id="cal-body"></div>
         </div>
         <div class="card">
-            <h4>Agendar Nueva Reservación</h4>
-            <input type="text" id="ag-title" placeholder="Cliente / Evento">
+            <h4>Nueva Reserva</h4>
+            <input type="text" id="ag-title" placeholder="Nombre Cliente">
             <input type="datetime-local" id="ag-date">
-            <textarea id="ag-desc" placeholder="Detalles extra..."></textarea>
-            <button class="btn-pill btn-gold" onclick="saveEvent()">GUARDAR EN CALENDARIO</button>
+            <button class="btn-pill btn-gold" onclick="addEvent()">AGENDAR</button>
         </div>
     </div>
 
     <div id="reloj" class="container">
-        <h2 class="text-gold">Control de Asistencia</h2>
+        <h2 style="color:var(--dorado)">Asistencia Personal</h2>
         <div class="card" style="text-align:center">
-            <h1 id="live-timer" style="font-size:4.5rem; margin:0">00:00</h1>
-            <p id="live-day-txt" style="letter-spacing:5px; text-transform:uppercase; color:var(--dorado)"></p>
+            <h1 id="clk-time" style="font-size:4rem; margin:0">00:00:00</h1>
+            <p id="clk-date"></p>
         </div>
         <div style="display:flex; gap:20px">
-            <button class="btn-pill btn-green" style="height:100px; font-size:1.4rem" onclick="handleClock('ENTRADA')">ENTRADA</button>
-            <button class="btn-pill btn-red" style="height:100px; font-size:1.4rem" onclick="handleClock('SALIDA')">SALIDA</button>
+            <button class="btn-pill btn-green" style="height:100px; font-size:1.3rem" onclick="check_io('ENTRADA')">ENTRADA</button>
+            <button class="btn-pill btn-red" style="height:100px; font-size:1.3rem" onclick="check_io('SALIDA')">SALIDA</button>
         </div>
-        <div class="card" style="margin-top:30px">
-            <h4>Personal actualmente en turno:</h4>
-            <div id="staff-online"></div>
+        <div class="card" style="margin-top:20px">
+            <h4>Estatus de Staff</h4>
+            <div id="staff-live"></div>
         </div>
     </div>
 
     <div id="cocina" class="container">
-        <h2 class="text-gold">Recetario Maestro</h2>
+        <h2 style="color:var(--dorado)">Costeo y Recetas</h2>
         <div class="card">
-            <p>Importar Base de Datos de Costeo (Excel):</p>
-            <input type="file" id="excel-rec" accept=".xlsx, .xls" hidden onchange="importCosteo(this)">
-            <button class="btn-pill btn-gold" onclick="document.getElementById('excel-rec').click()">SUBIR ARCHIVO COSTEO TOTAL</button>
+            <input type="file" id="excel-file" accept=".xlsx, .xls" onchange="importExcel(this)">
+            <button class="btn-pill btn-gold" onclick="document.getElementById('excel-file').click()">SUBIR EXCEL MULTI-PESTAÑA</button>
         </div>
-        <div id="recetario-view"></div>
+        <div id="recetas-container"></div>
     </div>
 
     <div id="admin" class="container">
-        <h2 class="text-gold">Panel Administrativo</h2>
-        
+        <h2 style="color:var(--dorado)">Panel Maestro</h2>
         <div class="card">
-            <h4>Nómina Detallada (Horas x Sueldo)</h4>
-            <div id="nomina-render"></div>
+            <h4>Nómina Pendiente (Horas Trabajadas)</h4>
+            <div id="nom-list"></div>
         </div>
-
         <div class="card">
-            <h4>Gestión de Personal y Roles</h4>
-            <input type="text" id="u-nom" placeholder="Nombre Completo">
-            <input type="number" id="u-pin" placeholder="PIN de 4 dígitos">
-            <input type="number" id="u-pay" placeholder="Sueldo por hora ($)">
-            <select id="u-rol">
-                <option value="Staff">Staff</option>
-                <option value="Socio">Socio / Dueño</option>
-            </select>
-            <button class="btn-pill btn-gold" onclick="registerUser()">AÑADIR AL SISTEMA</button>
-            <hr style="opacity:0.1; margin:20px 0">
-            <div id="users-list-admin"></div>
+            <h4>Gestión de Personal</h4>
+            <input type="text" id="adm-nom" placeholder="Nombre Completo">
+            <input type="number" id="adm-pin" placeholder="PIN 4 dígitos">
+            <input type="number" id="adm-sueldo" placeholder="Sueldo por hora">
+            <select id="adm-rol"><option value="Staff">Staff</option><option value="Socio">Socio</option></select>
+            <button class="btn-pill btn-gold" onclick="adm_user()">AÑADIR EMPLEADO</button>
+            <div id="adm-user-list" style="margin-top:15px"></div>
         </div>
-
         <div class="card">
-            <h4>Checklist Obligatorio de Salida</h4>
-            <div id="checklist-admin-view"></div>
+            <h4>Checklist de Salida</h4>
+            <div id="adm-check-list"></div>
             <div style="display:flex; gap:10px">
-                <input type="text" id="new-t" placeholder="Nueva tarea de limpieza...">
-                <button class="btn-pill btn-gold" style="width:60px" onclick="addTask()">+</button>
+                <input type="text" id="adm-task" placeholder="Nueva tarea de limpieza">
+                <button class="btn-pill btn-gold" style="width:60px" onclick="adm_add_task()">+</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-check" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:11000; align-items:center; justify-content:center; padding:20px;">
-        <div class="card" style="width:100%; max-width:450px">
-            <h2 class="text-gold">Limpieza de Cierre</h2>
-            <p>Marca todo lo que ya se completó:</p>
-            <div id="checklist-modal-items"></div>
-            <button class="btn-pill btn-gold" style="margin-top:20px" onclick="finalizeClockOut()">FINALIZAR TURNO</button>
+    <div id="modal-c" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:12000; align-items:center; justify-content:center; padding:20px;">
+        <div class="card" style="width:100%; max-width:400px">
+            <h2 style="color:var(--dorado)">Limpieza Obligatoria</h2>
+            <div id="modal-check-items"></div>
+            <button class="btn-pill btn-gold" style="margin-top:20px" onclick="finish_out()">CONFIRMAR SALIDA</button>
         </div>
     </div>
 
     <nav id="main-nav">
-        <div class="tab-item active" id="btn-finanzas" onclick="nav('finanzas')"><i class="fa-solid fa-vault"></i>Capital</div>
-        <div class="tab-item" id="btn-agenda" onclick="nav('agenda')"><i class="fa-solid fa-calendar"></i>Agenda</div>
-        <div class="tab-item" id="btn-reloj" onclick="nav('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
-        <div class="tab-item" id="btn-cocina" onclick="nav('cocina')"><i class="fa-solid fa-fire-burner"></i>Cocina</div>
-        <div class="tab-item" id="btn-admin" onclick="nav('admin')"><i class="fa-solid fa-crown"></i>Admin</div>
+        <div class="tab-item active" onclick="go('finanzas')"><i class="fa-solid fa-vault"></i>Capital</div>
+        <div class="tab-item" onclick="go('agenda')"><i class="fa-solid fa-calendar"></i>Agenda</div>
+        <div class="tab-item" onclick="go('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
+        <div class="tab-item" onclick="go('cocina')"><i class="fa-solid fa-utensils"></i>Cocina</div>
+        <div class="tab-item" onclick="go('admin')"><i class="fa-solid fa-crown"></i>Admin</div>
     </nav>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit, onSnapshot } from './firebase-config.js';
 
-        let curPin = "";
-        let me = null;
-        let viewDate = new Date();
+        let pin = "";
+        let user = null;
+        let cal_date = new Date();
 
-        // --- SISTEMA DE ACCESO ---
-        window.press = (n) => {
-            if(curPin.length < 4) {
-                curPin += n;
-                for(let i=0; i<4; i++) document.getElementById('dot'+i).style.background = i < curPin.length ? 'var(--dorado)' : 'transparent';
-                if(curPin.length === 4) login();
+        // --- 1. PINPAD (GLOBALES) ---
+        window.t_pin = (n) => {
+            if(pin.length < 4) {
+                pin += n;
+                u_dots();
+                if(pin.length === 4) auth();
             }
         };
-        window.resetPin = () => { curPin = ""; for(let i=0; i<4; i++) document.getElementById('dot'+i).style.background = 'transparent'; };
+        window.c_pin = () => { pin = ""; u_dots(); };
+        function u_dots() {
+            for(let i=0; i<4; i++) document.getElementById(`d${i}`).className = i < pin.length ? 'dot active' : 'dot';
+        }
 
-        async function login() {
-            const q = query(collection(db, "usuarios"), where("pin", "==", curPin));
+        async function auth() {
+            const q = query(collection(db, "usuarios"), where("pin", "==", pin));
             const snap = await getDocs(q);
             if(!snap.empty) {
-                me = { id: snap.docs[0].id, ...snap.docs[0].data() };
+                user = { id: snap.docs[0].id, ...snap.docs[0].data() };
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('main-nav').style.display = 'grid';
-                startApp();
+                init();
             } else {
-                msg("PIN INCORRECTO", true);
-                resetPin();
+                toast("PIN INCORRECTO", true);
+                c_pin();
             }
         }
 
-        // --- NAVEGACIÓN Y ROLES ---
-        window.nav = (id) => {
-            if((id === 'finanzas' || id === 'admin') && me.rol !== 'Socio') return msg("ACCESO RESTRINGIDO", true);
+        // --- 2. NAVEGACIÓN ---
+        window.go = (id) => {
+            if((id === 'finanzas' || id === 'admin') && user.rol !== 'Socio') return toast("SOLO SOCIOS", true);
             document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
             document.getElementById(id).style.display = 'block';
-            document.getElementById('btn-'+id).classList.add('active');
-            window.scrollTo(0,0);
+            const idx = {finanzas:0, agenda:1, reloj:2, cocina:3, admin:4}[id];
+            document.querySelectorAll('.tab-item')[idx].classList.add('active');
         };
 
-        // --- RELOJ Y RRHH (NOMINA REAL) ---
-        window.handleClock = async (tipo) => {
+        // --- 3. RELOJ Y NOMINA ---
+        window.check_io = async (tipo) => {
             if(tipo === 'SALIDA') {
-                const list = await getDocs(collection(db, "checklist"));
+                const snap = await getDocs(collection(db, "checklist"));
+                if(snap.empty) return do_check('SALIDA');
                 let h = "";
-                list.forEach(d => {
-                    h += `<div class="check-item"><input type="checkbox" class="c-val"><span>${d.data().tarea}</span></div>`;
-                });
-                document.getElementById('checklist-modal-items').innerHTML = h;
-                document.getElementById('modal-check').style.display = 'flex';
+                snap.forEach(d => h += `<div class="check-row"><input type="checkbox" class="c-val"><span>${d.data().tarea}</span></div>`);
+                document.getElementById('modal-check-items').innerHTML = h;
+                document.getElementById('modal-c').style.display = 'flex';
                 return;
             }
-            clockRegistry('ENTRADA');
+            do_check('ENTRADA');
         };
 
-        window.finalizeClockOut = () => {
-            const checks = document.querySelectorAll('.c-val');
-            const total = checks.length;
-            const done = Array.from(checks).filter(c => c.checked).length;
-            if(done < total) return msg("COMPLETA LA LIMPIEZA", true);
-            document.getElementById('modal-check').style.display = 'none';
-            clockRegistry('SALIDA');
+        window.finish_out = () => {
+            const all = document.querySelectorAll('.c-val');
+            const done = Array.from(all).filter(c => c.checked).length;
+            if(done < all.length) return toast("FALTA LIMPIEZA", true);
+            document.getElementById('modal-c').style.display = 'none';
+            do_check('SALIDA');
         };
 
-        async function clockRegistry(tipo) {
+        async function do_check(t) {
             await addDoc(collection(db, "asistencias"), {
-                uid: me.id, nombre: me.nombre, tipo, time: new Date().toISOString(), sueldo: me.sueldo, pagado: false
+                uid: user.id, nombre: user.nombre, tipo: t, time: new Date().toISOString(), sueldo: user.sueldo, pagado: false
             });
-            msg(tipo + " REGISTRADA");
-            renderStatus();
-            if(me.rol === 'Socio') renderNomina();
+            toast(t + " REGISTRADA");
+            load_staff();
+            if(user.rol === 'Socio') load_nomina();
         }
 
-        async function renderNomina() {
+        async function load_nomina() {
             const snap = await getDocs(query(collection(db, "asistencias"), where("pagado", "==", false)));
-            const container = document.getElementById('nomina-render');
-            container.innerHTML = "";
+            const cont = document.getElementById('nom-list');
+            cont.innerHTML = "";
             let data = {};
             snap.forEach(d => {
-                const a = {id: d.id, ...d.data()};
-                if(!data[a.uid]) data[a.uid] = { nombre: a.nombre, ent: [], sal: [], sueldo: a.sueldo, ids: [] };
+                const a = d.data();
+                if(!data[a.uid]) data[a.uid] = { nom: a.nombre, ent: [], sal: [], s: a.sueldo };
                 if(a.tipo === 'ENTRADA') data[a.uid].ent.push(new Date(a.time));
                 else data[a.uid].sal.push(new Date(a.time));
-                data[a.uid].ids.push(a.id);
             });
-
             for(let u in data) {
-                let totalH = 0;
-                data[u].ent.forEach((e, i) => {
-                    if(data[u].sal[i]) totalH += (data[u].sal[i] - e) / 1000 / 3600;
-                });
-                const totalP = totalH * data[u].sueldo;
-                container.innerHTML += `<div class="card" style="background:rgba(255,255,255,0.05)">
-                    <b>${data[u].nombre}</b><br><small>Sueldo: $${data[u].sueldo}/hr</small>
-                    <h3 class="text-gold">$${totalP.toFixed(2)} (${totalH.toFixed(2)} hrs)</h3>
-                    <button class="btn-pill btn-gold" onclick="payStaff('${u}')">REGISTRAR PAGO</button>
-                </div>`;
+                let hrs = 0;
+                data[u].ent.forEach((e, i) => { if(data[u].sal[i]) hrs += (data[u].sal[i] - e) / 3600000; });
+                cont.innerHTML += `<div class="row-item"><span>${data[u].nom}: $${(hrs*data[u].s).toFixed(2)} (${hrs.toFixed(1)}h)</span><button class="btn-pill btn-gold" style="width:80px" onclick="pay('${u}')">PAGAR</button></div>`;
             }
         }
 
-        window.payStaff = async (uid) => {
-            if(!confirm("¿Confirmar pago total?")) return;
+        window.pay = async (uid) => {
             const q = query(collection(db, "asistencias"), where("uid", "==", uid), where("pagado", "==", false));
             const snap = await getDocs(q);
             snap.forEach(async d => await updateDoc(doc(db, "asistencias", d.id), { pagado: true }));
-            msg("PAGO REGISTRADO"); renderNomina();
+            toast("PAGADO"); load_nomina();
         };
 
-        // --- ESCANER OCR Y FINANZAS ---
-        window.scanTicket = async (input) => {
-            msg("IA LEYENDO TICKET...");
+        // --- 4. FINANZAS Y OCR ---
+        window.manualFinanzas = async () => {
+            const ing = parseFloat(document.getElementById('f-ing-manual').value) || 0;
+            const gas = parseFloat(document.getElementById('f-gas-manual').value) || 0;
+            if(ing>0) await addDoc(collection(db, "finanzas"), { monto: ing, tipo: 'ING', desc: 'Manual', fecha: new Date().toISOString() });
+            if(gas>0) await addDoc(collection(db, "finanzas"), { monto: gas, tipo: 'GAS', desc: 'Manual', fecha: new Date().toISOString() });
+            load_finanzas();
+        };
+
+        window.scanDoc = async (input) => {
+            document.getElementById('ocr-status').innerText = "PROCESANDO IA...";
             const { data: { text } } = await Tesseract.recognize(input.files[0], 'spa');
-            const match = text.match(/TOTAL[:\s]*\$?(\d+[\.,]\d{2})/i) || text.match(/(\d+[\.,]\d{2})/);
-            const monto = match ? parseFloat(match[1].replace(',', '.')) : 0;
-            if(monto > 0) {
-                await addDoc(collection(db, "movimientos"), { monto, tipo: 'GASTO', desc: 'Escáner Ticket', fecha: new Date().toISOString() });
-                msg("GASTO REGISTRADO: $" + monto);
-                renderBalance();
-            } else {
-                msg("NO SE DETECTÓ MONTO", true);
-            }
+            const m = text.match(/(\d+[\.,]\d{2})/);
+            if(m) {
+                const val = parseFloat(m[0].replace(',', '.'));
+                await addDoc(collection(db, "finanzas"), { monto: val, tipo: 'GAS', desc: 'Ticket Escaneado', fecha: new Date().toISOString() });
+                toast("GASTO DETECTADO: $" + val);
+                load_finanzas();
+            } else { toast("NO SE HALLÓ MONTO", true); }
+            document.getElementById('ocr-status').innerText = "";
         };
 
-        async function renderBalance() {
-            const snap = await getDocs(collection(db, "movimientos"));
-            let ing = 0, gas = 0;
-            const list = document.getElementById('movimientos-lista');
-            list.innerHTML = "";
+        async function load_finanzas() {
+            const snap = await getDocs(collection(db, "finanzas"));
+            let bal = 0; let h = "";
             snap.forEach(d => {
-                const m = {id: d.id, ...d.data()};
-                if(m.tipo === 'INGRESO') ing += m.monto; else gas += m.monto;
-                list.innerHTML += `<div class="flex-between" style="padding:10px; border-bottom:1px solid #222">
-                    <small>${m.desc}</small><b style="color:${m.tipo==='GASTO'?'#b0413e':'#c5a059'}">$${m.monto}</b>
-                    <button class="btn-delete" onclick="deleteRec('movimientos','${m.id}')" style="position:static">✕</button>
-                </div>`;
+                const f = d.data();
+                bal += f.tipo === 'ING' ? f.monto : -f.monto;
+                h += `<div class="row-item"><span>${f.desc}</span><b style="color:${f.tipo==='GAS'?'var(--terracota)':'var(--dorado)'}">${f.tipo==='ING'?'+':'-'}$${f.monto}</b><button onclick="del_rec('finanzas','${d.id}')">✕</button></div>`;
             });
-            document.getElementById('balance-num').innerText = `$${(ing - gas).toFixed(2)}`;
-            document.getElementById('total-ing').innerText = `$${ing}`;
-            document.getElementById('total-gas').innerText = `$${gas}`;
+            document.getElementById('f-balance').innerText = `$${bal.toFixed(2)}`;
+            document.getElementById('f-list').innerHTML = h;
         }
 
-        // --- RECETARIO EXCEL ---
-        window.importCosteo = (input) => {
+        // --- 5. EXCEL Y RECETAS ---
+        window.importExcel = (input) => {
             const reader = new FileReader();
             reader.onload = async (e) => {
-                const data = new Uint8Array(e.target.result);
-                const wb = XLSX.read(data, {type: 'array'});
-                msg("IMPORTANDO PESTAÑAS...");
-                for(let sn of wb.SheetNames) {
-                    const json = XLSX.utils.sheet_to_json(wb.Sheets[sn]);
-                    await setDoc(doc(db, "recetas", sn), { items: json });
+                const wb = XLSX.read(new Uint8Array(e.target.result), {type: 'array'});
+                for(let s of wb.SheetNames) {
+                    const data = XLSX.utils.sheet_to_json(wb.Sheets[s]);
+                    await updateDoc(doc(db, "config", "recetas"), { [s]: data });
                 }
-                msg("RECETARIO ACTUALIZADO"); renderRecipes();
+                toast("RECETAS ACTUALIZADAS");
             };
             reader.readAsArrayBuffer(input.files[0]);
         };
 
-        async function renderRecipes() {
-            const snap = await getDocs(collection(db, "recetas"));
-            const div = document.getElementById('recetario-view');
-            div.innerHTML = "";
-            snap.forEach(d => {
-                div.innerHTML += `<div class="card"><h3>${d.id}</h3><small>${d.data().items.length} ingredientes</small></div>`;
-            });
-        }
-
-        // --- AGENDA ---
-        window.saveEvent = async () => {
+        // --- 6. AGENDA ---
+        window.addEvent = async () => {
             const t = document.getElementById('ag-title').value;
-            const f = document.getElementById('ag-date').value;
-            if(!t || !f) return msg("COMPLETA DATOS", true);
-            await addDoc(collection(db, "agenda"), { titulo: t, fecha: f, desc: document.getElementById('ag-desc').value });
-            msg("EVENTO GUARDADO"); renderCalendar();
+            const d = document.getElementById('ag-date').value;
+            await addDoc(collection(db, "agenda"), { titulo: t, fecha: d });
+            toast("RESERVADO"); render_cal();
         };
 
-        async function renderCalendar() {
-            const grid = document.getElementById('calendar-render');
-            grid.innerHTML = "";
-            const first = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
-            const days = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
-            const events = await getDocs(collection(db, "agenda"));
-            let evList = []; events.forEach(e => evList.push(e.data().fecha.split('T')[0]));
-
-            for(let i=0; i<first; i++) grid.innerHTML += `<div></div>`;
-            for(let d=1; d<=days; d++) {
-                const dateStr = `${viewDate.getFullYear()}-${(viewDate.getMonth()+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-                const hasEv = evList.includes(dateStr);
-                grid.innerHTML += `<div class="cal-day ${hasEv?'today':''}" onclick="msg('Evento: ${dateStr}')">${d}${hasEv?'<div class="cal-dot"></div>':''}</div>`;
-            }
-            document.getElementById('cal-month-name').innerText = viewDate.toLocaleDateString('es-MX', {month:'long', year:'numeric'}).toUpperCase();
-        }
-
-        // --- ADMINISTRACIÓN ---
-        window.addTask = async () => {
-            const t = document.getElementById('new-t').value;
-            await addDoc(collection(db, "checklist"), { tarea: t });
-            document.getElementById('new-t').value = "";
-            renderAdminCheck();
-        };
-
-        async function renderAdminCheck() {
-            const snap = await getDocs(collection(db, "checklist"));
-            const div = document.getElementById('checklist-admin-view');
-            div.innerHTML = "";
-            snap.forEach(d => {
-                div.innerHTML += `<div class="flex-between" style="padding:10px; border-bottom:1px solid #222">
-                    <span>${d.data().tarea}</span>
-                    <button class="btn-delete" onclick="deleteRec('checklist','${d.id}')" style="position:static">✕</button>
-                </div>`;
-            });
-        }
-
-        window.registerUser = async () => {
-            const n = document.getElementById('u-nom').value;
-            const p = document.getElementById('u-pin').value;
-            const s = document.getElementById('u-pay').value;
-            const r = document.getElementById('u-rol').value;
-            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, sueldo: parseFloat(s), rol: r });
-            msg("USUARIO CREADO"); renderUsers();
-        };
-
-        async function renderUsers() {
-            const snap = await getDocs(collection(db, "usuarios"));
-            const div = document.getElementById('users-list-admin');
-            div.innerHTML = "";
-            snap.forEach(d => {
-                const u = d.data();
-                div.innerHTML += `<div class="flex-between" style="padding:10px">
-                    <span>${u.nombre} (${u.rol})</span>
-                    <button onclick="deleteRec('usuarios','${d.id}')" style="color:var(--terracota); background:none; border:none">BORRAR</button>
-                </div>`;
-            });
-        }
-
-        // --- INICIALIZACIÓN ---
-        function startApp() {
-            nav(me.rol === 'Socio' ? 'finanzas' : 'reloj');
-            renderCalendar();
-            renderAdminCheck();
-            renderUsers();
-            if(me.rol === 'Socio') { renderBalance(); renderNomina(); renderRecipes(); }
+        async function render_cal() {
+            const body = document.getElementById('cal-body'); body.innerHTML = "";
+            const start = new Date(cal_date.getFullYear(), cal_date.getMonth(), 1).getDay();
+            const days = new Date(cal_date.getFullYear(), cal_date.getMonth()+1, 0).getDate();
+            const snap = await getDocs(collection(db, "agenda"));
+            let evs = []; snap.forEach(d => evs.push(d.data().fecha.split('T')[0]));
             
+            for(let i=0; i<start; i++) body.innerHTML += `<div></div>`;
+            for(let d=1; d<=days; d++) {
+                const ds = `${cal_date.getFullYear()}-${(cal_date.getMonth()+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                body.innerHTML += `<div class="cal-day">${d}${evs.includes(ds)?'<div class="event-mark"></div>':''}</div>`;
+            }
+            document.getElementById('cal-label').innerText = cal_date.toLocaleDateString('es-MX', {month:'long', year:'numeric'});
+        }
+
+        // --- 7. ADMIN TAREAS Y USUARIOS ---
+        window.adm_user = async () => {
+            await addDoc(collection(db, "usuarios"), { 
+                nombre: document.getElementById('adm-nom').value,
+                pin: document.getElementById('adm-pin').value,
+                sueldo: parseFloat(document.getElementById('adm-sueldo').value),
+                rol: document.getElementById('adm-rol').value
+            });
+            toast("EMPLEADO LISTO"); load_adm();
+        };
+
+        window.adm_add_task = async () => {
+            await addDoc(collection(db, "checklist"), { tarea: document.getElementById('adm-task').value });
+            document.getElementById('adm-task').value = "";
+            load_adm();
+        };
+
+        async function load_adm() {
+            const u_snap = await getDocs(collection(db, "usuarios"));
+            let uh = ""; u_snap.forEach(d => uh += `<div class="row-item"><span>${d.data().nombre}</span><button onclick="del_rec('usuarios','${d.id}')">BORRAR</button></div>`);
+            document.getElementById('adm-user-list').innerHTML = uh;
+
+            const t_snap = await getDocs(collection(db, "checklist"));
+            let th = ""; t_snap.forEach(d => th += `<div class="row-item"><span>${d.data().tarea}</span><button onclick="del_rec('checklist','${d.id}')">✕</button></div>`);
+            document.getElementById('adm-check-list').innerHTML = th;
+        }
+
+        // --- UTILIDADES ---
+        window.del_rec = async (c, id) => {
+            if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, c, id)); toast("ELIMINADO"); init(); }
+        };
+
+        function toast(m, e=false) {
+            const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
+            t.style.background = e ? 'var(--terracota)' : 'var(--dorado)';
+            setTimeout(() => t.style.display = 'none', 3000);
+        }
+
+        function init() {
+            go(user.rol === 'Socio' ? 'finanzas' : 'reloj');
+            render_cal(); load_adm();
+            if(user.rol === 'Socio') { load_finanzas(); load_nomina(); }
             setInterval(() => {
                 const n = new Date();
-                document.getElementById('live-timer').innerText = n.toLocaleTimeString('es-MX', {hour12:false, hour:'2-digit', minute:'2-digit'});
-                document.getElementById('live-day-txt').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+                document.getElementById('clk-time').innerText = n.toLocaleTimeString();
+                document.getElementById('clk-date').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
             }, 1000);
         }
 
-        // --- BORRADO UNIVERSAL ---
-        window.deleteRec = async (coll, id) => {
-            if(!confirm("¿Eliminar registro?")) return;
-            await deleteDoc(doc(db, coll, id));
-            msg("ELIMINADO");
-            if(coll === 'checklist') renderAdminCheck();
-            if(coll === 'usuarios') renderUsers();
-            if(coll === 'movimientos') renderBalance();
-        };
-
-        window.msg = (m, e=false) => {
-            const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
-            t.style.background = e ? 'var(--terracota)' : 'var(--dorado)';
-            setTimeout(() => t.style.display='none', 3000);
-        };
-
-        window.changeMonth = (n) => { viewDate.setMonth(viewDate.getMonth() + n); renderCalendar(); };
+        window.cal_move = (n) => { cal_date.setMonth(cal_date.getMonth()+n); render_cal(); };
     </script>
 </body>
 </html>
