@@ -142,7 +142,32 @@
     <div id="tareas" class="container"><h2>Checklist</h2></div>
     <div id="reloj" class="container"><h2>Reloj Checador</h2></div>
     <div id="recetas" class="container"><h2>Recetas</h2></div>
-    <div id="admin" class="container"><h2>Panel Admin</h2></div>
+    <div id="admin" class="container">
+    <h2 style="text-align: center; letter-spacing: 2px;">PANEL ADMIN</h2>
+
+    <div class="card" style="border-top: 3px solid var(--dorado);">
+        <h3 style="font-size: 0.9rem; color: var(--cantera);">+ REGISTRAR COLABORADOR</h3>
+        <input type="text" id="reg-nombre" placeholder="Nombre del empleado">
+        <input type="number" id="reg-pin" placeholder="PIN de 4 dígitos (Ej: 1122)">
+
+        <select id="reg-rol" style="width: 100%; padding: 12px; background: var(--negro); color: var(--cantera); border: 1px solid var(--verde-bosque); border-radius: 8px; margin: 10px 0;">
+            <option value="">Seleccionar Puesto...</option>
+            <option value="Socio">Socio</option>
+            <option value="Barman">Barman</option>
+            <option value="Chef">Chef</option>
+            <option value="Barista">Barista</option>
+            <option value="Staff">Staff</option>
+        </select>
+
+        <button class="btn-gold" onclick="guardarNuevoUsuario()" style="margin-top: 10px;">GUARDAR EN ESCAROLA</button>
+    </div>
+
+    <div class="card">
+        <h3 style="font-size: 0.9rem; color: var(--cantera);">EQUIPO ACTUAL</h3>
+        <div id="lista-personal-db" style="margin-top: 15px;">
+            </div>
+    </div>
+</div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc } from './firebase-config.js';
@@ -190,7 +215,7 @@
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('main-nav').style.display = 'grid';
                     showTab('finanzas');
-                    if(u.rol === 'Socio') window.calcularFinanzasReales();
+                    if(u.rol === 'Socio') window.calcularFinanzasReales();window.cargarPersonal();
                 } else {
                     window.notificar("PIN Incorrecto", true);
                     window.borrar();
@@ -208,6 +233,79 @@
             document.getElementById('val-gastos').innerText = `$${g.toLocaleString()}`;
             document.getElementById('val-utilidad').innerText = `$${(i-g).toLocaleString()}`;
         };
+        // --- LÓGICA DE ADMINISTRACIÓN ---
+
+        // Función para guardar en Firebase
+        window.guardarNuevoUsuario = async () => {
+            const nombre = document.getElementById('reg-nombre').value;
+            const pin = document.getElementById('reg-pin').value;
+            const rol = document.getElementById('reg-rol').value;
+
+            if(!nombre || pin.length !== 4 || !rol) {
+                window.notificar("⚠️ Completa todos los campos (PIN de 4 dígitos)", true);
+                return;
+            }
+
+            try {
+                await addDoc(collection(db, "usuarios"), {
+                    nombre: nombre,
+                    pin: pin,
+                    rol: rol,
+                    fechaRegistro: new Date().toISOString()
+                });
+                window.notificar("✅ Usuario registrado con éxito");
+                
+                // Limpiar campos
+                document.getElementById('reg-nombre').value = "";
+                document.getElementById('reg-pin').value = "";
+                document.getElementById('reg-rol').value = "";
+                
+                window.cargarPersonal(); // Recargar la lista
+            } catch (error) {
+                window.notificar("❌ Error al guardar", true);
+            }
+        };
+
+        // Función para cargar la lista de usuarios
+        window.cargarPersonal = async () => {
+            const listaContenedor = document.getElementById('lista-personal-db');
+            if (!listaContenedor) return;
+
+            const snap = await getDocs(collection(db, "usuarios"));
+            listaContenedor.innerHTML = ""; // Limpiar antes de cargar
+
+            snap.forEach(docSnap => {
+                const u = docSnap.data();
+                const id = docSnap.id;
+
+                listaContenedor.innerHTML += `
+                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px 0; border-bottom: 1px solid rgba(217,212,199,0.1);">
+                        <div>
+                            <strong style="color: var(--cantera)">${u.nombre}</strong><br>
+                            <small style="color: var(--dorado)">${u.rol}</small>
+                        </div>
+                        <button onclick="eliminarUsuario('${id}')" style="background: none; color: var(--terracota); border: none; cursor: pointer; font-size: 1.2rem;">✕</button>
+                    </div>
+                `;
+            });
+        };
+
+        // Función para eliminar usuario
+        window.eliminarUsuario = async (id) => {
+            if(confirm("¿Estás seguro de eliminar a este colaborador?")) {
+                try {
+                    await deleteDoc(doc(db, "usuarios", id));
+                    window.notificar("🗑️ Usuario eliminado");
+                    window.cargarPersonal();
+                } catch (error) {
+                    window.notificar("❌ Error al eliminar", true);
+                }
+            }
+        };
+        
+        // Hacer que la lista se cargue si el socio entra al admin
+        // (Esto se dispara en la función verificarAcceso que ya tienes)
     </script>
 </body>
 </html>
+
