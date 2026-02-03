@@ -149,104 +149,158 @@
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, orderBy, limit } from './firebase-config.js';
 
-        let pinIngresado = "";
-        let usuarioActual = null;
+let pinIngresado = "";
+let usuarioActual = null;
 
-        setInterval(() => {
-            const now = new Date();
-            if(document.getElementById('current-time')){
-                document.getElementById('current-time').innerText = now.toLocaleTimeString();
-                document.getElementById('current-date').innerText = now.toLocaleDateString();
-            }
-        }, 1000);
+// RELOJ EN TIEMPO REAL
+setInterval(() => {
+    const clockEl = document.getElementById('current-time');
+    if(clockEl) {
+        const now = new Date();
+        clockEl.innerText = now.toLocaleTimeString();
+        document.getElementById('current-date').innerText = now.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+    }
+}, 1000);
 
-        window.notificar = (msg, err = false) => {
-            const t = document.createElement("div");
-            t.className = "toast";
-            if(err) t.style.background = "var(--terracota)";
-            t.innerText = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        };
+// NOTIFICACIONES FLOTANTES
+window.notificar = (msg, err = false) => {
+    const t = document.createElement("div");
+    t.className = "toast";
+    if(err) t.style.background = "var(--terracota)";
+    t.innerText = msg;
+    document.body.appendChild(t);
+    setTimeout(() => t.remove(), 3000);
+};
 
-        window.tecleo = (n) => {
-            if(pinIngresado.length < 4) {
-                pinIngresado += n;
-                updateDots();
-                if(pinIngresado.length === 4) setTimeout(verificarAcceso, 200);
-            }
-        };
+// LÓGICA DEL PINPAD
+window.tecleo = (n) => {
+    if(pinIngresado.length < 4) {
+        pinIngresado += n;
+        updateDots();
+        if(pinIngresado.length === 4) setTimeout(verificarAcceso, 200);
+    }
+};
+window.borrar = () => { pinIngresado = ""; updateDots(); };
+function updateDots() {
+    for(let i=0; i<4; i++) {
+        const dot = document.getElementById(`dot-${i}`);
+        if(dot) dot.classList.toggle('filled', i < pinIngresado.length);
+    }
+}
 
-        window.borrar = () => { pinIngresado = ""; updateDots(); };
+// NAVEGACIÓN Y BLOQUEO POR ROL
+window.showTab = (tabId) => {
+    // Si no es Socio, no puede entrar a Finanzas ni Admin
+    if(usuarioActual.rol !== 'Socio' && (tabId === 'finanzas' || tabId === 'admin')) {
+        window.notificar("🚫 Acceso restringido a Socios", true);
+        return;
+    }
+    document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
+    document.getElementById(tabId).style.display = 'block';
+};
 
-        function updateDots() {
-            for(let i=0; i<4; i++) document.getElementById(`dot-${i}`).classList.toggle('filled', i < pinIngresado.length);
-        }
-
-        window.showTab = (tabId) => {
-            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).style.display = 'block';
-        };
-
-        async function verificarAcceso() {
-            const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
-            const snap = await getDocs(q);
-            if(!snap.empty) {
-                const d = snap.docs[0];
-                usuarioActual = { id: d.id, ...d.data() };
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-nav').style.display = 'grid';
+// LOGIN
+async function verificarAcceso() {
+    try {
+        const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
+        const snap = await getDocs(q);
+        
+        if(!snap.empty) {
+            const d = snap.docs[0];
+            usuarioActual = { id: d.id, ...d.data() };
+            
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-nav').style.display = 'grid';
+            
+            // Si es socio, ve finanzas, si no, va directo a Reloj o Tareas
+            if(usuarioActual.rol === 'Socio') {
                 showTab('finanzas');
-                if(usuarioActual.rol === 'Socio') {
-                    document.getElementById('seccion-nomina-socio').style.display = 'block';
-                    window.cargarPersonal();
-                }
+                window.cargarPersonal();
             } else {
-                window.notificar("PIN Incorrecto", true);
-                window.borrar();
+                showTab('reloj');
             }
+            window.notificar(`Bienvenido, ${usuarioActual.nombre}`);
+        } else {
+            window.notificar("PIN Incorrecto", true);
+            window.borrar();
+        }
+    } catch (e) {
+        window.notificar("Error de conexión", true);
+        console.error(e);
+    }
+}
+
+// GUARDAR USUARIO (ADMIN)
+window.guardarNuevoUsuario = async () => {
+    const n = document.getElementById('reg-nombre').value;
+    const p = document.getElementById('reg-pin').value;
+    const r = document.getElementById('reg-rol').value;
+    const s = document.getElementById('reg-sueldo').value;
+    
+    if(!n || !p || !r || !s) return window.notificar("Faltan datos", true);
+    
+    await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, rol: r, sueldo: Number(s) });
+    window.notificar("✅ Guardado correctamente");
+    window.cargarPersonal();
+};
+
+// ASISTENCIA (CORREGIDA)
+window.registrarAsistencia = async (tipo) => {
+    if(!usuarioActual) return;
+    
+    try {
+        // Consultar el último movimiento de este usuario
+        const q = query(
+            collection(db, "asistencias"), 
+            where("uid", "==", usuarioActual.id),
+            orderBy("timestamp", "desc"),
+            limit(1)
+        );
+        const lastSnap = await getDocs(q);
+        const ultimo = !lastSnap.empty ? lastSnap.docs[0].data().tipo : 'SALIDA';
+
+        if(tipo === ultimo) {
+            window.notificar(`⚠️ Ya marcaste ${tipo}`, true);
+            return;
         }
 
-        window.guardarNuevoUsuario = async () => {
-            const n = document.getElementById('reg-nombre').value;
-            const p = document.getElementById('reg-pin').value;
-            const r = document.getElementById('reg-rol').value;
-            const s = document.getElementById('reg-sueldo').value;
-            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, rol: r, sueldo: Number(s) });
-            window.notificar("✅ Guardado");
-            window.cargarPersonal();
-        };
+        await addDoc(collection(db, "asistencias"), {
+            uid: usuarioActual.id,
+            nombre: usuarioActual.nombre,
+            tipo: tipo,
+            timestamp: new Date().toISOString()
+        });
+        
+        window.notificar(`✨ ${tipo} exitosa`);
+    } catch (e) {
+        window.notificar("Error al marcar", true);
+        console.error(e);
+    }
+};
 
-        window.registrarAsistencia = async (tipo) => {
-            if(!usuarioActual) return;
-            const q = query(collection(db, "asistencias"), where("uid", "==", usuarioActual.id), orderBy("timestamp", "desc"), limit(1));
-            const lastSnap = await getDocs(q);
-            const ultimo = !lastSnap.empty ? lastSnap.docs[0].data().tipo : 'SALIDA';
-            if(tipo === ultimo) return window.notificar(`⚠️ Ya marcaste ${tipo}`, true);
+// CARGAR LISTA ADMIN
+window.cargarPersonal = async () => {
+    const snap = await getDocs(collection(db, "usuarios"));
+    const cont = document.getElementById('lista-personal-db');
+    if(!cont) return;
+    cont.innerHTML = "";
+    snap.forEach(d => {
+        const u = d.data();
+        cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #333;">
+            <span>${u.nombre} (${u.rol})</span>
+            <button onclick="eliminarUsuario('${d.id}')" style="background:none; color:var(--terracota); border:none;">✕</button>
+        </div>`;
+    });
+};
 
-            await addDoc(collection(db, "asistencias"), {
-                uid: usuarioActual.id, nombre: usuarioActual.nombre, tipo, timestamp: new Date().toISOString()
-            });
-            window.notificar(`✅ ${tipo} registrada`);
-        };
-
-        window.cargarPersonal = async () => {
-            const snap = await getDocs(collection(db, "usuarios"));
-            const cont = document.getElementById('lista-personal-db');
-            cont.innerHTML = "";
-            snap.forEach(d => {
-                const u = d.data();
-                cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #333;">
-                    <span>${u.nombre} ($${u.sueldo}/hr)</span>
-                    <button onclick="eliminarUsuario('${d.id}')" style="background:none; color:var(--terracota); border:none;">✕</button>
-                </div>`;
-            });
-        };
-
-        window.eliminarUsuario = async (id) => {
-            if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, "usuarios", id)); window.cargarPersonal(); }
-        };
+window.eliminarUsuario = async (id) => {
+    if(confirm("¿Eliminar usuario?")) {
+        await deleteDoc(doc(db, "usuarios", id));
+        window.cargarPersonal();
+    }
+};
     </script>
 </body>
 </html>
+
