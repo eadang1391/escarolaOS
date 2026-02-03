@@ -144,33 +144,30 @@
     <h2 style="text-align: center; letter-spacing: 2px;">RELOJ CHECADOR</h2>
     
     <div class="card" style="text-align: center; border-bottom: 3px solid var(--dorado);">
-        <div id="current-time" style="font-size: 2.5rem; color: var(--cantera); font-weight: bold; margin-bottom: 5px;">00:00:00</div>
-        <div id="current-date" style="color: var(--dorado); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">FECHA</div>
+        <div id="current-time" style="font-size: 2.5rem; color: var(--cantera); font-weight: bold;">00:00:00</div>
+        <div id="current-date" style="color: var(--dorado); font-size: 0.9rem;">FECHA</div>
     </div>
 
     <div class="card">
-        <h3 id="txt-status-reloj" style="font-size: 1rem; text-align: center; margin-bottom: 20px;">Presiona para registrar tu asistencia</h3>
         <div style="display: flex; gap: 15px;">
-            <button id="btn-entrada" class="btn-gold" onclick="registrarAsistencia('ENTRADA')" style="flex: 1; height: 60px;">ENTRADA</button>
-            <button id="btn-salida" class="btn-red" onclick="registrarAsistencia('SALIDA')" style="flex: 1; height: 60px;">SALIDA</button>
+            <button onclick="registrarAsistencia('ENTRADA')" style="background: var(--verde-bosque); color: var(--cantera); border: 1px solid var(--dorado); flex: 1; height: 60px; border-radius: 8px; font-weight: bold; cursor: pointer;">ENTRADA</button>
+            <button class="btn-red" onclick="registrarAsistencia('SALIDA')" style="flex: 1; height: 60px;">SALIDA</button>
         </div>
     </div>
 
-    <div class="card" style="background: rgba(0,0,0,0.3);">
-        <h3 style="font-size: 0.8rem; color: var(--dorado);">MIS MOVIMIENTOS HOY</h3>
-        <div id="historial-reloj-hoy" style="font-size: 0.9rem;">
-            </div>
+    <div id="seccion-nomina-socio" style="display:none;" class="card">
+        <h3 style="color: var(--dorado); font-size: 0.9rem;">💰 NÓMINA Y HORAS (VISTA SOCIO)</h3>
+        <div id="lista-nomina"></div>
     </div>
 </div>
     <div id="recetas" class="container"><h2>Recetas</h2></div>
     <div id="admin" class="container">
-    <h2 style="text-align: center; letter-spacing: 2px;">PANEL ADMIN</h2>
-
-    <div class="card" style="border-top: 3px solid var(--dorado);">
-        <h3 style="font-size: 0.9rem; color: var(--cantera);">+ REGISTRAR COLABORADOR</h3>
+    <h2>PANEL ADMIN</h2>
+    <div class="card">
+        <h3>+ REGISTRAR COLABORADOR</h3>
         <input type="text" id="reg-nombre" placeholder="Nombre del empleado">
-        <input type="number" id="reg-pin" placeholder="PIN de 4 dígitos (Ej: 1122)">
-
+        <input type="number" id="reg-pin" placeholder="PIN de 4 dígitos">
+        <input type="number" id="reg-sueldo" placeholder="Sueldo por hora $ (Ej: 50)">
         <select id="reg-rol" style="width: 100%; padding: 12px; background: var(--negro); color: var(--cantera); border: 1px solid var(--verde-bosque); border-radius: 8px; margin: 10px 0;">
             <option value="">Seleccionar Puesto...</option>
             <option value="Socio">Socio</option>
@@ -179,14 +176,10 @@
             <option value="Barista">Barista</option>
             <option value="Staff">Staff</option>
         </select>
-
-        <button class="btn-gold" onclick="guardarNuevoUsuario()" style="margin-top: 10px;">GUARDAR EN ESCAROLA</button>
+        <button class="btn-gold" onclick="guardarNuevoUsuario()">GUARDAR</button>
     </div>
-
     <div class="card">
-        <h3 style="font-size: 0.9rem; color: var(--cantera);">EQUIPO ACTUAL</h3>
-        <div id="lista-personal-db" style="margin-top: 15px;">
-            </div>
+        <div id="lista-personal-db"></div>
     </div>
 </div>
 
@@ -389,5 +382,6 @@
     </script>
 </body>
 </html>
+
 
 
