@@ -143,3 +143,95 @@
         <div class="tab-item" onclick="showTab('cocina')"><i class="fa-solid fa-book-open"></i>Cocina</div>
         <div class="tab-item" onclick="showTab('admin')"><i class="fa-solid fa-user-shield"></i>Admin</div>
     </nav>
+<div id="finanzas" class="container">
+        <h2 class="text-gold">Estado Financiero</h2>
+        <div class="card" style="border-left: 5px solid var(--dorado);">
+            <small class="text-small">UTILIDAD NETA (ESTE MES)</small>
+            <h1 id="val-utilidad" style="font-size: 2.8rem; margin: 10px 0;">$0</h1>
+            <div class="flex-between">
+                <span style="color:var(--dorado)">↑ Ingresos: <b id="val-ingresos">$0</b></span>
+                <span style="color:var(--terracota)">↓ Gastos: <b id="val-gastos">$0</b></span>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h3 class="text-gold"><i class="fa-solid fa-file-invoice-dollar"></i> Escáner de Gastos</h3>
+            <p class="text-small">Sube tu factura o ticket para registro automático.</p>
+            <button class="btn-pill btn-green" onclick="abrirEscaner()" style="width:100%">
+                <i class="fa-solid fa-camera"></i> ESCANEAR DOCUMENTO
+            </button>
+        </div>
+    </div>
+
+    <div id="agenda" class="container">
+        <h2 class="text-gold">Agenda & Reservas</h2>
+        
+        <div class="card">
+            <div class="flex-between">
+                <h3><i class="fa-solid fa-calendar-day text-gold"></i> Calendario</h3>
+                <button id="btn-add-evento" class="btn-pill btn-gold" style="padding: 8px 15px; font-size: 0.7rem;" onclick="abrirModalEvento()">+ EVENTO</button>
+            </div>
+            <div id="lista-eventos" style="margin-top:15px;">
+                </div>
+        </div>
+
+        <div class="card">
+            <div class="flex-between">
+                <h3><i class="fa-solid fa-chair text-gold"></i> Reservaciones</h3>
+                <button class="btn-pill btn-green" style="padding: 8px 15px; font-size: 0.7rem;" onclick="abrirModalReserva()">+ NUEVA</button>
+            </div>
+            <div id="lista-reservas" style="margin-top:15px;"></div>
+        </div>
+    </div>
+
+    <div id="reloj" class="container">
+        <h2 class="text-gold">Control de Asistencia</h2>
+        <div class="card" style="text-align: center;">
+            <div id="current-time" style="font-size: 3rem; font-weight: bold; color: var(--cantera);">00:00:00</div>
+            <div id="current-date" class="text-gold" style="text-transform: uppercase; letter-spacing: 2px;">FECHA</div>
+        </div>
+
+        <div class="card" style="display: flex; gap: 15px;">
+            <button class="btn-pill btn-green" style="flex:1; height: 70px;" onclick="registrarAsistencia('ENTRADA')">ENTRADA</button>
+            <button class="btn-pill btn-red" style="flex:1; height: 70px;" onclick="registrarAsistencia('SALIDA')">SALIDA</button>
+        </div>
+
+        <div id="nomina-socio" style="display:none;">
+            <h3 class="text-gold"><i class="fa-solid fa-wallet"></i> Nómina Semanal</h3>
+            <div id="lista-nomina"></div>
+        </div>
+    </div>
+
+    <div id="cocina" class="container">
+        <h2 class="text-gold">Recetario & Costos</h2>
+        <div class="card">
+            <button class="btn-pill btn-gold" onclick="abrirModalReceta()" style="width:100%">+ CREAR RECETA COSTEO</button>
+        </div>
+        <div id="lista-recetas"></div>
+    </div>
+
+    <div id="admin" class="container">
+        <h2 class="text-gold">Administración</h2>
+        <div class="card">
+            <h3>Gestión de Personal</h3>
+            <input type="text" id="reg-nombre" placeholder="Nombre Completo">
+            <input type="number" id="reg-pin" placeholder="PIN de Seguridad (4 dígitos)">
+            <input type="number" id="reg-sueldo" placeholder="Sueldo Base por Hora $">
+            <select id="reg-rol">
+                <option value="Socio">Socio</option>
+                <option value="Barman">Barman</option>
+                <option value="Chef">Chef</option>
+                <option value="Barista">Barista</option>
+                <option value="Staff">Staff</option>
+            </select>
+            <button class="btn-pill btn-gold" style="width:100%; margin-top:10px;" onclick="guardarNuevoUsuario()">REGISTRAR COLABORADOR</button>
+        </div>
+        <div id="lista-personal-db" class="card"></div>
+    </div>
+
+    <div id="modal-universal" class="modal">
+        <div class="modal-content">
+            <button onclick="cerrarModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:var(--terracota); font-size:1.5rem;">✕</button>
+            <div id="modal-body"></div>
+        </div>
+    </div>
