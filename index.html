@@ -140,7 +140,28 @@
     </div>
 
     <div id="tareas" class="container"><h2>Checklist</h2></div>
-    <div id="reloj" class="container"><h2>Reloj Checador</h2></div>
+    <div id="reloj" class="container">
+    <h2 style="text-align: center; letter-spacing: 2px;">RELOJ CHECADOR</h2>
+    
+    <div class="card" style="text-align: center; border-bottom: 3px solid var(--dorado);">
+        <div id="current-time" style="font-size: 2.5rem; color: var(--cantera); font-weight: bold; margin-bottom: 5px;">00:00:00</div>
+        <div id="current-date" style="color: var(--dorado); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 2px;">FECHA</div>
+    </div>
+
+    <div class="card">
+        <h3 id="txt-status-reloj" style="font-size: 1rem; text-align: center; margin-bottom: 20px;">Presiona para registrar tu asistencia</h3>
+        <div style="display: flex; gap: 15px;">
+            <button id="btn-entrada" class="btn-gold" onclick="registrarAsistencia('ENTRADA')" style="flex: 1; height: 60px;">ENTRADA</button>
+            <button id="btn-salida" class="btn-red" onclick="registrarAsistencia('SALIDA')" style="flex: 1; height: 60px;">SALIDA</button>
+        </div>
+    </div>
+
+    <div class="card" style="background: rgba(0,0,0,0.3);">
+        <h3 style="font-size: 0.8rem; color: var(--dorado);">MIS MOVIMIENTOS HOY</h3>
+        <div id="historial-reloj-hoy" style="font-size: 0.9rem;">
+            </div>
+    </div>
+</div>
     <div id="recetas" class="container"><h2>Recetas</h2></div>
     <div id="admin" class="container">
     <h2 style="text-align: center; letter-spacing: 2px;">PANEL ADMIN</h2>
@@ -211,11 +232,15 @@
                 const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
                 const snap = await getDocs(q);
                 if(!snap.empty) {
-                    const u = snap.docs[0].data();
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('main-nav').style.display = 'grid';
-                    showTab('finanzas');
-                    if(u.rol === 'Socio') window.calcularFinanzasReales();window.cargarPersonal();
+    const docUser = snap.docs[0];
+    usuarioActual = { id: docUser.id, ...docUser.data() }; // <-- GUARDAMOS AL USUARIO
+    
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('main-nav').style.display = 'grid';
+    showTab('finanzas');
+                    window.cargarHistorialReloj();
+                    if(u.rol === 'Socio') window.calcularFinanzasReales();
+                    window.cargarPersonal();
                 } else {
                     window.notificar("PIN Incorrecto", true);
                     window.borrar();
@@ -305,7 +330,64 @@
         
         // Hacer que la lista se cargue si el socio entra al admin
         // (Esto se dispara en la función verificarAcceso que ya tienes)
+        // --- LÓGICA DEL RELOJ CHECADOR ---
+        let usuarioActual = null; // Guardará los datos del que hizo login
+
+        // Actualizador de hora en pantalla
+        setInterval(() => {
+            const now = new Date();
+            if(document.getElementById('current-time')) {
+                document.getElementById('current-time').innerText = now.toLocaleTimeString();
+                document.getElementById('current-date').innerText = now.toLocaleDateString('es-MX', { weekday: 'long', day: 'numeric', month: 'long' });
+            }
+        }, 1000);
+
+        window.registrarAsistencia = async (tipo) => {
+            if (!usuarioActual) return window.notificar("⚠️ Error de sesión", true);
+
+            try {
+                await addDoc(collection(db, "asistencias"), {
+                    uid: usuarioActual.id,
+                    nombre: usuarioActual.nombre,
+                    rol: usuarioActual.rol,
+                    tipo: tipo, // ENTRADA o SALIDA
+                    timestamp: new Date().toISOString(),
+                    fechaCorta: new Date().toLocaleDateString()
+                });
+
+                window.notificar(`✅ ${tipo} registrada: ${usuarioActual.nombre}`);
+                window.cargarHistorialReloj();
+            } catch (error) {
+                window.notificar("❌ Error al registrar", true);
+            }
+        };
+
+        window.cargarHistorialReloj = async () => {
+            const contenedor = document.getElementById('historial-reloj-hoy');
+            if (!contenedor || !usuarioActual) return;
+
+            const q = query(
+                collection(db, "asistencias"), 
+                where("uid", "==", usuarioActual.id),
+                where("fechaCorta", "==", new Date().toLocaleDateString())
+            );
+
+            const snap = await getDocs(q);
+            contenedor.innerHTML = "";
+            
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                const hora = new Date(data.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                contenedor.innerHTML += `
+                    <div style="display:flex; justify-content:space-between; padding: 5px 0; border-bottom: 1px solid rgba(255,255,255,0.05);">
+                        <span>${data.tipo}</span>
+                        <span style="color:var(--dorado)">${hora}</span>
+                    </div>
+                `;
+            });
+        };
     </script>
 </body>
 </html>
+
 
