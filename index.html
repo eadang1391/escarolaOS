@@ -3,80 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EscarolaOS - Sistema Integral</title>
+    <title>EscarolaOS - Full Master System</title>
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    
+    <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+
     <style>
         :root {
-            --verde-bosque: #1b3022;
-            --verde-oscuro: #14241a;
-            --terracota: #b0413e;
-            --cantera: #d9d4c7;
-            --dorado: #c5a059;
-            --negro: #0a0a0a;
-            --blanco-trans: rgba(217, 212, 199, 0.1);
-            --sombra: 0 10px 30px rgba(0,0,0,0.5);
+            --verde-bosque: #1b3022; --verde-oscuro: #14241a; --terracota: #b0413e;
+            --cantera: #d9d4c7; --dorado: #c5a059; --negro: #0a0a0a;
+            --blanco-trans: rgba(217, 212, 199, 0.15); --shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
-
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
-        body { 
-            font-family: 'Segoe UI', sans-serif; 
-            background-color: var(--verde-bosque); 
-            color: var(--cantera); 
-            margin: 0; padding: 0; 
-            height: 100vh; overflow-x: hidden;
-        }
-
-        /* --- PANTALLA PIN --- */
-        #login-screen {
-            position: fixed; inset: 0; background: var(--verde-bosque);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 9000;
-        }
-        .logo-box { text-align: center; margin-bottom: 30px; }
-        .logo-box h1 { font-size: 2.2rem; letter-spacing: 12px; margin: 0; }
-        .logo-box span { color: var(--dorado); }
-
-        .dot-container { display: flex; gap: 15px; margin-bottom: 40px; }
-        .dot { width: 16px; height: 16px; border: 2px solid var(--dorado); border-radius: 50%; transition: 0.3s; }
-        .dot.active { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); }
-
-        .grid-pin { display: grid; grid-template-columns: repeat(3, 80px); gap: 15px; }
-        .btn-pin {
-            width: 80px; height: 80px; border-radius: 50%; border: 1px solid var(--dorado);
-            background: var(--verde-oscuro); color: var(--dorado); font-size: 1.4rem;
-            font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-        .btn-pin:active { background: var(--dorado); color: var(--verde-oscuro); transform: scale(0.9); }
-
-        /* --- NAVEGACIÓN --- */
-        #main-nav {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 95%; max-width: 500px; background: rgba(20, 36, 26, 0.95);
-            backdrop-filter: blur(10px); display: none; grid-template-columns: repeat(5, 1fr);
-            border-radius: 40px; border: 1px solid var(--dorado); padding: 10px; z-index: 5000;
-            box-shadow: var(--sombra);
-        }
-        .tab-item { text-align: center; color: var(--cantera); opacity: 0.4; cursor: pointer; font-size: 0.6rem; text-transform: uppercase; }
-        .tab-item.active { opacity: 1; color: var(--dorado); }
-        .tab-item i { font-size: 1.2rem; display: block; margin-bottom: 4px; }
-
-        /* --- CONTENEDORES --- */
-        .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; display: none; padding-bottom: 120px; }
-        .card { background: var(--verde-oscuro); border-radius: 25px; padding: 20px; margin-bottom: 15px; border: 1px solid var(--blanco-trans); box-shadow: var(--sombra); }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; transition: all 0.2s ease; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--verde-bosque); color: var(--cantera); margin: 0; overflow-x: hidden; height: 100vh; }
         
-        .btn-pill { border-radius: 50px; border: none; padding: 12px 15px; font-weight: bold; cursor: pointer; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; text-transform: uppercase; font-size: 0.75rem; transition: 0.3s; }
+        /* Estructura de Contenedores */
+        .container { width: 100%; max-width: 900px; margin: 0 auto; padding: 25px; display: none; padding-bottom: 140px; animation: slideUp 0.4s ease; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        
+        .card { background: var(--verde-oscuro); border-radius: 30px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--blanco-trans); box-shadow: var(--shadow); position: relative; }
+        
+        /* UI Elements */
+        .btn-pill { border-radius: 50px; border: none; padding: 15px; font-weight: bold; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; text-transform: uppercase; font-size: 0.85rem; width: 100%; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
         .btn-gold { background: var(--dorado); color: var(--verde-oscuro); }
         .btn-green { background: var(--verde-oscuro); color: var(--dorado); border: 1px solid var(--dorado); }
         .btn-red { background: var(--terracota); color: white; }
+        .btn-delete { position: absolute; top: 15px; right: 15px; background: none; border: none; color: var(--terracota); cursor: pointer; font-size: 1.1rem; }
 
-        input, select { width: 100%; padding: 12px; margin: 8px 0; background: var(--negro); border: 1px solid var(--blanco-trans); border-radius: 12px; color: var(--cantera); }
+        input, select, textarea { width: 100%; padding: 15px; margin: 10px 0; background: var(--negro); border: 1px solid var(--blanco-trans); border-radius: 15px; color: white; font-size: 1rem; }
+        
+        /* Navegación Inferior */
+        #main-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 600px; background: rgba(20, 36, 26, 0.98); border-radius: 60px; border: 1px solid var(--dorado); display: none; grid-template-columns: repeat(5, 1fr); padding: 12px; z-index: 5000; box-shadow: var(--shadow); backdrop-filter: blur(15px); }
+        .tab-item { text-align: center; color: var(--cantera); opacity: 0.4; cursor: pointer; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
+        .tab-item.active { opacity: 1; color: var(--dorado); font-weight: bold; }
+        .tab-item i { font-size: 1.5rem; display: block; margin-bottom: 5px; }
 
-        #toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: var(--dorado); color: var(--verde-oscuro); padding: 10px 25px; border-radius: 50px; font-weight: bold; display: none; z-index: 10000; }
+        /* Login Screen */
+        #login-screen { position: fixed; inset: 0; background: var(--verde-bosque); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 10000; }
+        .btn-pin { width: 85px; height: 85px; border-radius: 50%; border: 1px solid var(--dorado); background: var(--verde-oscuro); color: var(--dorado); font-size: 1.8rem; font-weight: bold; }
+        .btn-pin:active { background: var(--dorado); color: var(--verde-oscuro); transform: scale(0.9); }
 
-        /* Estilo para Checklist */
-        .check-row { display: flex; align-items: center; gap: 12px; background: var(--blanco-trans); padding: 12px; border-radius: 15px; margin-bottom: 8px; cursor: pointer; }
-        .check-row input { width: 20px; height: 20px; margin: 0; accent-color: var(--dorado); }
+        /* Calendario */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .cal-day { aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: 15px; background: var(--blanco-trans); font-size: 0.9rem; cursor: pointer; position: relative; }
+        .cal-day.today { border: 2px solid var(--dorado); background: rgba(197, 160, 89, 0.1); }
+        .cal-dot { width: 6px; height: 6px; background: var(--dorado); border-radius: 50%; position: absolute; bottom: 8px; }
+
+        /* Checklist Style */
+        .check-item { display: flex; align-items: center; gap: 15px; padding: 15px; background: var(--blanco-trans); border-radius: 15px; margin-bottom: 10px; cursor: pointer; }
+        .check-item input { width: 22px; height: 22px; accent-color: var(--dorado); }
+
+        /* Utilitarios */
+        .text-gold { color: var(--dorado); }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        #toast { position: fixed; top: 30px; left: 50%; transform: translateX(-50%); padding: 15px 40px; border-radius: 50px; font-weight: bold; display: none; z-index: 11000; box-shadow: var(--shadow); }
     </style>
 </head>
 <body>
@@ -84,396 +65,408 @@
     <div id="toast"></div>
 
     <div id="login-screen">
-        <div class="logo-box"><h1>ESCAROLA<span>OS</span></h1><p style="color:var(--dorado); letter-spacing:3px; font-size:0.6rem;">MASTER CONTROL</p></div>
-        <div class="dot-container">
-            <div class="dot" id="d0"></div><div class="dot" id="d1"></div><div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+        <h1 style="letter-spacing:15px; margin-bottom:10px">ESCAROLA<span>OS</span></h1>
+        <p style="color:var(--dorado); font-size:0.7rem; letter-spacing:5px; margin-bottom:30px">SISTEMA INTEGRAL DE CONTROL</p>
+        <div style="display:flex; margin-bottom: 50px;">
+            <div id="dot0" class="dot" style="width:20px; height:20px; border:2px solid var(--dorado); border-radius:50%; margin:0 12px;"></div>
+            <div id="dot1" class="dot" style="width:20px; height:20px; border:2px solid var(--dorado); border-radius:50%; margin:0 12px;"></div>
+            <div id="dot2" class="dot" style="width:20px; height:20px; border:2px solid var(--dorado); border-radius:50%; margin:0 12px;"></div>
+            <div id="dot3" class="dot" style="width:20px; height:20px; border:2px solid var(--dorado); border-radius:50%; margin:0 12px;"></div>
         </div>
-        <div class="grid-pin" id="pin-board">
-            <button class="btn-pin" data-val="1">1</button><button class="btn-pin" data-val="2">2</button><button class="btn-pin" data-val="3">3</button>
-            <button class="btn-pin" data-val="4">4</button><button class="btn-pin" data-val="5">5</button><button class="btn-pin" data-val="6">6</button>
-            <button class="btn-pin" data-val="7">7</button><button class="btn-pin" data-val="8">8</button><button class="btn-pin" data-val="9">9</button>
-            <button class="btn-pin" style="color:var(--terracota)" data-val="C">C</button><button class="btn-pin" data-val="0">0</button><button class="btn-pin" data-val="R"><i class="fa-solid fa-rotate"></i></button>
+        <div style="display:grid; grid-template-columns: repeat(3, 90px); gap: 20px;">
+            <button class="btn-pin" onclick="press('1')">1</button><button class="btn-pin" onclick="press('2')">2</button><button class="btn-pin" onclick="press('3')">3</button>
+            <button class="btn-pin" onclick="press('4')">4</button><button class="btn-pin" onclick="press('5')">5</button><button class="btn-pin" onclick="press('6')">6</button>
+            <button class="btn-pin" onclick="press('7')">7</button><button class="btn-pin" onclick="press('8')">8</button><button class="btn-pin" onclick="press('9')">9</button>
+            <button class="btn-pin" onclick="resetPin()" style="color:var(--terracota)">C</button><button class="btn-pin" onclick="press('0')">0</button><button class="btn-pin" onclick="location.reload()"><i class="fa-solid fa-rotate"></i></button>
         </div>
     </div>
 
-    <nav id="main-nav">
-        <div class="tab-item active" id="tab-finanzas" onclick="showTab('finanzas')"><i class="fa-solid fa-chart-line"></i>Finanzas</div>
-        <div class="tab-item" id="tab-agenda" onclick="showTab('agenda')"><i class="fa-solid fa-calendar-alt"></i>Agenda</div>
-        <div class="tab-item" id="tab-reloj" onclick="showTab('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
-        <div class="tab-item" id="tab-cocina" onclick="showTab('cocina')"><i class="fa-solid fa-utensils"></i>Cocina</div>
-        <div class="tab-item" id="tab-admin" onclick="showTab('admin')"><i class="fa-solid fa-user-shield"></i>Admin</div>
-    </nav>
-
     <div id="finanzas" class="container">
-        <h2 style="color:var(--dorado)">Capital & Balance</h2>
-        <div class="card" style="border-left: 5px solid var(--dorado)">
-            <small>UTILIDAD ESTIMADA</small>
-            <h1 id="total-balance" style="font-size: 2.8rem; margin: 5px 0">$0.00</h1>
-            <div style="display:flex; justify-content:space-between; font-size:0.8rem">
-                <span style="color:var(--dorado)">Ingresos: <b id="ing-val">$0</b></span>
-                <span style="color:var(--terracota)">Gastos: <b id="gas-val">$0</b></span>
+        <h2 class="text-gold">Estado de Capital</h2>
+        <div class="card" style="border-left: 8px solid var(--dorado)">
+            <small>BALANCE TOTAL (Bancos + POS - Gastos)</small>
+            <h1 id="balance-num" style="font-size:3.8rem; margin:10px 0">$0.00</h1>
+            <div class="flex-between">
+                <span>Ingresos: <b id="total-ing">$0</b></span>
+                <span>Gastos: <b id="total-gas" style="color:var(--terracota)">$0</b></span>
             </div>
         </div>
+        
         <div class="card">
-            <h4><i class="fa-solid fa-qrcode"></i> Escáner de Facturas</h4>
-            <button class="btn-pill btn-gold" onclick="alert('Iniciando Cámara IA...')">SUBIR TICKET</button>
+            <h4><i class="fa-solid fa-camera"></i> Escáner de Gastos (IA OCR)</h4>
+            <p style="font-size:0.8rem; opacity:0.7">Sube la foto de tu ticket para procesar el gasto automáticamente.</p>
+            <input type="file" id="ocr-upload" accept="image/*" hidden onchange="scanTicket(this)">
+            <button class="btn-pill btn-green" onclick="document.getElementById('ocr-upload').click()">ESCANEAR FACTURA / TICKET</button>
+        </div>
+
+        <div class="card">
+            <h4>Registro de Movimientos</h4>
+            <div id="movimientos-lista"></div>
+            <button class="btn-pill btn-gold" style="margin-top:15px" onclick="exportToExcel('finanzas')">DESCARGAR EXCEL FINANCIERO</button>
         </div>
     </div>
 
     <div id="agenda" class="container">
-        <h2 style="color:var(--dorado)">Reservas y Eventos</h2>
-        <div id="calendar-card" class="card">
+        <h2 class="text-gold">Agenda de Eventos</h2>
+        <div class="card">
+            <div class="flex-between">
+                <button onclick="changeMonth(-1)" class="btn-pill" style="width:40px">◀</button>
+                <h3 id="cal-month-name">Febrero 2026</h3>
+                <button onclick="changeMonth(1)" class="btn-pill" style="width:40px">▶</button>
             </div>
+            <div class="cal-grid" id="calendar-render"></div>
+        </div>
+        <div class="card">
+            <h4>Agendar Nueva Reservación</h4>
+            <input type="text" id="ag-title" placeholder="Cliente / Evento">
+            <input type="datetime-local" id="ag-date">
+            <textarea id="ag-desc" placeholder="Detalles extra..."></textarea>
+            <button class="btn-pill btn-gold" onclick="saveEvent()">GUARDAR EN CALENDARIO</button>
+        </div>
     </div>
 
     <div id="reloj" class="container">
-        <h2 style="color:var(--dorado)">Asistencia Personal</h2>
+        <h2 class="text-gold">Control de Asistencia</h2>
         <div class="card" style="text-align:center">
-            <h1 id="live-clock" style="font-size:3.5rem; margin:0">00:00</h1>
-            <p id="live-date" style="color:var(--dorado); margin:0">FECHA</p>
+            <h1 id="live-timer" style="font-size:4.5rem; margin:0">00:00</h1>
+            <p id="live-day-txt" style="letter-spacing:5px; text-transform:uppercase; color:var(--dorado)"></p>
         </div>
-        <div style="display:flex; gap:15px">
-            <button class="btn-pill btn-green" style="height:80px; font-size:1.2rem" onclick="marcarEntrada()">ENTRADA</button>
-            <button class="btn-pill btn-red" style="height:80px; font-size:1.2rem" onclick="marcarSalida()">SALIDA</button>
+        <div style="display:flex; gap:20px">
+            <button class="btn-pill btn-green" style="height:100px; font-size:1.4rem" onclick="handleClock('ENTRADA')">ENTRADA</button>
+            <button class="btn-pill btn-red" style="height:100px; font-size:1.4rem" onclick="handleClock('SALIDA')">SALIDA</button>
+        </div>
+        <div class="card" style="margin-top:30px">
+            <h4>Personal actualmente en turno:</h4>
+            <div id="staff-online"></div>
         </div>
     </div>
 
     <div id="cocina" class="container">
-        <h2 style="color:var(--dorado)">Recetario e Inventario</h2>
+        <h2 class="text-gold">Recetario Maestro</h2>
         <div class="card">
-            <button class="btn-pill btn-gold" onclick="document.getElementById('excel-input').click()">IMPORTAR EXCEL RECETAS</button>
-            <input type="file" id="excel-input" hidden accept=".xlsx, .xls">
+            <p>Importar Base de Datos de Costeo (Excel):</p>
+            <input type="file" id="excel-rec" accept=".xlsx, .xls" hidden onchange="importCosteo(this)">
+            <button class="btn-pill btn-gold" onclick="document.getElementById('excel-rec').click()">SUBIR ARCHIVO COSTEO TOTAL</button>
         </div>
-        <div id="lista-insumos-alerta"></div>
+        <div id="recetario-view"></div>
     </div>
 
     <div id="admin" class="container">
-        <h2 style="color:var(--dorado)">Configuración Máster</h2>
+        <h2 class="text-gold">Panel Administrativo</h2>
+        
         <div class="card">
-            <h4>Gestionar Checklist de Limpieza</h4>
-            <div id="admin-tasks-list"></div>
-            <div style="display:flex; gap:10px; margin-top:10px">
-                <input type="text" id="new-task-input" placeholder="Ej: Limpiar freidora">
-                <button class="btn-pill btn-gold" style="width:50px" onclick="addChecklistTask()">+</button>
+            <h4>Nómina Detallada (Horas x Sueldo)</h4>
+            <div id="nomina-render"></div>
+        </div>
+
+        <div class="card">
+            <h4>Gestión de Personal y Roles</h4>
+            <input type="text" id="u-nom" placeholder="Nombre Completo">
+            <input type="number" id="u-pin" placeholder="PIN de 4 dígitos">
+            <input type="number" id="u-pay" placeholder="Sueldo por hora ($)">
+            <select id="u-rol">
+                <option value="Staff">Staff</option>
+                <option value="Socio">Socio / Dueño</option>
+            </select>
+            <button class="btn-pill btn-gold" onclick="registerUser()">AÑADIR AL SISTEMA</button>
+            <hr style="opacity:0.1; margin:20px 0">
+            <div id="users-list-admin"></div>
+        </div>
+
+        <div class="card">
+            <h4>Checklist Obligatorio de Salida</h4>
+            <div id="checklist-admin-view"></div>
+            <div style="display:flex; gap:10px">
+                <input type="text" id="new-t" placeholder="Nueva tarea de limpieza...">
+                <button class="btn-pill btn-gold" style="width:60px" onclick="addTask()">+</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-container" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:10000; align-items:center; justify-content:center; padding:20px;">
-        <div class="card" style="width:100%; max-width:450px; position:relative">
-            <button onclick="closeModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:var(--terracota); font-size:1.5rem">✕</button>
-            <div id="modal-content"></div>
+    <div id="modal-check" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.95); z-index:11000; align-items:center; justify-content:center; padding:20px;">
+        <div class="card" style="width:100%; max-width:450px">
+            <h2 class="text-gold">Limpieza de Cierre</h2>
+            <p>Marca todo lo que ya se completó:</p>
+            <div id="checklist-modal-items"></div>
+            <button class="btn-pill btn-gold" style="margin-top:20px" onclick="finalizeClockOut()">FINALIZAR TURNO</button>
         </div>
     </div>
-<script type="module">
-        // 1. CONFIGURACIÓN Y CONEXIÓN
-        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
-        let currentPin = "";
-        window.usuarioActual = null;
-        let tareasLimpieza = [];
+    <nav id="main-nav">
+        <div class="tab-item active" id="btn-finanzas" onclick="nav('finanzas')"><i class="fa-solid fa-vault"></i>Capital</div>
+        <div class="tab-item" id="btn-agenda" onclick="nav('agenda')"><i class="fa-solid fa-calendar"></i>Agenda</div>
+        <div class="tab-item" id="btn-reloj" onclick="nav('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
+        <div class="tab-item" id="btn-cocina" onclick="nav('cocina')"><i class="fa-solid fa-fire-burner"></i>Cocina</div>
+        <div class="tab-item" id="btn-admin" onclick="nav('admin')"><i class="fa-solid fa-crown"></i>Admin</div>
+    </nav>
 
-        // 2. LÓGICA DEL PINPAD (REFORZADA)
-        document.getElementById('pin-board').addEventListener('click', (e) => {
-            const val = e.target.closest('button')?.dataset.val;
-            if (!val) return;
+    <script type="module">
+        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit, onSnapshot } from './firebase-config.js';
 
-            if (val === 'C') { 
-                currentPin = ""; 
-                updateDots(); 
-            } else if (val === 'R') { 
-                location.reload(); 
+        let curPin = "";
+        let me = null;
+        let viewDate = new Date();
+
+        // --- SISTEMA DE ACCESO ---
+        window.press = (n) => {
+            if(curPin.length < 4) {
+                curPin += n;
+                for(let i=0; i<4; i++) document.getElementById('dot'+i).style.background = i < curPin.length ? 'var(--dorado)' : 'transparent';
+                if(curPin.length === 4) login();
+            }
+        };
+        window.resetPin = () => { curPin = ""; for(let i=0; i<4; i++) document.getElementById('dot'+i).style.background = 'transparent'; };
+
+        async function login() {
+            const q = query(collection(db, "usuarios"), where("pin", "==", curPin));
+            const snap = await getDocs(q);
+            if(!snap.empty) {
+                me = { id: snap.docs[0].id, ...snap.docs[0].data() };
+                document.getElementById('login-screen').style.display = 'none';
+                document.getElementById('main-nav').style.display = 'grid';
+                startApp();
             } else {
-                if (currentPin.length < 4) {
-                    currentPin += val;
-                    updateDots();
-                    if (currentPin.length === 4) {
-                        setTimeout(checkAccess, 200);
-                    }
-                }
-            }
-        });
-
-        function updateDots() {
-            for (let i = 0; i < 4; i++) {
-                document.getElementById(`d${i}`).classList.toggle('active', i < currentPin.length);
+                msg("PIN INCORRECTO", true);
+                resetPin();
             }
         }
 
-        // 3. CONTROL DE ACCESO Y SEGURIDAD
-        async function checkAccess() {
-            showToast("VERIFICANDO...");
-            try {
-                const q = query(collection(db, "usuarios"), where("pin", "==", currentPin));
-                const snap = await getDocs(q);
-
-                if (!snap.empty) {
-                    const docUser = snap.docs[0];
-                    window.usuarioActual = { id: docUser.id, ...docUser.data() };
-                    
-                    showToast(`¡HOLA, ${window.usuarioActual.nombre.toUpperCase()}!`);
-                    
-                    // Transición al Dashboard
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('main-nav').style.display = 'grid';
-                    
-                    iniciarReloj();
-                    configurarEntornoPorRol();
-                } else {
-                    showToast("PIN INCORRECTO", true);
-                    currentPin = "";
-                    updateDots();
-                }
-            } catch (err) {
-                showToast("ERROR DE CONEXIÓN", true);
-                currentPin = "";
-                updateDots();
-            }
-        }
-
-        function configurarEntornoPorRol() {
-            const esSocio = window.usuarioActual.rol === 'Socio';
-            
-            if (esSocio) {
-                showTab('finanzas');
-                cargarConfiguracionAdmin();
-            } else {
-                showTab('reloj');
-                // Ocultar pestañas restringidas
-                document.getElementById('tab-finanzas').style.display = 'none';
-                document.getElementById('tab-admin').style.display = 'none';
-                document.getElementById('main-nav').style.gridTemplateColumns = 'repeat(3, 1fr)';
-            }
-        }
-
-        // 4. NAVEGACIÓN ENTRE MÓDULOS
-        window.showTab = (tabId) => {
+        // --- NAVEGACIÓN Y ROLES ---
+        window.nav = (id) => {
+            if((id === 'finanzas' || id === 'admin') && me.rol !== 'Socio') return msg("ACCESO RESTRINGIDO", true);
             document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
             document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            
-            document.getElementById(tabId).style.display = 'block';
-            document.getElementById('tab-' + tabId).classList.add('active');
+            document.getElementById(id).style.display = 'block';
+            document.getElementById('btn-'+id).classList.add('active');
             window.scrollTo(0,0);
         };
 
-        // 5. RELOJ Y FECHA EN TIEMPO REAL
-        function iniciarReloj() {
+        // --- RELOJ Y RRHH (NOMINA REAL) ---
+        window.handleClock = async (tipo) => {
+            if(tipo === 'SALIDA') {
+                const list = await getDocs(collection(db, "checklist"));
+                let h = "";
+                list.forEach(d => {
+                    h += `<div class="check-item"><input type="checkbox" class="c-val"><span>${d.data().tarea}</span></div>`;
+                });
+                document.getElementById('checklist-modal-items').innerHTML = h;
+                document.getElementById('modal-check').style.display = 'flex';
+                return;
+            }
+            clockRegistry('ENTRADA');
+        };
+
+        window.finalizeClockOut = () => {
+            const checks = document.querySelectorAll('.c-val');
+            const total = checks.length;
+            const done = Array.from(checks).filter(c => c.checked).length;
+            if(done < total) return msg("COMPLETA LA LIMPIEZA", true);
+            document.getElementById('modal-check').style.display = 'none';
+            clockRegistry('SALIDA');
+        };
+
+        async function clockRegistry(tipo) {
+            await addDoc(collection(db, "asistencias"), {
+                uid: me.id, nombre: me.nombre, tipo, time: new Date().toISOString(), sueldo: me.sueldo, pagado: false
+            });
+            msg(tipo + " REGISTRADA");
+            renderStatus();
+            if(me.rol === 'Socio') renderNomina();
+        }
+
+        async function renderNomina() {
+            const snap = await getDocs(query(collection(db, "asistencias"), where("pagado", "==", false)));
+            const container = document.getElementById('nomina-render');
+            container.innerHTML = "";
+            let data = {};
+            snap.forEach(d => {
+                const a = {id: d.id, ...d.data()};
+                if(!data[a.uid]) data[a.uid] = { nombre: a.nombre, ent: [], sal: [], sueldo: a.sueldo, ids: [] };
+                if(a.tipo === 'ENTRADA') data[a.uid].ent.push(new Date(a.time));
+                else data[a.uid].sal.push(new Date(a.time));
+                data[a.uid].ids.push(a.id);
+            });
+
+            for(let u in data) {
+                let totalH = 0;
+                data[u].ent.forEach((e, i) => {
+                    if(data[u].sal[i]) totalH += (data[u].sal[i] - e) / 1000 / 3600;
+                });
+                const totalP = totalH * data[u].sueldo;
+                container.innerHTML += `<div class="card" style="background:rgba(255,255,255,0.05)">
+                    <b>${data[u].nombre}</b><br><small>Sueldo: $${data[u].sueldo}/hr</small>
+                    <h3 class="text-gold">$${totalP.toFixed(2)} (${totalH.toFixed(2)} hrs)</h3>
+                    <button class="btn-pill btn-gold" onclick="payStaff('${u}')">REGISTRAR PAGO</button>
+                </div>`;
+            }
+        }
+
+        window.payStaff = async (uid) => {
+            if(!confirm("¿Confirmar pago total?")) return;
+            const q = query(collection(db, "asistencias"), where("uid", "==", uid), where("pagado", "==", false));
+            const snap = await getDocs(q);
+            snap.forEach(async d => await updateDoc(doc(db, "asistencias", d.id), { pagado: true }));
+            msg("PAGO REGISTRADO"); renderNomina();
+        };
+
+        // --- ESCANER OCR Y FINANZAS ---
+        window.scanTicket = async (input) => {
+            msg("IA LEYENDO TICKET...");
+            const { data: { text } } = await Tesseract.recognize(input.files[0], 'spa');
+            const match = text.match(/TOTAL[:\s]*\$?(\d+[\.,]\d{2})/i) || text.match(/(\d+[\.,]\d{2})/);
+            const monto = match ? parseFloat(match[1].replace(',', '.')) : 0;
+            if(monto > 0) {
+                await addDoc(collection(db, "movimientos"), { monto, tipo: 'GASTO', desc: 'Escáner Ticket', fecha: new Date().toISOString() });
+                msg("GASTO REGISTRADO: $" + monto);
+                renderBalance();
+            } else {
+                msg("NO SE DETECTÓ MONTO", true);
+            }
+        };
+
+        async function renderBalance() {
+            const snap = await getDocs(collection(db, "movimientos"));
+            let ing = 0, gas = 0;
+            const list = document.getElementById('movimientos-lista');
+            list.innerHTML = "";
+            snap.forEach(d => {
+                const m = {id: d.id, ...d.data()};
+                if(m.tipo === 'INGRESO') ing += m.monto; else gas += m.monto;
+                list.innerHTML += `<div class="flex-between" style="padding:10px; border-bottom:1px solid #222">
+                    <small>${m.desc}</small><b style="color:${m.tipo==='GASTO'?'#b0413e':'#c5a059'}">$${m.monto}</b>
+                    <button class="btn-delete" onclick="deleteRec('movimientos','${m.id}')" style="position:static">✕</button>
+                </div>`;
+            });
+            document.getElementById('balance-num').innerText = `$${(ing - gas).toFixed(2)}`;
+            document.getElementById('total-ing').innerText = `$${ing}`;
+            document.getElementById('total-gas').innerText = `$${gas}`;
+        }
+
+        // --- RECETARIO EXCEL ---
+        window.importCosteo = (input) => {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const data = new Uint8Array(e.target.result);
+                const wb = XLSX.read(data, {type: 'array'});
+                msg("IMPORTANDO PESTAÑAS...");
+                for(let sn of wb.SheetNames) {
+                    const json = XLSX.utils.sheet_to_json(wb.Sheets[sn]);
+                    await setDoc(doc(db, "recetas", sn), { items: json });
+                }
+                msg("RECETARIO ACTUALIZADO"); renderRecipes();
+            };
+            reader.readAsArrayBuffer(input.files[0]);
+        };
+
+        async function renderRecipes() {
+            const snap = await getDocs(collection(db, "recetas"));
+            const div = document.getElementById('recetario-view');
+            div.innerHTML = "";
+            snap.forEach(d => {
+                div.innerHTML += `<div class="card"><h3>${d.id}</h3><small>${d.data().items.length} ingredientes</small></div>`;
+            });
+        }
+
+        // --- AGENDA ---
+        window.saveEvent = async () => {
+            const t = document.getElementById('ag-title').value;
+            const f = document.getElementById('ag-date').value;
+            if(!t || !f) return msg("COMPLETA DATOS", true);
+            await addDoc(collection(db, "agenda"), { titulo: t, fecha: f, desc: document.getElementById('ag-desc').value });
+            msg("EVENTO GUARDADO"); renderCalendar();
+        };
+
+        async function renderCalendar() {
+            const grid = document.getElementById('calendar-render');
+            grid.innerHTML = "";
+            const first = new Date(viewDate.getFullYear(), viewDate.getMonth(), 1).getDay();
+            const days = new Date(viewDate.getFullYear(), viewDate.getMonth() + 1, 0).getDate();
+            const events = await getDocs(collection(db, "agenda"));
+            let evList = []; events.forEach(e => evList.push(e.data().fecha.split('T')[0]));
+
+            for(let i=0; i<first; i++) grid.innerHTML += `<div></div>`;
+            for(let d=1; d<=days; d++) {
+                const dateStr = `${viewDate.getFullYear()}-${(viewDate.getMonth()+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                const hasEv = evList.includes(dateStr);
+                grid.innerHTML += `<div class="cal-day ${hasEv?'today':''}" onclick="msg('Evento: ${dateStr}')">${d}${hasEv?'<div class="cal-dot"></div>':''}</div>`;
+            }
+            document.getElementById('cal-month-name').innerText = viewDate.toLocaleDateString('es-MX', {month:'long', year:'numeric'}).toUpperCase();
+        }
+
+        // --- ADMINISTRACIÓN ---
+        window.addTask = async () => {
+            const t = document.getElementById('new-t').value;
+            await addDoc(collection(db, "checklist"), { tarea: t });
+            document.getElementById('new-t').value = "";
+            renderAdminCheck();
+        };
+
+        async function renderAdminCheck() {
+            const snap = await getDocs(collection(db, "checklist"));
+            const div = document.getElementById('checklist-admin-view');
+            div.innerHTML = "";
+            snap.forEach(d => {
+                div.innerHTML += `<div class="flex-between" style="padding:10px; border-bottom:1px solid #222">
+                    <span>${d.data().tarea}</span>
+                    <button class="btn-delete" onclick="deleteRec('checklist','${d.id}')" style="position:static">✕</button>
+                </div>`;
+            });
+        }
+
+        window.registerUser = async () => {
+            const n = document.getElementById('u-nom').value;
+            const p = document.getElementById('u-pin').value;
+            const s = document.getElementById('u-pay').value;
+            const r = document.getElementById('u-rol').value;
+            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, sueldo: parseFloat(s), rol: r });
+            msg("USUARIO CREADO"); renderUsers();
+        };
+
+        async function renderUsers() {
+            const snap = await getDocs(collection(db, "usuarios"));
+            const div = document.getElementById('users-list-admin');
+            div.innerHTML = "";
+            snap.forEach(d => {
+                const u = d.data();
+                div.innerHTML += `<div class="flex-between" style="padding:10px">
+                    <span>${u.nombre} (${u.rol})</span>
+                    <button onclick="deleteRec('usuarios','${d.id}')" style="color:var(--terracota); background:none; border:none">BORRAR</button>
+                </div>`;
+            });
+        }
+
+        // --- INICIALIZACIÓN ---
+        function startApp() {
+            nav(me.rol === 'Socio' ? 'finanzas' : 'reloj');
+            renderCalendar();
+            renderAdminCheck();
+            renderUsers();
+            if(me.rol === 'Socio') { renderBalance(); renderNomina(); renderRecipes(); }
+            
             setInterval(() => {
-                const ahora = new Date();
-                document.getElementById('live-clock').innerText = ahora.toLocaleTimeString('es-MX', { hour12: false });
-                document.getElementById('live-date').innerText = ahora.toLocaleDateString('es-MX', { 
-                    weekday: 'long', day: 'numeric', month: 'long' 
-                }).toUpperCase();
+                const n = new Date();
+                document.getElementById('live-timer').innerText = n.toLocaleTimeString('es-MX', {hour12:false, hour:'2-digit', minute:'2-digit'});
+                document.getElementById('live-day-txt').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
             }, 1000);
         }
 
-        // 6. UTILIDADES DE NOTIFICACIÓN (TOAST)
-        window.showToast = (msg, error = false) => {
-            const t = document.getElementById('toast');
-            t.innerText = msg;
-            t.style.display = 'block';
-            t.style.background = error ? 'var(--terracota)' : 'var(--dorado)';
-            setTimeout(() => { t.style.display = 'none'; }, 2500);
+        // --- BORRADO UNIVERSAL ---
+        window.deleteRec = async (coll, id) => {
+            if(!confirm("¿Eliminar registro?")) return;
+            await deleteDoc(doc(db, coll, id));
+            msg("ELIMINADO");
+            if(coll === 'checklist') renderAdminCheck();
+            if(coll === 'usuarios') renderUsers();
+            if(coll === 'movimientos') renderBalance();
         };
 
-        window.closeModal = () => {
-            document.getElementById('modal-container').style.display = 'none';
+        window.msg = (m, e=false) => {
+            const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
+            t.style.background = e ? 'var(--terracota)' : 'var(--dorado)';
+            setTimeout(() => t.style.display='none', 3000);
         };
 
-        // Exportar funciones para uso en HTML
-        window.checkAccess = checkAccess;
-    // --- 7. LÓGICA DE ASISTENCIA (RRHH) ---
-        window.marcarEntrada = async () => {
-            if(!window.usuarioActual) return;
-            try {
-                // Verificar último registro para evitar doble entrada
-                const q = query(collection(db, "asistencias"), where("uid", "==", window.usuarioActual.id), orderBy("hora", "desc"), limit(1));
-                const snap = await getDocs(q);
-                const ultimo = snap.empty ? null : snap.docs[0].data();
-
-                if(ultimo && ultimo.tipo === "ENTRADA") {
-                    showToast("YA TIENES UNA ENTRADA ACTIVA", true);
-                    return;
-                }
-
-                await addDoc(collection(db, "asistencias"), {
-                    uid: window.usuarioActual.id,
-                    nombre: window.usuarioActual.nombre,
-                    tipo: "ENTRADA",
-                    hora: new Date().toISOString(),
-                    sueldoBase: window.usuarioActual.sueldo || 0,
-                    pagado: false
-                });
-                showToast("ENTRADA REGISTRADA");
-            } catch (e) { showToast("ERROR AL REGISTRAR", true); }
-        };
-
-        window.marcarSalida = async () => {
-            // 1. Cargar tareas de limpieza vigentes
-            const snap = await getDocs(collection(db, "checklist"));
-            if(snap.empty) {
-                ejecutarSalida();
-                return;
-            }
-
-            // 2. Mostrar Checklist Obligatorio en Modal
-            let html = `<h3 style="color:var(--dorado); margin-top:0">Checklist de Cierre</h3>
-                        <p style="font-size:0.8rem; margin-bottom:15px">Debes completar todo para finalizar turno:</p>`;
-            
-            snap.forEach((d, i) => {
-                const t = d.data();
-                html += `<div class="check-row" onclick="document.getElementById('task-${i}').click()">
-                            <input type="checkbox" id="task-${i}" class="task-confirm">
-                            <span>${t.tarea}</span>
-                         </div>`;
-            });
-
-            html += `<button class="btn-pill btn-gold" style="margin-top:15px" onclick="validarYSalir()">CONFIRMAR Y SALIR</button>`;
-            
-            document.getElementById('modal-content').innerHTML = html;
-            document.getElementById('modal-container').style.display = 'flex';
-        };
-
-        window.validarYSalir = () => {
-            const total = document.querySelectorAll('.task-confirm').length;
-            const marcadas = document.querySelectorAll('.task-confirm:checked').length;
-
-            if(marcadas < total) {
-                showToast("FALTAN TAREAS POR COMPLETAR", true);
-                return;
-            }
-            closeModal();
-            ejecutarSalida();
-        };
-
-        async function ejecutarSalida() {
-            try {
-                await addDoc(collection(db, "asistencias"), {
-                    uid: window.usuarioActual.id,
-                    nombre: window.usuarioActual.nombre,
-                    tipo: "SALIDA",
-                    hora: new Date().toISOString(),
-                    pagado: false
-                });
-                showToast("SALIDA REGISTRADA. ¡BUEN DESCANSO!");
-            } catch (e) { showToast("ERROR AL SALIR", true); }
-        }
-
-        // --- 8. CONFIGURACIÓN DE TAREAS (ADMIN) ---
-        window.cargarConfiguracionAdmin = async () => {
-            const cont = document.getElementById('admin-tasks-list');
-            if(!cont) return;
-            
-            const snap = await getDocs(collection(db, "checklist"));
-            cont.innerHTML = "";
-            snap.forEach(d => {
-                const t = d.data();
-                cont.innerHTML += `<div style="display:flex; justify-content:space-between; align-items:center; padding:10px; border-bottom:1px solid var(--blanco-trans)">
-                    <span>${t.tarea}</span>
-                    <button onclick="eliminarTarea('${d.id}')" style="background:none; border:none; color:var(--terracota); cursor:pointer"><i class="fa-solid fa-trash"></i></button>
-                </div>`;
-            });
-        };
-
-        window.addChecklistTask = async () => {
-            const input = document.getElementById('new-task-input');
-            if(!input.value) return;
-            
-            await addDoc(collection(db, "checklist"), { tarea: input.value });
-            input.value = "";
-            showToast("TAREA AGREGADA");
-            cargarConfiguracionAdmin();
-        };
-
-        window.eliminarTarea = async (id) => {
-            if(!confirm("¿Eliminar esta tarea del checklist?")) return;
-            await deleteDoc(doc(db, "checklist", id));
-            cargarConfiguracionAdmin();
-        };
-    // --- 9. MÓDULO DE NÓMINA (PARA EL SOCIO) ---
-        window.cargarNominaSocio = async () => {
-            const cont = document.getElementById('finanzas'); // O un contenedor específico en Finanzas
-            const snap = await getDocs(query(collection(db, "asistencias"), where("pagado", "==", false)));
-            
-            let resumen = {};
-            snap.forEach(d => {
-                const a = d.data();
-                if(!resumen[a.uid]) resumen[a.uid] = { nombre: a.nombre, total: 0, registros: [] };
-                resumen[a.uid].registros.push({id: d.id, ...a});
-            });
-
-            let html = `<h4 style="margin-top:25px; color:var(--dorado)">Nómina Pendiente</h4>`;
-            for(let id in resumen) {
-                html += `<div class="card" style="background:var(--blanco-trans)">
-                    <div style="display:flex; justify-content:space-between; align-items:center">
-                        <div><b>${resumen[id].nombre}</b><br><small>Turnos pendientes</small></div>
-                        <button class="btn-pill btn-gold" style="width:auto; padding:5px 15px" onclick="pagarNomina('${id}')">PAGAR</button>
-                    </div>
-                </div>`;
-            }
-            // Insertar después del balance en la pestaña finanzas
-            const nominaDiv = document.createElement('div');
-            nominaDiv.innerHTML = html;
-            cont.appendChild(nominaDiv);
-        };
-
-        window.pagarNomina = async (uid) => {
-            if(!confirm("¿Confirmas que has pagado este periodo?")) return;
-            const q = query(collection(db, "asistencias"), where("uid", "==", uid), where("pagado", "==", false));
-            const snap = await getDocs(q);
-            const promesas = snap.docs.map(d => updateDoc(doc(db, "asistencias", d.id), { pagado: true }));
-            await Promise.all(promesas);
-            showToast("PAGO REGISTRADO CORRECTAMENTE");
-            location.reload(); // Refrescar para limpiar vista
-        };
-
-        // --- 10. RECETARIO Y EXCEL ---
-        document.getElementById('excel-input')?.addEventListener('change', function(e) {
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const data = new Uint8Array(event.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
-                const sheet = workbook.Sheets[workbook.SheetNames[0]];
-                const json = XLSX.utils.sheet_to_json(sheet);
-                procesarRecetasExcel(json);
-            };
-            reader.readAsArrayBuffer(e.target.files[0]);
-        });
-
-        async function procesarRecetasExcel(datos) {
-            showToast("PROCESANDO EXCEL...");
-            for(let fila of datos) {
-                await addDoc(collection(db, "recetas"), {
-                    nombre: fila.Nombre || fila.item,
-                    costo: fila.Costo || 0,
-                    unidad: fila.Unidad || 'pz',
-                    timestamp: new Date().toISOString()
-                });
-            }
-            showToast("RECETARIO ACTUALIZADO");
-        }
-
-        // --- 11. INICIALIZADOR FINAL ---
-        // Modificamos la función que se ejecuta al entrar
-        const originalConfigRol = configurarEntornoPorRol;
-        window.configurarEntornoPorRol = () => {
-            originalConfigRol();
-            if(window.usuarioActual.rol === 'Socio') {
-                cargarNominaSocio();
-                cargarConfiguracionAdmin();
-            }
-        };
-
-        // Exportar funciones globales
-        window.validarYSalir = validarYSalir;
-        window.addChecklistTask = addChecklistTask;
-        window.eliminarTarea = eliminarTarea;
-        window.pagarNomina = pagarNomina;
-        window.marcarEntrada = marcarEntrada;
-        window.marcarSalida = marcarSalida;
+        window.changeMonth = (n) => { viewDate.setMonth(viewDate.getMonth() + n); renderCalendar(); };
     </script>
 </body>
 </html>
-    </script>
-
-
