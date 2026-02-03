@@ -158,5 +158,95 @@
             setTimeout(() => { t.style.display = 'none'; }, 2000);
         }
     </script>
+    <nav id="main-nav" style="display:none; position:fixed; bottom:25px; left:50%; transform:translateX(-50%); width:92%; max-width:450px; background:rgba(20, 36, 26, 0.95); backdrop-filter:blur(15px); grid-template-columns:repeat(5, 1fr); border-radius:50px; border:1px solid var(--dorado); padding:12px; z-index:1000; box-shadow:0 15px 45px rgba(0,0,0,0.7);">
+        <div class="tab-item active" onclick="showTab('finanzas')"><i class="fa-solid fa-vault"></i><small>Capital</small></div>
+        <div class="tab-item" onclick="showTab('agenda')"><i class="fa-solid fa-calendar"></i><small>Agenda</small></div>
+        <div class="tab-item" onclick="showTab('reloj')"><i class="fa-solid fa-clock"></i><small>Reloj</small></div>
+        <div class="tab-item" onclick="showTab('cocina')"><i class="fa-solid fa-fire"></i><small>Cocina</small></div>
+        <div class="tab-item" onclick="showTab('admin')"><i class="fa-solid fa-crown"></i><small>Admin</small></div>
+    </nav>
+
+    <style>
+        .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 25px; display: none; padding-bottom: 120px; animation: fadeIn 0.4s ease; }
+        .card { background: var(--verde-oscuro); border-radius: 28px; padding: 22px; margin-bottom: 20px; border: 1px solid rgba(217, 212, 199, 0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.4); }
+        .tab-item { text-align: center; color: var(--cantera); opacity: 0.4; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .tab-item.active { opacity: 1; color: var(--dorado); }
+        .tab-item i { font-size: 1.2rem; }
+        .tab-item small { font-size: 0.6rem; text-transform: uppercase; }
+        .btn-pill { border-radius: 50px; border: none; padding: 12px 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; letter-spacing: 1px; font-size: 0.75rem; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-gold { background: var(--dorado); color: var(--verde-oscuro); }
+        .btn-green { background: var(--verde-oscuro); color: var(--dorado); border: 1px solid var(--dorado); }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+
+    <div id="finanzas" class="container">
+        <h2 style="color:var(--dorado)">Estado Financiero</h2>
+        <div class="card" style="border-left: 5px solid var(--dorado)">
+            <small style="opacity:0.6">BALANCE NETO</small>
+            <h1 id="total-balance" style="font-size: 2.5rem; margin: 10px 0">$0.00</h1>
+            <div style="display:flex; justify-content:space-between; font-size: 0.8rem">
+                <span style="color:var(--dorado)">Ingresos: <b id="ing-val">$0</b></span>
+                <span style="color:var(--terracota)">Gastos: <b id="gas-val">$0</b></span>
+            </div>
+        </div>
+        <div class="card">
+            <h4 style="color:var(--dorado)">Escanear Gasto</h4>
+            <button class="btn-pill btn-green" onclick="alert('Iniciando Cámara...')"><i class="fa-solid fa-camera"></i> CAPTURAR TICKET</button>
+        </div>
+    </div>
+
+    <div id="agenda" class="container">
+        <h2 style="color:var(--dorado)">Agenda & Reservas</h2>
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
+                <b>Calendario</b>
+                <button class="btn-pill btn-gold" style="width:auto; padding:8px 15px" onclick="openModal('evento')">+ EVENTO</button>
+            </div>
+            <div id="calendar-grid" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:5px; text-align:center; font-size:0.7rem"></div>
+        </div>
+    </div>
+
+    <div id="reloj" class="container">
+        <h2 style="color:var(--dorado)">Control de Asistencia</h2>
+        <div class="card" style="text-align:center">
+            <div id="clock-display" style="font-size:3rem; font-weight:bold">00:00:00</div>
+            <div id="date-display" style="color:var(--dorado); font-size:0.8rem; margin-top:5px"></div>
+        </div>
+        <div style="display:flex; gap:15px">
+            <button class="btn-pill btn-green" style="height:70px" onclick="checkIn()">ENTRADA</button>
+            <button class="btn-pill btn-pill" style="height:70px; background:var(--terracota); color:white" onclick="checkOut()">SALIDA</button>
+        </div>
+    </div>
+
+    <div id="cocina" class="container">
+        <h2 style="color:var(--dorado)">Recetario & Stock</h2>
+        <div class="card">
+            <div style="display:flex; gap:10px">
+                <button class="btn-pill btn-gold" onclick="openModal('receta')">+ NUEVA</button>
+                <button class="btn-pill btn-green" onclick="openModal('excel')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
+            </div>
+        </div>
+        <div id="recetas-list"></div>
+    </div>
+
+    <div id="admin" class="container">
+        <h2 style="color:var(--dorado)">Administración</h2>
+        <div class="card">
+            <h4>Checklist de Limpieza</h4>
+            <div id="admin-checklist-tasks" style="margin-bottom:15px"></div>
+            <div style="display:flex; gap:10px">
+                <input type="text" id="task-input" placeholder="Nueva tarea..." style="flex:1; background:var(--negro); border:1px solid rgba(217,212,199,0.2); border-radius:10px; padding:10px; color:white">
+                <button class="btn-pill btn-gold" style="width:auto" onclick="addTask()">+</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-container" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.9); z-index:9000; align-items:center; justify-content:center; padding:20px;">
+        <div class="card" style="width:100%; max-width:450px; position:relative">
+            <button onclick="closeModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:var(--terracota); font-size:1.5rem">✕</button>
+            <div id="modal-content"></div>
+        </div>
+    </div>
 </body>
 </html>
+
