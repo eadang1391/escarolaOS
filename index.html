@@ -108,16 +108,16 @@
 </div>
 
     <script type="module">
-    // 1. IMPORTACIONES (Desde tu archivo de configuración)
+    // 1. IMPORTACIONES
     import { 
         db, collection, addDoc, getDocs, query, where, doc, getDoc, updateDoc, deleteDoc 
     } from './firebase-config.js';
 
-    // 2. VARIABLES DE ESTADO (Globales dentro del módulo)
+    // 2. VARIABLES DE ESTADO
     let pinIngresado = "";
     let rolSeleccionado = "";
 
-    // 3. SISTEMA DE NOTIFICACIONES (Toasts)
+    // 3. SISTEMA DE NOTIFICACIONES
     window.notificar = (mensaje, esError = false) => {
         const aviso = document.createElement("div");
         aviso.className = "toast";
@@ -131,221 +131,145 @@
         }, 3000);
     };
 
-    // 4. LÓGICA DE SELECCIÓN DE ROLES (Botones Chef, Barista, etc.)
+    // 4. LÓGICA DEL PINPAD
+    window.tecleo = (num) => {
+        if (pinIngresado.length < 4) {
+            pinIngresado += num;
+            actualizarInterfaz();
+            if (pinIngresado.length === 4) {
+                setTimeout(verificarAcceso, 200);
+            }
+        }
+    };
+
+    window.borrar = () => {
+        pinIngresado = "";
+        actualizarInterfaz();
+    };
+
+    function actualizarInterfaz() {
+        for (let i = 0; i < 4; i++) {
+            const dot = document.getElementById(`dot-${i}`);
+            if(dot) dot.classList.toggle('filled', i < pinIngresado.length);
+        }
+    }
+
+    // 5. SELECCIÓN DE ROLES
     window.seleccionarRol = (rol, elemento) => {
         document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
         elemento.classList.add('active');
         rolSeleccionado = rol;
     };
 
-    // 5. LÓGICA PARA GUARDAR PERSONAL NUEVO
+    // 6. GESTIÓN DE PERSONAL
     window.guardarNuevoUsuario = async () => {
         const nombre = document.getElementById('reg-nombre').value;
         const pin = document.getElementById('reg-pin').value;
 
         if (!nombre || pin.length !== 4 || !rolSeleccionado) {
-            window.notificar("⚠️ Completa nombre, PIN (4 dígitos) y puesto", true);
+            window.notificar("⚠️ Completa todos los datos", true);
             return;
         }
 
         try {
             await addDoc(collection(db, "usuarios"), {
-                nombre: nombre,
-                pin: pin,
-                rol: rolSeleccionado,
-                creado: new Date().toISOString()
+                nombre, pin, rol: rolSeleccionado, creado: new Date().toISOString()
             });
-
-            window.notificar(`✅ ${nombre} registrado como ${rolSeleccionado}`);
-
-            // Limpiar formulario
+            window.notificar(`✅ ${nombre} registrado`);
             document.getElementById('reg-nombre').value = "";
             document.getElementById('reg-pin').value = "";
             document.querySelectorAll('.rol-btn').forEach(btn => btn.classList.remove('active'));
             rolSeleccionado = "";
+            window.cargarPersonal();
         } catch (error) {
-            console.error("Error al guardar:", error);
-            window.notificar("❌ Error al guardar en base de datos", true);
+            window.notificar("❌ Error al guardar", true);
         }
     };
-// --- FUNCIÓN PARA LEER PERSONAL DE FIREBASE ---
-window.cargarPersonal = async () => {
-    const listaContenedor = document.getElementById('lista-personal-db');
-    if (!listaContenedor) return;
 
-    try {
-        const querySnapshot = await getDocs(collection(db, "usuarios"));
-        listaContenedor.innerHTML = ""; // Limpiar lista actual
-
-        querySnapshot.forEach((docSnap) => {
-            const u = docSnap.data();
-            const id = docSnap.id;
-
-            listaContenedor.innerHTML += `
-                <div class="user-row">
-                    <div>
-                        <strong style="color: var(--dorado);">${u.nombre}</strong><br>
-                        <small style="opacity: 0.6; font-size: 0.7rem;">${u.rol}</small>
-                    </div>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <span style="font-family: monospace; letter-spacing: 2px;">****</span>
-                        <button onclick="eliminarUsuario('${id}')" style="background:none; border:none; color:var(--terracota); cursor:pointer;">✕</button>
-                    </div>
-                </div>
-            `;
-        });
-    } catch (error) {
-        console.error("Error al cargar lista:", error);
-    }
-};
-
-// --- FUNCIÓN PARA ELIMINAR (Como pediste en tus instrucciones) ---
-window.eliminarUsuario = async (id) => {
-    if (confirm("¿Seguro que quieres eliminar a este colaborador?")) {
+    window.cargarPersonal = async () => {
+        const listaContenedor = document.getElementById('lista-personal-db');
+        if (!listaContenedor) return;
         try {
+            const snap = await getDocs(collection(db, "usuarios"));
+            listaContenedor.innerHTML = "";
+            snap.forEach((docSnap) => {
+                const u = docSnap.data();
+                listaContenedor.innerHTML += `
+                    <div class="user-row">
+                        <div><strong>${u.nombre}</strong><br><small>${u.rol}</small></div>
+                        <button onclick="eliminarUsuario('${docSnap.id}')" style="background:none; border:none; color:var(--terracota); cursor:pointer;">✕</button>
+                    </div>`;
+            });
+        } catch (e) { console.error(e); }
+    };
+
+    window.eliminarUsuario = async (id) => {
+        if (confirm("¿Eliminar colaborador?")) {
             await deleteDoc(doc(db, "usuarios", id));
-            window.notificar("Colaborador eliminado");
-            window.cargarPersonal(); // Recargar lista
-        } catch (e) { window.notificar("Error al eliminar", true); }
-    }
-};
-    // 6. LÓGICA DEL PINPAD (Tecleo y Borrado)
-    window.tecleo = (num) => {
-    if (pinIngresado.length < 4) {
-        pinIngresado += num;
-        actualizarInterfaz();
-        if (pinIngresado.length === 4) {
-            // Un pequeño retraso para que se vea el cuarto punto lleno
-            setTimeout(verificarAcceso, 200);
+            window.notificar("Eliminado");
+            window.cargarPersonal();
         }
-    }
-};
+    };
 
-window.borrar = () => {
-    pinIngresado = "";
-    actualizarInterfaz();
-};
-
-function actualizarInterfaz() {
-    for (let i = 0; i < 4; i++) {
-        const dot = document.getElementById(`dot-${i}`);
-        if(dot) {
-            dot.classList.toggle('filled', i < pinIngresado.length);
+    // 7. FINANZAS
+    window.actualizarFinanzasUI = (ingresos, gastos) => {
+        const utilidad = ingresos - gastos;
+        if(document.getElementById('val-ingresos')) {
+            document.getElementById('val-ingresos').innerText = `$${ingresos.toLocaleString()}`;
+            document.getElementById('val-gastos').innerText = `$${gastos.toLocaleString()}`;
+            document.getElementById('val-utilidad').innerText = `$${utilidad.toLocaleString()}`;
+            document.getElementById('val-utilidad').style.color = utilidad < 0 ? 'var(--terracota)' : 'var(--dorado)';
         }
-    }
-}
+    };
 
-    // 7. VERIFICACIÓN DE ACCESO (Login con Firebase)
+    window.calcularFinanzasReales = async () => {
+        try {
+            let inc = 0, gas = 0;
+            const qI = await getDocs(collection(db, "pagos"));
+            qI.forEach(d => inc += Number(d.data().monto || 0));
+            const qG = await getDocs(collection(db, "gastos"));
+            qG.forEach(d => gas += Number(d.data().monto || 0));
+            window.actualizarFinanzasUI(inc, gas);
+        } catch (e) { console.error(e); }
+    };
+
+    // 8. ACCESO
     async function verificarAcceso() {
         try {
-            // Buscamos en la colección 'usuarios' cualquier documento que coincida con el PIN
             const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
-            const querySnapshot = await getDocs(q);
+            const snap = await getDocs(q);
 
-            if (!querySnapshot.empty) {
-                const usuario = querySnapshot.docs[0].data();
-                window.notificar("¡Bienvenido, " + usuario.nombre + "!");
-                
-                // Cambiar de pantalla
+            if (!snap.empty) {
+                const usuario = snap.docs[0].data();
+                window.notificar("Bienvenido " + usuario.nombre);
                 document.getElementById('login-screen').style.display = 'none';
                 document.getElementById('dashboard').style.display = 'block';
-                // ... dentro de verificarAcceso()
-if (!querySnapshot.empty) {
-    const usuario = querySnapshot.docs[0].data();
-    
-    // 1. Entramos al Dashboard
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
 
-    // 2. Filtramos: Si es SOCIO, despertamos las funciones financieras y de personal
-    if (usuario.rol === 'Socio') {
-        window.cargarPersonal();      // Esto llena la lista de empleados
-        window.calcularFinanzasReales(); // Esto suma el dinero en Firebase
-    }
-}
                 if (usuario.rol === 'Socio') {
-    window.cargarPersonal(); // <--- Carga los nombres solo si es Socio
-}
-
-                // Solo el Socio ve la gestión de personal (ID: seccion-admin)
-                const seccionAdmin = document.getElementById('seccion-admin');
-                if (seccionAdmin) {
-                    seccionAdmin.style.display = (usuario.rol === 'Socio') ? 'block' : 'none';
+                    window.cargarPersonal();
+                    window.calcularFinanzasReales();
+                    const admin = document.getElementById('seccion-admin');
+                    if(admin) admin.style.display = 'block';
+                } else {
+                    const admin = document.getElementById('seccion-admin');
+                    if(admin) admin.style.display = 'none';
                 }
             } else {
                 window.notificar("PIN Incorrecto", true);
                 window.borrar();
             }
-        } catch (error) {
-            console.error("Error de acceso:", error);
-            window.notificar("❌ Error de conexión", true);
+        } catch (e) {
+            window.notificar("Error de conexión", true);
             window.borrar();
         }
     }
-        window.calcularFinanzasReales = async () => {
-    try {
-        let totalIngresos = 0;
-        let totalGastos = 0;
-
-        // 1. Sumar Ingresos (Pagos de planes/clases)
-        const qIngresos = await getDocs(collection(db, "pagos"));
-        qIngresos.forEach(doc => {
-            totalIngresos += Number(doc.data().monto || 0);
-        });
-
-        // 2. Sumar Gastos (Insumos, renta, etc.)
-        const qGastos = await getDocs(collection(db, "gastos"));
-        qGastos.forEach(doc => {
-            totalGastos += Number(doc.data().monto || 0);
-        });
-
-        // 3. Mandar los totales a la interfaz que pegamos antes
-        window.actualizarFinanzasUI(totalIngresos, totalGastos);
-
-    } catch (error) {
-        console.error("Error calculando finanzas:", error);
-    }
-};
-        // ... (aquí estarían tus otras funciones como verificarAcceso)
-
-    // --- PUNTO 3: CÁLCULO DE UTILIDAD ---
-    window.actualizarFinanzasUI = (ingresos, gastos) => {
-        const utilidad = ingresos - gastos;
-        
-        // Actualiza los textos en las tarjetas que diseñamos
-        document.getElementById('val-ingresos').innerText = `$${ingresos.toLocaleString()}`;
-        document.getElementById('val-gastos').innerText = `$${gastos.toLocaleString()}`;
-        document.getElementById('val-utilidad').innerText = `$${utilidad.toLocaleString()}`;
-        
-        // Color dinámico: Rojo si es pérdida, Dorado si es ganancia
-        const utilElement = document.getElementById('val-utilidad');
-        utilElement.style.color = utilidad < 0 ? 'var(--terracota)' : 'var(--dorado)';
-    };
-        <script type="module">
-    // ... aquí están tus imports
-    // ... aquí está tu lógica de PIN
-    // ... aquí está tu función de verificarAcceso
-
-    // --- AQUÍ PEGAS EL PUNTO 3 (AL FINAL) ---
-    window.actualizarFinanzasUI = (ingresos, gastos) => {
-        const utilidad = ingresos - gastos;
-        
-        // Buscamos los IDs en tu HTML y les ponemos el valor
-        document.getElementById('val-ingresos').innerText = `$${ingresos.toLocaleString()}`;
-        document.getElementById('val-gastos').innerText = `$${gastos.toLocaleString()}`;
-        document.getElementById('val-utilidad').innerText = `$${utilidad.toLocaleString()}`;
-        
-        // Color dinámico según el resultado
-        const utilElement = document.getElementById('val-utilidad');
-        utilElement.style.color = utilidad < 0 ? 'var(--terracota)' : 'var(--dorado)';
-    };
-
 </script>
 
 </script>
 </script>
 </body>
 </html>
+
 
 
 
