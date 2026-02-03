@@ -3,60 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EscarolaOS - Master</title>
+    <title>EscarolaOS - Master System</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
             --verde-bosque: #1b3022;
             --verde-oscuro: #14241a;
             --terracota: #b0413e;
             --cantera: #d9d4c7;
-            --dorado: #c5a059; /* Dorado elegante tipo champán */
+            --dorado: #c5a059; /* Dorado Champán */
             --negro: #0a0a0a;
             --blanco-trans: rgba(217, 212, 199, 0.1);
+            --sombra: 0 8px 32px rgba(0,0,0,0.4);
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
         body { 
-            font-family: 'Segoe UI', Roboto, sans-serif; 
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
             background-color: var(--verde-bosque); 
             color: var(--cantera); 
             margin: 0; padding: 0; 
             overflow-x: hidden;
+            line-height: 1.5;
         }
 
-        /* Botones tipo Píldora con Animación */
+        /* Botones Tipo Píldora Premium */
         .btn-pill {
             border-radius: 50px;
             border: none;
             padding: 14px 28px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            font-size: 0.85rem;
+            display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+            font-size: 0.8rem;
         }
-        .btn-pill:active { transform: scale(0.92); filter: brightness(1.2); }
+        .btn-pill:active { transform: scale(0.94); filter: brightness(1.2); }
         
-        .btn-gold { background: var(--dorado); color: var(--verde-oscuro); }
-        .btn-green { background: var(--verde-oscuro); color: var(--dorado); border: 1px solid var(--dorado); }
-        .btn-red { background: var(--terracota); color: var(--cantera); }
+        .btn-gold { background: var(--dorado); color: var(--verde-oscuro); width: 100%; }
+        .btn-green { background: var(--verde-oscuro); color: var(--dorado); border: 1px solid var(--dorado); width: 100%; }
+        .btn-red { background: var(--terracota); color: var(--cantera); width: 100%; }
 
-        /* Contenedores y Cards Modernas */
-        .container { width: 100%; max-width: 600px; margin: 0 auto; padding: 25px; display: none; padding-bottom: 120px; }
+        /* Contenedores Principales */
+        .container { 
+            width: 100%; max-width: 600px; margin: 0 auto; 
+            padding: 25px; display: none; padding-bottom: 130px; 
+            animation: fadeIn 0.4s ease;
+        }
         
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
         .card { 
             background: var(--verde-oscuro); 
-            border-radius: 24px; 
-            padding: 22px; 
+            border-radius: 28px; 
+            padding: 24px; 
             margin-bottom: 20px; 
             border: 1px solid var(--blanco-trans);
-            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+            box-shadow: var(--sombra);
         }
 
-        /* Navegación Inferior Estilizada */
+        /* Barra de Navegación "Flotante" */
         .tab-bar {
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%);
             width: 92%; max-width: 450px;
@@ -64,63 +73,69 @@
             backdrop-filter: blur(15px);
             display: none; grid-template-columns: repeat(5, 1fr);
             border-radius: 50px; border: 1px solid var(--dorado);
-            padding: 12px; z-index: 1000; box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            padding: 12px; z-index: 1000; box-shadow: 0 15px 45px rgba(0,0,0,0.7);
         }
         
         .tab-item { text-align: center; font-size: 0.6rem; color: var(--cantera); opacity: 0.4; transition: 0.3s; cursor: pointer; }
         .tab-item.active { opacity: 1; color: var(--dorado); }
-        .tab-item i { font-size: 1.3rem; display: block; margin-bottom: 5px; }
+        .tab-item i { font-size: 1.4rem; display: block; margin-bottom: 6px; }
 
-        /* Login Screen */
+        /* Pantalla de Inicio (PIN) */
         #login-screen {
             position: fixed; inset: 0; background: var(--verde-bosque);
             display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 3000;
         }
 
-        .logo-text { font-size: 2rem; letter-spacing: 8px; color: var(--cantera); margin-bottom: 40px; text-align: center; }
-        .logo-text span { color: var(--dorado); font-weight: bold; }
+        .logo-box { text-align: center; margin-bottom: 50px; }
+        .logo-box h1 { font-size: 2.2rem; letter-spacing: 10px; margin: 0; }
+        .logo-box span { color: var(--dorado); font-weight: bold; }
 
-        .dot { width: 14px; height: 14px; border: 2px solid var(--dorado); border-radius: 50%; transition: 0.3s; }
+        .dot-container { display: flex; gap: 20px; margin-bottom: 50px; }
+        .dot { width: 16px; height: 16px; border: 2px solid var(--dorado); border-radius: 50%; transition: 0.3s; }
         .dot.filled { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); }
 
-        /* Pop-ups Internos */
+        /* Pop-ups / Modales Maestros */
         .modal {
-            position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            position: fixed; inset: 0; background: rgba(0,0,0,0.92);
             display: none; align-items: center; justify-content: center; z-index: 4000; padding: 20px;
         }
         
         .modal-content { 
-            background: var(--verde-bosque); width: 100%; max-width: 450px;
-            border-radius: 30px; border: 1px solid var(--dorado); padding: 30px;
+            background: var(--verde-bosque); width: 100%; max-width: 480px;
+            border-radius: 35px; border: 1px solid var(--dorado); padding: 35px;
             position: relative; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-height: 90vh; overflow-y: auto;
         }
         
-        @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes popIn { from { transform: scale(0.85); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-        /* Inputs Modernos */
+        /* Formulario e Inputs */
         input, select, textarea {
-            width: 100%; padding: 16px; margin: 12px 0;
+            width: 100%; padding: 18px; margin: 12px 0;
             background: var(--negro); border: 1px solid var(--blanco-trans);
-            color: var(--cantera); border-radius: 15px; font-size: 1rem; transition: 0.3s;
+            color: var(--cantera); border-radius: 18px; font-size: 1rem; transition: 0.3s;
         }
         input:focus { border-color: var(--dorado); background: var(--verde-oscuro); }
 
-        /* Utilidades */
-        .flex-between { display: flex; justify-content: space-between; align-items: center; }
-        .text-gold { color: var(--dorado); }
-        .text-small { font-size: 0.8rem; color: #888; }
+        /* Estilo Lista Checklist */
+        .check-item {
+            display: flex; align-items: center; gap: 15px; padding: 15px;
+            background: var(--blanco-trans); border-radius: 15px; margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .check-item input[type="checkbox"] { width: 22px; height: 22px; margin: 0; accent-color: var(--dorado); }
+
     </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="logo-text">ESCAROLA<span>OS</span></div>
-        <div style="display: flex; gap: 20px; margin-bottom: 50px;" id="pin-dots">
+        <div class="logo-box"><h1>ESCAROLA<span>OS</span></h1><p style="color:var(--dorado); letter-spacing:3px; font-size:0.7rem;">MASTER CONTROL</p></div>
+        <div class="dot-container" id="pin-dots">
             <div class="dot" id="dot-0"></div><div class="dot" id="dot-1"></div>
             <div class="dot" id="dot-2"></div><div class="dot" id="dot-3"></div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(3, 85px); gap: 20px;" id="pinpad">
+        <div style="display: grid; grid-template-columns: repeat(3, 85px); gap: 20px;">
             <button class="btn-pill btn-green" onclick="tecleo('1')" style="width:85px; height:85px; padding:0; border-radius:50%">1</button>
             <button class="btn-pill btn-green" onclick="tecleo('2')" style="width:85px; height:85px; padding:0; border-radius:50%">2</button>
             <button class="btn-pill btn-green" onclick="tecleo('3')" style="width:85px; height:85px; padding:0; border-radius:50%">3</button>
@@ -130,273 +145,138 @@
             <button class="btn-pill btn-green" onclick="tecleo('7')" style="width:85px; height:85px; padding:0; border-radius:50%">7</button>
             <button class="btn-pill btn-green" onclick="tecleo('8')" style="width:85px; height:85px; padding:0; border-radius:50%">8</button>
             <button class="btn-pill btn-green" onclick="tecleo('9')" style="width:85px; height:85px; padding:0; border-radius:50%">9</button>
-            <button class="btn-pill btn-red" onclick="borrar()" style="width:85px; height:85px; padding:0; border-radius:50%">C</button>
+            <button class="btn-pill btn-red" onclick="borrarPin()" style="width:85px; height:85px; padding:0; border-radius:50%">C</button>
             <button class="btn-pill btn-green" onclick="tecleo('0')" style="width:85px; height:85px; padding:0; border-radius:50%">0</button>
-            <button class="btn-pill btn-gold" onclick="location.reload()" style="width:85px; height:85px; padding:0; border-radius:50%"><i class="fa-solid fa-sync"></i></button>
+            <button class="btn-pill btn-gold" onclick="location.reload()" style="width:85px; height:85px; padding:0; border-radius:50%"><i class="fa-solid fa-rotate"></i></button>
         </div>
     </div>
 
     <nav class="tab-bar" id="main-nav">
-        <div class="tab-item active" onclick="showTab('finanzas')"><i class="fa-solid fa-chart-pie"></i>Finanzas</div>
+        <div class="tab-item active" onclick="showTab('finanzas')"><i class="fa-solid fa-vault"></i>Capital</div>
         <div class="tab-item" onclick="showTab('agenda')"><i class="fa-solid fa-calendar-check"></i>Agenda</div>
         <div class="tab-item" onclick="showTab('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
-        <div class="tab-item" onclick="showTab('cocina')"><i class="fa-solid fa-book-open"></i>Cocina</div>
-        <div class="tab-item" onclick="showTab('admin')"><i class="fa-solid fa-user-shield"></i>Admin</div>
+        <div class="tab-item" onclick="showTab('cocina')"><i class="fa-solid fa-fire-burner"></i>Cocina</div>
+        <div class="tab-item" onclick="showTab('admin')"><i class="fa-solid fa-crown"></i>Admin</div>
     </nav>
-<div id="finanzas" class="container">
+    <div id="finanzas" class="container">
         <h2 class="text-gold">Estado Financiero</h2>
-        <div class="card" style="border-left: 5px solid var(--dorado);">
-            <small class="text-small">UTILIDAD NETA (ESTE MES)</small>
-            <h1 id="val-utilidad" style="font-size: 2.8rem; margin: 10px 0;">$0</h1>
+        <div class="card" style="border-left: 6px solid var(--dorado);">
             <div class="flex-between">
-                <span style="color:var(--dorado)">↑ Ingresos: <b id="val-ingresos">$0</b></span>
-                <span style="color:var(--terracota)">↓ Gastos: <b id="val-gastos">$0</b></span>
+                <small class="text-small" id="fecha-balance">BALANCE MENSUAL</small>
+                <button class="btn-pill btn-gold" style="padding: 5px 12px; font-size: 0.6rem;" onclick="descargarReporte('finanzas')"> EXCEL</button>
+            </div>
+            <h1 id="val-utilidad" style="font-size: 3rem; margin: 15px 0; letter-spacing: -1px;">$0.00</h1>
+            <div style="display: flex; justify-content: space-between; gap: 10px;">
+                <div style="flex:1; color:var(--dorado)">
+                    <small>INGRESOS (POS)</small><br><b id="val-ingresos">$0</b>
+                </div>
+                <div style="flex:1; color:var(--terracota)">
+                    <small>GASTOS</small><br><b id="val-gastos">$0</b>
+                </div>
             </div>
         </div>
         
         <div class="card">
-            <h3 class="text-gold"><i class="fa-solid fa-file-invoice-dollar"></i> Escáner de Gastos</h3>
-            <p class="text-small">Sube tu factura o ticket para registro automático.</p>
-            <button class="btn-pill btn-green" onclick="abrirEscaner()" style="width:100%">
-                <i class="fa-solid fa-camera"></i> ESCANEAR DOCUMENTO
+            <h3 style="color:var(--dorado)"><i class="fa-solid fa-scan"></i> Escáner de Facturas</h3>
+            <p class="text-small">Sube tickets para lectura automática e impacto en gastos.</p>
+            <input type="file" id="input-factura" accept="image/*" style="display:none" onchange="procesarFactura(event)">
+            <button class="btn-pill btn-green" onclick="document.getElementById('input-factura').click()">
+                <i class="fa-solid fa-camera"></i> CAPTURAR DOCUMENTO
             </button>
         </div>
     </div>
 
     <div id="agenda" class="container">
         <h2 class="text-gold">Agenda & Reservas</h2>
-        
         <div class="card">
-            <div class="flex-between">
-                <h3><i class="fa-solid fa-calendar-day text-gold"></i> Calendario</h3>
-                <button id="btn-add-evento" class="btn-pill btn-gold" style="padding: 8px 15px; font-size: 0.7rem;" onclick="abrirModalEvento()">+ EVENTO</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3><i class="fa-solid fa-calendar-day"></i> Eventos</h3>
+                <button id="btn-admin-evento" class="btn-pill btn-gold" style="padding: 8px 15px; font-size: 0.7rem;" onclick="abrirModal('evento')">+ EVENTO</button>
             </div>
-            <div id="lista-eventos" style="margin-top:15px;">
+            <div id="lista-eventos-hoy" class="text-small" style="margin-bottom:10px;"></div>
+            <div id="mini-calendario" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center;">
                 </div>
         </div>
 
         <div class="card">
-            <div class="flex-between">
-                <h3><i class="fa-solid fa-chair text-gold"></i> Reservaciones</h3>
-                <button class="btn-pill btn-green" style="padding: 8px 15px; font-size: 0.7rem;" onclick="abrirModalReserva()">+ NUEVA</button>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3><i class="fa-solid fa-chair"></i> Reservaciones</h3>
+                <button class="btn-pill btn-green" style="padding: 8px 15px; font-size: 0.7rem;" onclick="abrirModal('reserva')">+ NUEVA</button>
             </div>
-            <div id="lista-reservas" style="margin-top:15px;"></div>
+            <div id="lista-reservas"></div>
         </div>
     </div>
 
     <div id="reloj" class="container">
         <h2 class="text-gold">Control de Asistencia</h2>
-        <div class="card" style="text-align: center;">
-            <div id="current-time" style="font-size: 3rem; font-weight: bold; color: var(--cantera);">00:00:00</div>
-            <div id="current-date" class="text-gold" style="text-transform: uppercase; letter-spacing: 2px;">FECHA</div>
+        <div class="card" style="text-align: center; background: radial-gradient(circle, var(--verde-oscuro) 0%, var(--negro) 100%);">
+            <div id="current-time" style="font-size: 3.5rem; font-weight: bold; color: var(--cantera); text-shadow: 0 0 20px rgba(197,160,89,0.3);">00:00:00</div>
+            <div id="current-date" style="color:var(--dorado); letter-spacing: 2px; font-size: 0.8rem; margin-top: 5px;">CARGANDO...</div>
         </div>
 
-        <div class="card" style="display: flex; gap: 15px;">
-            <button class="btn-pill btn-green" style="flex:1; height: 70px;" onclick="registrarAsistencia('ENTRADA')">ENTRADA</button>
-            <button class="btn-pill btn-red" style="flex:1; height: 70px;" onclick="registrarAsistencia('SALIDA')">SALIDA</button>
+        <div style="display: flex; gap: 15px; margin-bottom: 20px;">
+            <button class="btn-pill btn-green" style="flex:1; height: 75px; font-size: 1rem;" onclick="registrarAsistencia('ENTRADA')">ENTRADA</button>
+            <button class="btn-pill btn-red" style="flex:1; height: 75px; font-size: 1rem;" onclick="lanzarChecklist()">SALIDA</button>
         </div>
 
-        <div id="nomina-socio" style="display:none;">
-            <h3 class="text-gold"><i class="fa-solid fa-wallet"></i> Nómina Semanal</h3>
+        <div id="area-nomina-socio" style="display:none;">
+            <div class="flex-between" style="margin-bottom:15px;">
+                <h3 class="text-gold">Nómina y Pagos</h3>
+                <button class="btn-pill btn-gold" style="padding: 5px 12px; font-size: 0.6rem;" onclick="descargarReporte('nomina')"> REPORTES</button>
+            </div>
             <div id="lista-nomina"></div>
         </div>
     </div>
 
     <div id="cocina" class="container">
-        <h2 class="text-gold">Recetario & Costos</h2>
+        <h2 class="text-gold">Recetario & Insumos</h2>
         <div class="card">
-            <button class="btn-pill btn-gold" onclick="abrirModalReceta()" style="width:100%">+ CREAR RECETA COSTEO</button>
+            <div style="display:flex; gap:10px;">
+                <button class="btn-pill btn-gold" style="flex:1" onclick="abrirModal('receta')">+ MANUAL</button>
+                <button class="btn-pill btn-green" style="flex:1" onclick="abrirModal('excel')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
+            </div>
         </div>
         <div id="lista-recetas"></div>
+        <div id="alerta-stock" class="card" style="display:none; border:1px solid var(--terracota);">
+            <h4 style="color:var(--terracota); margin:0;"><i class="fa-solid fa-triangle-exclamation"></i> Stock Bajo</h4>
+            <ul id="items-stock-bajo" class="text-small" style="margin-top:10px;"></ul>
+        </div>
     </div>
 
     <div id="admin" class="container">
-        <h2 class="text-gold">Administración</h2>
+        <h2 class="text-gold">Administración Máster</h2>
         <div class="card">
-            <h3>Gestión de Personal</h3>
-            <input type="text" id="reg-nombre" placeholder="Nombre Completo">
-            <input type="number" id="reg-pin" placeholder="PIN de Seguridad (4 dígitos)">
-            <input type="number" id="reg-sueldo" placeholder="Sueldo Base por Hora $">
+            <h4 class="text-gold">Nuevo Personal</h4>
+            <input type="text" id="reg-nombre" placeholder="Nombre completo">
+            <div style="display:flex; gap:10px;">
+                <input type="number" id="reg-pin" placeholder="PIN (4 dígitos)">
+                <input type="number" id="reg-sueldo" placeholder="Sueldo/hr $">
+            </div>
             <select id="reg-rol">
-                <option value="Socio">Socio</option>
-                <option value="Barman">Barman</option>
+                <option value="Socio">Socio (Acceso Total)</option>
                 <option value="Chef">Chef</option>
+                <option value="Barman">Barman</option>
                 <option value="Barista">Barista</option>
-                <option value="Staff">Staff</option>
+                <option value="Staff">Staff General</option>
             </select>
-            <button class="btn-pill btn-gold" style="width:100%; margin-top:10px;" onclick="guardarNuevoUsuario()">REGISTRAR COLABORADOR</button>
+            <button class="btn-pill btn-gold" onclick="guardarNuevoUsuario()">REGISTRAR EN SISTEMA</button>
         </div>
-        <div id="lista-personal-db" class="card"></div>
+
+        <div class="card">
+            <h4 class="text-gold">Configuración Checklist</h4>
+            <div id="lista-tareas-config"></div>
+            <div style="display:flex; gap:10px; margin-top:10px;">
+                <input type="text" id="nueva-tarea" placeholder="Nueva tarea de limpieza..." style="margin:0">
+                <button class="btn-pill btn-gold" style="width:auto" onclick="agregarTareaAdmin()">+</button>
+            </div>
+        </div>
+        
+        <div id="lista-personal-admin"></div>
     </div>
 
     <div id="modal-universal" class="modal">
         <div class="modal-content">
-            <button onclick="cerrarModal()" style="position:absolute; top:15px; right:15px; background:none; border:none; color:var(--terracota); font-size:1.5rem;">✕</button>
+            <button onclick="cerrarModal()" style="position:absolute; top:20px; right:20px; background:none; border:none; color:var(--terracota); font-size:1.8rem; cursor:pointer;">✕</button>
             <div id="modal-body"></div>
         </div>
     </div>
-<script type="module">
-        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, setDoc, orderBy, limit } from './firebase-config.js';
-
-        let pinIngresado = "";
-        let usuarioActual = null;
-
-        // --- 1. RELOJ Y NAVEGACIÓN ---
-        setInterval(() => {
-            const now = new Date();
-            const clock = document.getElementById('current-time');
-            if(clock) {
-                clock.innerText = now.toLocaleTimeString();
-                document.getElementById('current-date').innerText = now.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
-            }
-        }, 1000);
-
-        window.showTab = (tabId) => {
-            if(!usuarioActual) return;
-            if(usuarioActual.rol !== 'Socio' && (tabId === 'finanzas' || tabId === 'admin')) {
-                window.notificar("🚫 Acceso restringido", true);
-                return;
-            }
-            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(tabId).style.display = 'block';
-        };
-
-        // --- 2. LOGIN Y PINPAD ---
-        window.tecleo = (n) => {
-            if(pinIngresado.length < 4) {
-                pinIngresado += n;
-                actualizarDots();
-                if(pinIngresado.length === 4) setTimeout(verificarAcceso, 200);
-            }
-        };
-        window.borrar = () => { pinIngresado = ""; actualizarDots(); };
-        function actualizarDots() {
-            for(let i=0; i<4; i++) {
-                const dot = document.getElementById(`dot-${i}`);
-                if(dot) dot.classList.toggle('filled', i < pinIngresado.length);
-            }
-        }
-
-        async function verificarAcceso() {
-            const q = query(collection(db, "usuarios"), where("pin", "==", pinIngresado));
-            const snap = await getDocs(q);
-            if(!snap.empty) {
-                const d = snap.docs[0];
-                usuarioActual = { id: d.id, ...d.data() };
-                document.getElementById('login-screen').style.display = 'none';
-                document.getElementById('main-nav').style.display = 'grid';
-                window.notificar(`Bienvenido ${usuarioActual.nombre}`);
-                showTab(usuarioActual.rol === 'Socio' ? 'finanzas' : 'reloj');
-                if(usuarioActual.rol === 'Socio') { window.cargarPersonal(); window.cargarNomina(); }
-            } else {
-                window.notificar("PIN Incorrecto", true);
-                window.borrar();
-            }
-        }
-
-        // --- 3. RELOJ CHECADOR (BOTONES CORREGIDOS) ---
-        window.registrarAsistencia = async (tipo) => {
-            if(!usuarioActual) return;
-            try {
-                // Verificar checklist antes de salir
-                if(tipo === 'SALIDA') {
-                    const confirmCheck = confirm("¿Completaste tu Checklist de Limpieza?");
-                    if(!confirmCheck) return;
-                }
-
-                const q = query(collection(db, "asistencias"), where("uid", "==", usuarioActual.id), orderBy("timestamp", "desc"), limit(1));
-                const snap = await getDocs(q);
-                const ultimo = !snap.empty ? snap.docs[0].data().tipo : 'SALIDA';
-
-                if(tipo === ultimo) {
-                    window.notificar(`⚠️ Ya marcaste ${tipo}`, true);
-                    return;
-                }
-
-                await addDoc(collection(db, "asistencias"), {
-                    uid: usuarioActual.id, nombre: usuarioActual.nombre, tipo, 
-                    timestamp: new Date().toISOString(), pagado: false
-                });
-                window.notificar(`✨ ${tipo} exitosa`);
-            } catch (e) { window.notificar("Error al registrar", true); }
-        };
-
-        // --- 4. MODALES Y RECETARIO (IMPORTAR EXCEL) ---
-        window.abrirModalReceta = () => {
-            abrirModal(`
-                <h3 class="text-gold">Gestión de Recetas</h3>
-                <div class="card" style="background:var(--verde-bosque)">
-                    <p class="text-small">Importar Recetario (Excel/CSV):</p>
-                    <input type="file" id="excel-input" accept=".csv, .xlsx" style="font-size:0.8rem">
-                    <button class="btn-pill btn-gold" style="width:100%" onclick="procesarExcel()">SUBIR EXCEL</button>
-                </div>
-                <hr style="border:0.5px solid var(--blanco-trans)">
-                <button class="btn-pill btn-green" style="width:100%" onclick="notificar('Función Manual activada')">+ Crear Manual</button>
-            `);
-        };
-
-        // --- 5. CHECKLIST DE LIMPIEZA ---
-        window.abrirModalChecklist = () => {
-            abrirModal(`
-                <h3 class="text-gold">Checklist de Limpieza</h3>
-                <div style="text-align:left">
-                    <label><input type="checkbox"> Limpieza de Estación</label><br>
-                    <label><input type="checkbox"> Lavado de loza</label><br>
-                    <label><input type="checkbox"> Sacar basura</label><br>
-                    <label><input type="checkbox"> Barrido y trapeado</label>
-                </div>
-                <button class="btn-pill btn-gold" style="width:100%; margin-top:15px" onclick="cerrarModal()">GUARDAR</button>
-            `);
-        };
-
-        // --- 6. UTILIDADES ---
-        window.abrirModal = (contenido) => {
-            const modal = document.getElementById('modal-universal');
-            document.getElementById('modal-body').innerHTML = contenido;
-            modal.style.display = 'flex';
-        };
-        window.cerrarModal = () => { document.getElementById('modal-universal').style.display = 'none'; };
-        window.notificar = (msg, err = false) => {
-            const t = document.createElement("div");
-            t.style.cssText = `position:fixed; bottom:110px; left:50%; transform:translateX(-50%); background:${err?'var(--terracota)':'var(--dorado)'}; color:var(--verde-oscuro); padding:12px 25px; border-radius:50px; z-index:9999; font-weight:bold;`;
-            t.innerText = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.remove(), 3000);
-        };
-
-        // --- 7. ADMIN Y NÓMINA ---
-        window.guardarNuevoUsuario = async () => {
-            const n = document.getElementById('reg-nombre').value;
-            const p = document.getElementById('reg-pin').value;
-            const r = document.getElementById('reg-rol').value;
-            const s = document.getElementById('reg-sueldo').value;
-            if(!n || !p || !s) return notificar("Faltan datos", true);
-            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, rol: r, sueldo: Number(s) });
-            notificar("✅ Guardado");
-            window.cargarPersonal();
-        };
-
-        window.cargarPersonal = async () => {
-            const snap = await getDocs(collection(db, "usuarios"));
-            const cont = document.getElementById('lista-personal-db');
-            if(!cont) return;
-            cont.innerHTML = "<h3>Personal</h3>";
-            snap.forEach(d => {
-                const u = d.data();
-                cont.innerHTML += `<div class="flex-between" style="margin-bottom:10px">
-                    <span>${u.nombre} ($${u.sueldo}/hr)</span>
-                    <button class="btn-pill btn-red" style="padding:5px 10px" onclick="eliminarUsuario('${d.id}')">✕</button>
-                </div>`;
-            });
-        };
-
-        window.eliminarUsuario = async (id) => {
-            if(confirm("¿Borrar?")) { await deleteDoc(doc(db, "usuarios", id)); window.cargarPersonal(); }
-        };
-
-        // Vincular funciones a la ventana para que los botones las vean
-        window.verificarAcceso = verificarAcceso;
-    </script>
-</html>
-
