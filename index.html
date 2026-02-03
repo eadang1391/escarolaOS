@@ -424,11 +424,154 @@
 
         // 6. FUNCIÓN DE CARGA INICIAL (Se completará en las siguientes partes)
         function inicializarDatosApp() {
+            // --- 7. GESTIÓN DE CHECKLIST (EDITABLE) ---
+        window.cargarChecklistConfig = async () => {
+            const cont = document.getElementById('lista-tareas-config');
+            if(!cont) return;
+            const snap = await getDocs(collection(db, "checklist"));
+            tareasLimpiezaActuales = [];
+            cont.innerHTML = "";
+            snap.forEach(d => {
+                const t = d.data();
+                tareasLimpiezaActuales.push({id: d.id, ...t});
+                cont.innerHTML += `
+                    <div class="flex-between" style="margin-bottom:8px; background:var(--blanco-trans); padding:10px; border-radius:12px;">
+                        <span style="font-size:0.85rem;">${t.tarea}</span>
+                        <button onclick="eliminarTareaAdmin('${d.id}')" style="background:none; border:none; color:var(--terracota); cursor:pointer;">✕</button>
+                    </div>`;
+            });
+        };
+
+        window.agregarTareaAdmin = async () => {
+            const input = document.getElementById('nueva-tarea');
+            if(!input.value) return;
+            await addDoc(collection(db, "checklist"), { tarea: input.value, creada: new Date().toISOString() });
+            input.value = "";
+            notificar("TAREA AGREGADA", false);
+            cargarChecklistConfig();
+        };
+
+        window.eliminarTareaAdmin = async (id) => {
+            await deleteDoc(doc(db, "checklist", id));
+            cargarChecklistConfig();
+        };
+
+        // --- 8. RELOJ CHECADOR Y LANZAMIENTO DE CHECKLIST ---
+        window.registrarAsistencia = async (tipo) => {
+            if(!usuarioActual) return;
+            try {
+                const q = query(collection(db, "asistencias"), where("uid", "==", usuarioActual.id), orderBy("timestamp", "desc"), limit(1));
+                const snap = await getDocs(q);
+                const ultimoRegistro = !snap.empty ? snap.docs[0].data().tipo : 'SALIDA';
+
+                if(tipo === ultimoRegistro) {
+                    notificar(`YA MARCASTE ${tipo}`, true);
+                    return;
+                }
+
+                await addDoc(collection(db, "asistencias"), {
+                    uid: usuarioActual.id,
+                    nombre: usuarioActual.nombre,
+                    tipo: tipo,
+                    timestamp: new Date().toISOString(),
+                    fecha: new Date().toLocaleDateString(),
+                    sueldoBase: usuarioActual.sueldo || 0,
+                    pagado: false
+                });
+
+                notificar(`${tipo} REGISTRADA CON ÉXITO`, false);
+                if(usuarioActual.rol === 'Socio') cargarNomina();
+            } catch (e) {
+                notificar("ERROR AL REGISTRAR", true);
+            }
+        };
+
+        window.lanzarChecklist = async () => {
+            await cargarChecklistConfig();
+            if(tareasLimpiezaActuales.length === 0) {
+                registrarAsistencia('SALIDA');
+                return;
+            }
+
+            let htmlCheck = `<h3 class="text-gold">LIMPIEZA OBLIGATORIA</h3><p class="text-small">Marca las tareas realizadas para poder salir:</p>`;
+            tareasLimpiezaActuales.forEach((t, index) => {
+                htmlCheck += `
+                    <div class="check-item" onclick="document.getElementById('chk-${index}').click()">
+                        <input type="checkbox" id="chk-${index}" class="task-chk">
+                        <span>${t.tarea}</span>
+                    </div>`;
+            });
+            htmlCheck += `<button class="btn-pill btn-gold" style="margin-top:15px; width:100%;" onclick="validarSalidaFinal()">CONFIRMAR Y SALIR</button>`;
+            
+            abrirModalContenido(htmlCheck);
+        };
+
+        window.validarSalidaFinal = () => {
+            const total = document.querySelectorAll('.task-chk').length;
+            const marcadas = document.querySelectorAll('.task-chk:checked').length;
+            if(marcadas < total) {
+                notificar("DEBES COMPLETAR TODO", true);
+            } else {
+                cerrarModal();
+                registrarAsistencia('SALIDA');
+            }
+        };
+
+        // --- 9. NÓMINA DINÁMICA ---
+        window.cargarNomina = async () => {
+            const cont = document.getElementById('lista-nomina');
+            if(!cont) return;
+            cont.innerHTML = "<p class='text-small'>Procesando horas...</p>";
+            const snap = await getDocs(query(collection(db, "asistencias"), where("pagado", "==", false)));
+            let acumulado = {};
+            snap.forEach(d => {
+                const a = d.data();
+                if(!acumulado[a.uid]) acumulado[a.uid] = { nombre: a.nombre, total: 0 };
+            });
+
+            let html = "";
+            for(let uid in acumulado) {
+                html += `
+                    <div class="card" style="background:var(--blanco-trans); margin-bottom:10px;">
+                        <div class="flex-between">
+                            <div><b class="text-gold">${acumulado[uid].nombre}</b><br><small class="text-small">PENDIENTE</small></div>
+                            <button class="btn-pill btn-gold" style="width:auto; padding:8px 15px;" onclick="marcarPagado('${uid}')">PAGAR</button>
+                        </div>
+                    </div>`;
+            }
+            cont.innerHTML = html || "<p class='text-small'>No hay pagos pendientes.</p>";
+        };
+
+        window.marcarPagado = async (uid) => {
+            if(!confirm("¿Confirmas que has entregado el pago?")) return;
+            const q = query(collection(db, "asistencias"), where("uid", "==", uid), where("pagado", "==", false));
+            const snap = await getDocs(q);
+            const promesas = snap.docs.map(d => updateDoc(doc(db, "asistencias", d.id), { pagado: true }));
+            await Promise.all(promesas);
+            notificar("PAGO REGISTRADO", false);
+            cargarNomina();
+        };
+
+        // --- 10. UTILIDADES DE MODAL ---
+        window.abrirModalContenido = (html) => {
+            document.getElementById('modal-body').innerHTML = html;
+            document.getElementById('modal-universal').style.display = 'flex';
+        };
+        window.cerrarModal = () => { document.getElementById('modal-universal').style.display = 'none'; };
+
+        // --- 11. INICIALIZADOR FINAL ---
+        function inicializarDatosApp() {
             console.log("EscarolaOS inicializando módulos...");
-            // Aquí llamaremos a las cargas de eventos, nóminas y stock
+            cargarChecklistConfig();
+            if(usuarioActual.rol === 'Socio') {
+                cargarNomina();
+                window.cargarPersonalAdmin();
+            }
         }
-        
-        // Exportar funciones necesarias al objeto window
+
         window.verificarCredenciales = verificarCredenciales;
         window.borrarPin = borrarPin;
     </script>
+</body>
+</html>
+
