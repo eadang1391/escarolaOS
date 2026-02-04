@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v13.9 - Luxury Edition</title>
+    <title>EscarolaOS v13.10</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -15,246 +15,189 @@
             --cantera: #d9d4c7;
             --dorado: #c5a059;
             --negro-profundo: #050505;
-            --glass: rgba(255, 255, 255, 0.03);
-            --border: rgba(197, 160, 89, 0.2);
-            --shadow: 0 20px 40px rgba(0,0,0,0.6);
+            --glass: rgba(255, 255, 255, 0.05);
+            --border: rgba(197, 160, 89, 0.25);
+            --pill: 50px;
         }
 
-        /* RESET & BASE */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--verde-bosque); color: var(--cantera); height: 100vh; overflow: hidden; }
 
-        /* PINPAD ELEGANTE (RESTAURADO) */
-        #login-screen { 
-            position: fixed; inset: 0; 
-            background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro-profundo) 100%); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 999999; 
-        }
-        .logo-app { width: 120px; margin-bottom: 20px; filter: drop-shadow(0 0 10px var(--dorado)); }
-        .pin-container { display: flex; gap: 20px; margin: 40px 0; }
-        .pin-dot { width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; transition: 0.4s; }
-        .pin-dot.filled { background: var(--dorado); box-shadow: 0 0 20px var(--dorado); transform: scale(1.2); }
-        
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .key { 
-            width: 85px; height: 85px; border-radius: 50%; 
-            border: 1px solid var(--border); background: var(--glass); 
-            color: var(--dorado); font-size: 1.8rem; font-weight: 300;
-            display: flex; align-items: center; justify-content: center; 
-            transition: 0.2s; backdrop-filter: blur(10px);
-        }
-        .key:active { background: var(--dorado); color: var(--negro-profundo); transform: scale(0.9); }
+        /* LOGIN & PINPAD */
+        #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, var(--verde-bosque) 0%, var(--negro-profundo) 100%); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999; }
+        .logo-app { width: 100px; margin-bottom: 15px; }
+        .pin-dot { width: 16px; height: 16px; border: 2px solid var(--dorado); border-radius: 50%; margin: 0 10px; transition: 0.3s; }
+        .pin-dot.filled { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); }
+        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 30px; }
+        .key { width: 80px; height: 80px; border-radius: 50%; border: 1px solid var(--border); color: var(--dorado); font-size: 1.8rem; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
 
-        /* UI MODERNA */
-        .view-frame { display: none; height: 100vh; overflow-y: auto; padding: 30px; padding-bottom: 200px; scrollbar-width: none; }
-        .view-frame::-webkit-scrollbar { display: none; }
-        
-        .card { 
-            background: var(--verde-oscuro); border-radius: 30px; padding: 25px; 
-            margin-bottom: 20px; border: 1px solid var(--border); 
-            box-shadow: var(--shadow);
-        }
+        /* UI GENERAL */
+        .view-frame { display: none; height: 100vh; overflow-y: auto; padding: 25px; padding-bottom: 180px; }
+        .card { background: var(--verde-oscuro); border-radius: 30px; padding: 25px; margin-bottom: 20px; border: 1px solid var(--border); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .header-s { border-left: 4px solid var(--dorado); padding-left: 15px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; font-size: 0.8rem; }
 
-        .header-s { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; }
-        .header-s h2 { font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; color: var(--dorado); }
-
-        /* KPI BOXES */
-        .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .kpi-box { background: rgba(0,0,0,0.4); padding: 20px; border-radius: 20px; border-left: 3px solid var(--dorado); }
-        .kpi-box span { font-size: 0.6rem; letter-spacing: 2px; opacity: 0.6; display: block; margin-bottom: 5px; }
-        .kpi-box h3 { font-size: 1.4rem; color: #fff; }
-
-        /* INPUTS ESTILO MINIMALISTA */
-        .f-input { 
-            width: 100%; padding: 18px; border-radius: 15px; background: rgba(0,0,0,0.5); 
-            border: 1px solid var(--border); color: #fff; margin-bottom: 15px; font-size: 1rem;
-        }
-        .f-input:focus { border-color: var(--dorado); outline: none; }
-
-        /* BOTONES */
-        .btn-p { 
-            width: 100%; padding: 20px; border-radius: 18px; border: none; 
-            font-weight: 900; letter-spacing: 2px; text-transform: uppercase; 
-            cursor: pointer; transition: 0.3s;
-        }
-        .btn-gold { background: linear-gradient(135deg, #c5a059, #9e7d3e); color: #000; box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2); }
+        /* BOTONES PÍLDORA */
+        .btn-p { width: 100%; padding: 18px; border-radius: var(--pill); border: none; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: 0.2s; }
+        .btn-gold { background: var(--dorado); color: var(--negro-profundo); }
         .btn-red { background: var(--terracota); color: #fff; }
 
-        /* LISTAS MODERNAS */
-        .item-row { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 18px; background: rgba(255,255,255,0.02); 
-            border-radius: 15px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05);
-        }
+        /* CALENDARIO ROBUSTO */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
+        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.3); border-radius: 12px; font-size: 0.9rem; position: relative; cursor: pointer; border: 1px solid transparent; }
+        .cal-day:active { border-color: var(--dorado); background: var(--glass); }
+        .event-dot { width: 6px; height: 6px; background: var(--terracota); border-radius: 50%; position: absolute; bottom: 5px; }
 
-        /* NAVEGACIÓN MODERNA */
-        #main-nav { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 600px; background: rgba(13, 26, 18, 0.95); 
-            display: none; grid-template-columns: repeat(5, 1fr); 
-            padding: 15px; border-radius: 40px; border: 1px solid var(--dorado);
-            backdrop-filter: blur(20px); z-index: 9999; box-shadow: var(--shadow);
-        }
-        .nav-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.6rem; font-weight: 800; text-transform: uppercase; }
-        .nav-item.active { opacity: 1; color: var(--dorado); transform: translateY(-5px); transition: 0.3s; }
-        .nav-item i { font-size: 1.6rem; display: block; margin-bottom: 6px; }
+        /* LISTAS Y EXPANDIBLES */
+        .item-row { background: var(--glass); padding: 15px 20px; border-radius: var(--pill); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .f-input { width: 100%; padding: 15px 25px; border-radius: var(--pill); background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; margin-bottom: 15px; }
 
-        /* SISTEMA DE POPUPS (UNIFICADO) */
-        .modal { 
-            display: none; position: fixed; inset: 0; 
-            background: rgba(0,0,0,0.95); z-index: 1000000; 
-            align-items: center; justify-content: center; padding: 25px; 
-            backdrop-filter: blur(10px);
-        }
-        .modal-content { 
-            background: var(--verde-oscuro); padding: 40px; border-radius: 40px; 
-            width: 100%; max-width: 450px; border: 2px solid var(--dorado);
-            box-shadow: 0 0 50px rgba(197, 160, 89, 0.3);
-        }
+        /* NAV PÍLDORA */
+        #main-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 92%; background: rgba(13, 26, 18, 0.95); border-radius: var(--pill); display: none; grid-template-columns: repeat(5, 1fr); padding: 15px 10px; border: 1px solid var(--dorado); backdrop-filter: blur(15px); z-index: 9999; }
+        .nav-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.6rem; text-transform: uppercase; font-weight: 700; }
+        .nav-item.active { opacity: 1; color: var(--dorado); }
+        .nav-item i { font-size: 1.4rem; display: block; margin-bottom: 4px; }
 
-        /* CHECKLIST */
-        .check-item { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; font-size: 1.1rem; }
-        .check-item input { width: 25px; height: 25px; accent-color: var(--dorado); }
+        /* POPUPS */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 100000; align-items: center; justify-content: center; padding: 20px; }
+        .modal-content { background: var(--verde-oscuro); padding: 35px; border-radius: 40px; width: 100%; max-width: 450px; border: 2px solid var(--dorado); text-align: center; }
 
+        /* KPI CAPITAL */
+        .kpi-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 15px; }
+        .kpi-card { background: rgba(0,0,0,0.3); padding: 15px; border-radius: 20px; text-align: center; border: 1px solid var(--border); }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <img src="logo.png" alt="EscarolaOS" class="logo-app" onerror="this.style.display='none'">
-        <h1 style="letter-spacing: 8px; font-weight: 200; color: #fff;">ESCAROLA<span style="color:var(--dorado); font-weight: 900;">OS</span></h1>
-        
-        <div class="pin-container">
+        <img src="logo.png" class="logo-app" onerror="this.style.opacity='0'">
+        <h2 style="letter-spacing: 5px; margin-bottom: 30px;">ESCAROLA<span style="color:var(--dorado)">OS</span></h2>
+        <div style="display:flex; margin-bottom:40px">
             <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
         </div>
-
-        <div class="numpad" id="numpad-render"></div>
+        <div id="numpad-ui" class="numpad"></div>
     </div>
 
-    <div id="app-body">
-        
+    <div id="app-content">
         <div id="v-finanzas" class="view-frame">
-            <div class="card" style="text-align:center; border-bottom: 4px solid var(--dorado);">
-                <span style="letter-spacing:4px; opacity:0.5; font-size:0.7rem">PATRIMONIO TOTAL</span>
-                <h1 id="neto" style="font-size:3.5rem; color:#fff; margin:10px 0">$0.00</h1>
+            <div class="card" style="text-align:center">
+                <span style="font-size:0.7rem; letter-spacing:3px; opacity:0.6">BALANCE NETO</span>
+                <h1 id="total-money" style="font-size:3rem; margin:10px 0">$0.00</h1>
             </div>
             <div class="kpi-grid">
-                <div class="kpi-box"><span>Caja</span><h3 id="caja">$0</h3></div>
-                <div class="kpi-box"><span>Banco</span><h3 id="banco">$0</h3></div>
-                <div class="kpi-box"><span>Ventas</span><h3 id="ventas" style="color:var(--dorado)">$0</h3></div>
-                <div class="kpi-box"><span>Gastos</span><h3 id="gastos" style="color:var(--terracota)">$0</h3></div>
+                <div class="kpi-card"><span>Caja</span><h3 id="val-caja">$0</h3></div>
+                <div class="kpi-card"><span>Banco</span><h3 id="val-banco">$0</h3></div>
+                <div class="kpi-card"><span>Ventas</span><h3 id="val-ventas" style="color:var(--dorado)">$0</h3></div>
+                <div class="kpi-card"><span>Gastos</span><h3 id="val-gastos" style="color:var(--terracota)">$0</h3></div>
             </div>
             <div class="card">
-                <div class="header-s"><i class="fa-solid fa-plus-circle fa-lg" style="color:var(--dorado)"></i><h2>Transacción</h2></div>
-                <input type="text" id="f-desc" class="f-input" placeholder="Concepto de movimiento">
-                <input type="number" id="f-monto" class="f-input" placeholder="Monto $0.00">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
-                    <select id="f-tipo" class="f-input"><option value="INGRESO">Ingreso</option><option value="GASTO">Gasto</option></select>
-                    <select id="f-medio" class="f-input"><option value="CAJA">Caja</option><option value="BANCO">Banco</option></select>
+                <div class="header-s">Nuevo Movimiento</div>
+                <input type="text" id="f-desc" class="f-input" placeholder="Descripción">
+                <input type="number" id="f-monto" class="f-input" placeholder="Monto $">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px">
+                    <select id="f-tipo" class="f-input" style="margin:0"><option value="INGRESO">Ingreso</option><option value="GASTO">Gasto</option></select>
+                    <select id="f-canal" class="f-input" style="margin:0"><option value="CAJA">Caja</option><option value="BANCO">Banco</option></select>
                 </div>
-                <button class="btn-p btn-gold" onclick="window.saveFin()">Registrar Movimiento</button>
+                <button class="btn-p btn-gold" onclick="window.addFin()">Registrar</button>
             </div>
             <div id="fin-list"></div>
         </div>
 
         <div id="v-agenda" class="view-frame">
             <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                    <button onclick="window.chMonth(-1)" style="color:var(--dorado); background:none; border:none; font-size:1.5rem"><i class="fa-solid fa-angle-left"></i></button>
-                    <h2 id="cal-label" style="letter-spacing:3px">MES AÑO</h2>
-                    <button onclick="window.chMonth(1)" style="color:var(--dorado); background:none; border:none; font-size:1.5rem"><i class="fa-solid fa-angle-right"></i></button>
+                <div style="display:flex; justify-content:space-between; align-items:center">
+                    <button onclick="window.chM(-1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h2 id="cal-title" style="font-size:1rem; letter-spacing:2px">FEBRERO 2026</h2>
+                    <button onclick="window.chM(1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
-                <div class="cal-grid" id="cal-render"></div>
+                <div id="cal-grid" class="cal-grid"></div>
             </div>
             <div class="card">
-                <input type="text" id="ag-tit" class="f-input" placeholder="Nombre de reserva / Evento">
+                <div class="header-s">Nueva Reserva</div>
+                <input type="text" id="ag-tit" class="f-input" placeholder="Cliente / Evento">
                 <input type="date" id="ag-fec" class="f-input">
                 <input type="time" id="ag-hor" class="f-input">
-                <button class="btn-p btn-gold" onclick="window.saveAg()">Crear Reservación</button>
+                <button class="btn-p btn-gold" onclick="window.addAg()">Agendar</button>
             </div>
-            <div id="ag-day-list"></div>
+            <div id="ag-list"></div>
         </div>
 
         <div id="v-reloj" class="view-frame">
-            <div class="card" style="text-align:center; padding:60px 20px; border: 1px solid var(--dorado);">
-                <h1 id="clock-txt" style="font-size:4.5rem; font-weight:100; color:#fff">00:00:00</h1>
-                <p id="date-txt" style="letter-spacing:5px; text-transform:uppercase; color:var(--dorado); font-weight:800"></p>
+            <div class="card" style="text-align:center; padding:50px 0; border:2px solid var(--dorado)">
+                <h1 id="live-clock" style="font-size:3.5rem">00:00:00</h1>
+                <p id="live-date" style="color:var(--dorado); letter-spacing:4px; margin-top:10px"></p>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
-                <button class="btn-p btn-gold" style="height:180px" onclick="window.punch('ENTRADA')"><i class="fa-solid fa-fingerprint fa-3x"></i><br><br>ENTRADA</button>
-                <button class="btn-p btn-red" style="height:180px" onclick="window.punch('SALIDA')"><i class="fa-solid fa-door-open fa-3x"></i><br><br>SALIDA</button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
+                <button class="btn-p btn-gold" style="height:120px" onclick="window.punch('ENTRADA')">ENTRADA</button>
+                <button class="btn-p btn-red" style="height:120px" onclick="window.punch('SALIDA')">SALIDA</button>
             </div>
-            <div id="punch-list" style="margin-top:30px"></div>
+            <div id="punch-hist" style="margin-top:20px"></div>
         </div>
 
         <div id="v-bodega" class="view-frame">
             <div class="card">
-                <div class="header-s"><h2>Recetario Maestro</h2></div>
-                <input type="text" id="r-nom" class="f-input" placeholder="Nombre del platillo">
-                <input type="number" id="r-cos" class="f-input" placeholder="Costo de producción $">
-                <textarea id="r-det" class="f-input" rows="3" placeholder="Ingredientes y gramajes..."></textarea>
-                <button class="btn-p btn-gold" onclick="window.saveRec()">Guardar en Recetario</button>
+                <div class="header-s">Recetario & Costeo</div>
+                <input type="text" id="r-nom" class="f-input" placeholder="Nombre del Platillo">
+                <input type="number" id="r-cos" class="f-input" placeholder="Costo Total $">
+                <textarea id="r-det" class="f-input" placeholder="Ingredientes..." style="border-radius:20px"></textarea>
+                <button class="btn-p btn-gold" onclick="window.saveRec()">Guardar Receta</button>
+                <div id="rec-list" style="margin-top:20px"></div>
             </div>
-            <div id="rec-list"></div>
-            <div class="card" style="margin-top:30px">
-                <div class="header-s"><h2>Inventario Crítico</h2></div>
+            <div class="card">
+                <div class="header-s">Control de Inventario</div>
                 <input type="text" id="i-nom" class="f-input" placeholder="Insumo">
-                <input type="number" id="i-can" class="f-input" placeholder="Existencia actual">
-                <button class="btn-p btn-gold" onclick="window.saveInv()">Actualizar Stock</button>
+                <input type="number" id="i-can" class="f-input" placeholder="Cantidad en Stock">
+                <button class="btn-p btn-gold" onclick="window.saveInv()">Actualizar Inventario</button>
+                <div id="inv-list" style="margin-top:20px"></div>
             </div>
-            <div id="inv-list"></div>
         </div>
 
         <div id="v-admin" class="view-frame">
             <div class="card">
-                <div class="header-s"><h2>Cálculo de Nómina</h2></div>
-                <div id="payroll-list"></div>
+                <div class="header-s">Nómina y Pagos</div>
+                <div id="payroll-box"></div>
             </div>
             <div class="card">
-                <div class="header-s"><h2>Personal y Seguridad</h2></div>
-                <input type="text" id="u-nom" class="f-input" placeholder="Nombre completo">
-                <input type="number" id="u-pin" class="f-input" placeholder="PIN (4 dígitos)">
-                <input type="number" id="u-pag" class="f-input" placeholder="Sueldo por hora $">
+                <div class="header-s">Gestión de Empleados</div>
+                <input type="text" id="u-nom" class="f-input" placeholder="Nombre">
+                <input type="number" id="u-pin" class="f-input" placeholder="PIN">
+                <input type="number" id="u-pag" class="f-input" placeholder="Sueldo/Hora">
                 <select id="u-rol" class="f-input">
                     <option value="Socio">Socio</option>
                     <option value="Chef">Chef</option>
                     <option value="Barista">Barista</option>
-                    <option value="Barman">Barman</option>
                     <option value="Staff">Staff</option>
                 </select>
-                <div id="u-edit-ctrl" style="display:none; gap:10px">
-                    <button class="btn-p btn-gold" onclick="window.upUser()">Actualizar Usuario</button>
+                <div id="edit-btns" style="display:none; gap:10px">
+                    <button class="btn-p btn-gold" onclick="window.updateUser()">Actualizar</button>
                     <button class="btn-p btn-red" onclick="window.cancelEdit()">X</button>
                 </div>
-                <button id="u-add-btn" class="btn-p btn-gold" onclick="window.addUser()">Dar de Alta</button>
-                <div id="staff-list" style="margin-top:20px"></div>
+                <button id="add-user-btn" class="btn-p btn-gold" onclick="window.addUser()">Agregar Empleado</button>
+                <div id="staff-list" style="margin-top:15px"></div>
             </div>
             <div class="card">
-                <div class="header-s"><h2>Checklist de Limpieza</h2></div>
+                <div class="header-s">Checklist Maestro</div>
                 <div style="display:flex; gap:10px">
-                    <input type="text" id="t-nom" class="f-input" placeholder="Nueva tarea..." style="margin:0">
-                    <button class="btn-p btn-gold" style="width:60px" onclick="window.addTask()"><i class="fa-solid fa-plus"></i></button>
+                    <input type="text" id="t-nom" class="f-input" placeholder="Tarea..." style="margin:0">
+                    <button class="btn-p btn-gold" style="width:60px; padding:0" onclick="window.addTask()"><i class="fa-solid fa-plus"></i></button>
                 </div>
-                <div id="tasks-render" style="margin-top:20px"></div>
+                <div id="task-list" style="margin-top:15px"></div>
             </div>
-            <div class="card">
-                <div class="header-s"><h2>Auditoría de Pagos</h2></div>
-                <div id="pay-log"></div>
+            <div id="pay-history" class="card">
+                <div class="header-s">Historial de Pagos</div>
+                <div id="pay-log-render"></div>
             </div>
         </div>
-
     </div>
 
     <nav id="main-nav">
         <div class="nav-item" onclick="window.go('finanzas')"><i class="fa-solid fa-vault"></i>Capital</div>
-        <div class="nav-item" onclick="window.go('agenda')"><i class="fa-solid fa-calendar-check"></i>Agenda</div>
-        <div class="nav-item" onclick="window.go('reloj')"><i class="fa-solid fa-stopwatch"></i>Reloj</div>
-        <div class="nav-item" onclick="window.go('bodega')"><i class="fa-solid fa-boxes-stacked"></i>Bodega</div>
-        <div class="nav-item" onclick="window.go('admin')"><i class="fa-solid fa-gears"></i>Admin</div>
+        <div class="nav-item" onclick="window.go('agenda')"><i class="fa-solid fa-calendar-alt"></i>Agenda</div>
+        <div class="nav-item" onclick="window.go('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
+        <div class="nav-item" onclick="window.go('bodega')"><i class="fa-solid fa-box-open"></i>Bodega</div>
+        <div class="nav-item" onclick="window.go('admin')"><i class="fa-solid fa-user-shield"></i>Admin</div>
     </nav>
 
-    <div id="m-app" class="modal"><div class="modal-content" id="m-body"></div></div>
+    <div id="m-sys" class="modal"><div class="modal-content" id="m-body"></div></div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
@@ -262,255 +205,237 @@
         let pin = "";
         let user = null;
         let selMonth = new Date();
-        let editId = null;
-        let currentPay = null;
+        let editUid = null;
 
-        // --- AUTH & PINPAD ---
-        const renderPad = () => {
-            const p = document.getElementById('numpad-render');
-            for(let i=1; i<=9; i++) p.innerHTML += `<div class="key" onclick="window.k(${i})">${i}</div>`;
-            p.innerHTML += `<div class="key" onclick="window.k('CLR')"><i class="fa-solid fa-delete-left"></i></div>`;
-            p.innerHTML += `<div class="key" onclick="window.k(0)">0</div>`;
-            p.innerHTML += `<div class="key" onclick="location.reload()"><i class="fa-solid fa-power-off"></i></div>`;
+        // --- AUTH ---
+        const drawPad = () => {
+            const pad = document.getElementById('numpad-ui');
+            for(let i=1; i<=9; i++) pad.innerHTML += `<div class="key" onclick="window.k(${i})">${i}</div>`;
+            pad.innerHTML += `<div class="key" onclick="window.k('CLR')"><i class="fa-solid fa-eraser"></i></div>`;
+            pad.innerHTML += `<div class="key" onclick="window.k(0)">0</div>`;
+            pad.innerHTML += `<div class="key" onclick="location.reload()"><i class="fa-solid fa-power-off"></i></div>`;
         };
 
         window.k = async (n) => {
             if(n==='CLR') { pin=""; uDots(); return; }
             if(pin.length < 4) pin += n; uDots();
             if(pin.length === 4) {
-                const q = query(collection(db, "usuarios"), where("pin", "==", pin));
-                const snap = await getDocs(q);
+                const snap = await getDocs(query(collection(db, "usuarios"), where("pin", "==", pin)));
                 if(!snap.empty) {
                     user = { id: snap.docs[0].id, ...snap.docs[0].data() };
                     document.getElementById('login-screen').style.display='none';
                     document.getElementById('main-nav').style.display='grid';
                     boot();
-                } else { pin=""; uDots(); window.popup("PIN INCORRECTO"); }
+                } else { pin=""; uDots(); }
             }
         };
 
         const uDots = () => {
-            const d = document.querySelectorAll('.pin-dot');
-            d.forEach((x, i) => x.classList.toggle('filled', i < pin.length));
+            const dots = document.querySelectorAll('.pin-dot');
+            dots.forEach((d, i) => d.classList.toggle('filled', i < pin.length));
         };
 
-        // --- CORE UI ---
+        // --- NAVIGATION & POPUPS ---
         window.go = (v) => {
-            if((v==='finanzas' || v==='admin') && user.rol !== 'Socio') return window.popup("ACCESO DENEGADO");
+            if((v==='finanzas' || v==='admin') && user.rol !== 'Socio') return;
             document.querySelectorAll('.view-frame').forEach(f => f.style.display='none');
-            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
             document.getElementById(`v-${v}`).style.display='block';
         };
 
-        window.popup = (msg, isConfirm, onConfirm) => {
-            const b = document.getElementById('m-body');
-            b.innerHTML = `<h3 style="text-align:center; color:var(--dorado);">${msg}</h3><br>`;
-            if(isConfirm) {
-                b.innerHTML += `<button class="btn-p btn-gold" id="p-ok">Aceptar</button><br><br>
-                                <button class="btn-p btn-red" onclick="document.getElementById('m-app').style.display='none'">Cancelar</button>`;
-                document.getElementById('m-app').style.display='flex';
-                document.getElementById('p-ok').onclick = () => { onConfirm(); document.getElementById('m-app').style.display='none'; };
-            } else {
-                b.innerHTML += `<button class="btn-p btn-gold" onclick="document.getElementById('m-app').style.display='none'">OK</button>`;
-                document.getElementById('m-app').style.display='flex';
-            }
+        window.pop = (html) => {
+            document.getElementById('m-body').innerHTML = html;
+            document.getElementById('m-sys').style.display='flex';
         };
 
-        // --- FINANZAS ---
-        window.saveFin = async () => {
+        // --- CAPITAL ---
+        window.addFin = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
             const d = document.getElementById('f-desc').value;
             if(!m || !d) return;
-            await addDoc(collection(db,"finanzas"), { desc:d, monto:m, tipo:document.getElementById('f-tipo').value, canal:document.getElementById('f-medio').value, fecha:new Date().toISOString() });
+            await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('f-tipo').value, canal: document.getElementById('f-canal').value, fecha: new Date().toISOString() });
             loadFin();
         };
 
         window.loadFin = async () => {
-            const snap = await getDocs(query(collection(db,"finanzas"), orderBy("fecha","desc")));
-            let total=0, cj=0, bn=0, v=0, g=0;
-            const l = document.getElementById('fin-list'); l.innerHTML = "";
-            snap.forEach(d => {
-                const f = d.data();
-                const m = f.tipo==='INGRESO' ? f.monto : -f.monto;
-                if(f.canal==='CAJA') cj+=m; else bn+=m;
-                if(f.tipo==='INGRESO') v+=f.monto; else g+=f.monto;
-                l.innerHTML += `<div class="item-row"><span>${f.desc}</span> <b>$${f.monto} <button class="btn-red" style="padding:5px; border-radius:5px;" onclick="window.delDoc('finanzas','${d.id}','loadFin')">×</button></b></div>`;
+            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
+            let cj=0, bn=0, v=0, g=0;
+            const list = document.getElementById('fin-list'); list.innerHTML = "";
+            snap.forEach(docSnap => {
+                const f = docSnap.data();
+                const realM = f.tipo === 'INGRESO' ? f.monto : -f.monto;
+                if(f.canal === 'CAJA') cj += realM; else bn += realM;
+                if(f.tipo === 'INGRESO') v += f.monto; else g += f.monto;
+                list.innerHTML += `<div class="item-row"><span>${f.desc}</span> <b>$${f.monto} <button onclick="window.delDoc('finanzas','${docSnap.id}','loadFin')" style="background:none; border:none; color:var(--terracota)">×</button></b></div>`;
             });
-            document.getElementById('neto').innerText = `$${(cj+bn).toFixed(2)}`;
-            document.getElementById('caja').innerText = `$${cj.toFixed(2)}`;
-            document.getElementById('banco').innerText = `$${bn.toFixed(2)}`;
-            document.getElementById('ventas').innerText = `$${v.toFixed(2)}`;
-            document.getElementById('gastos').innerText = `$${g.toFixed(2)}`;
+            document.getElementById('total-money').innerText = `$${(cj+bn).toFixed(2)}`;
+            document.getElementById('val-caja').innerText = `$${cj.toFixed(2)}`;
+            document.getElementById('val-banco').innerText = `$${bn.toFixed(2)}`;
+            document.getElementById('val-ventas').innerText = `$${v.toFixed(2)}`;
+            document.getElementById('val-gastos').innerText = `$${g.toFixed(2)}`;
         };
 
         // --- AGENDA ---
-        window.chMonth = (x) => { selMonth.setMonth(selMonth.getMonth()+x); loadAg(); };
+        window.chM = (val) => { selMonth.setMonth(selMonth.getMonth() + val); loadAg(); };
         window.loadAg = async () => {
-            const g = document.getElementById('cal-render'); g.innerHTML = "";
+            const grid = document.getElementById('cal-grid');
             const evs = await getDocs(collection(db, "agenda"));
             const dates = evs.docs.map(d => d.data().fecha);
-            document.getElementById('cal-label').innerText = selMonth.toLocaleDateString('es-MX',{month:'long',year:'numeric'}).toUpperCase();
-            const days = new Date(selMonth.getFullYear(), selMonth.getMonth()+1,0).getDate();
+            grid.innerHTML = "";
+            document.getElementById('cal-title').innerText = selMonth.toLocaleDateString('es-MX', {month:'long', year:'numeric'}).toUpperCase();
+            const days = new Date(selMonth.getFullYear(), selMonth.getMonth() + 1, 0).getDate();
             for(let i=1; i<=days; i++) {
                 const f = `${selMonth.getFullYear()}-${String(selMonth.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                g.innerHTML += `<div class="cal-day" onclick="window.viewAg('${f}')">${i} ${dates.includes(f)?'<div class="event-dot"></div>':''}</div>`;
+                grid.innerHTML += `<div class="cal-day" onclick="window.viewDay('${f}')">${i} ${dates.includes(f)?'<div class="event-dot"></div>':''}</div>`;
             }
         };
 
-        window.saveAg = async () => {
-            await addDoc(collection(db,"agenda"), { tit: document.getElementById('ag-tit').value, fecha: document.getElementById('ag-fec').value, hora: document.getElementById('ag-hor').value });
+        window.addAg = async () => {
+            await addDoc(collection(db, "agenda"), { tit: document.getElementById('ag-tit').value, fecha: document.getElementById('ag-fec').value, hora: document.getElementById('ag-hor').value });
             loadAg();
         };
 
-        window.viewAg = async (f) => {
-            const snap = await getDocs(query(collection(db,"agenda"), where("fecha","==",f)));
-            const l = document.getElementById('ag-day-list');
-            l.innerHTML = `<h4 style="margin-bottom:15px">Agenda: ${f}</h4>`;
-            snap.forEach(d => l.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.delDoc('agenda','${d.id}','loadAg')">×</button></div>`);
+        window.viewDay = async (f) => {
+            const snap = await getDocs(query(collection(db, "agenda"), where("fecha", "==", f)));
+            const list = document.getElementById('ag-list');
+            list.innerHTML = `<h4>Eventos: ${f}</h4>`;
+            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.delDoc('agenda','${d.id}','loadAg')">×</button></div>`);
         };
 
         // --- RELOJ & CHECKLIST ---
         window.punch = async (t) => {
             if(t==='SALIDA') {
-                const snap = await getDocs(collection(db, "tareas"));
-                const b = document.getElementById('m-body');
-                b.innerHTML = `<h2 style="text-align:center; color:var(--dorado)">CHECKLIST SALIDA</h2><br>`;
-                snap.forEach(d => b.innerHTML += `<div class="check-item"><input type="checkbox" class="chk-task"> ${d.data().tarea}</div>`);
-                b.innerHTML += `<br><button class="btn-p btn-gold" onclick="window.confirmExit()">FINALIZAR TURNO</button>`;
-                document.getElementById('m-app').style.display='flex';
-            } else { window.savePunch('ENTRADA'); }
+                const ts = await getDocs(collection(db, "tareas"));
+                let html = `<h3>CHECKLIST SALIDA</h3><br>`;
+                ts.forEach(d => html += `<label style="display:block; margin-bottom:15px"><input type="checkbox" class="exit-chk"> ${d.data().tarea}</label>`);
+                html += `<button class="btn-p btn-gold" onclick="window.confirmExit()">Finalizar</button>`;
+                window.pop(html);
+            } else { savePunch('ENTRADA'); }
         };
 
         window.confirmExit = () => {
-            const chks = document.querySelectorAll('.chk-task');
-            if(chks.length > 0 && !Array.from(chks).some(c => c.checked)) return window.popup("MARQUE AL MENOS UNA TAREA");
-            window.savePunch('SALIDA');
-            location.reload();
+            if(!Array.from(document.querySelectorAll('.exit-chk')).some(c => c.checked)) return;
+            savePunch('SALIDA'); location.reload();
         };
 
-        window.savePunch = async (t) => {
-            await addDoc(collection(db,"asistencias"), { uid:user.id, name:user.nombre, tipo:t, fecha:new Date().toISOString() });
-            if(user.rol==='Socio') loadPunch();
+        const savePunch = async (t) => {
+            await addDoc(collection(db, "asistencias"), { uid: user.id, name: user.nombre, tipo: t, fecha: new Date().toISOString() });
+            if(user.rol === 'Socio') loadPunchHist();
         };
 
-        window.loadPunch = async () => {
-            const snap = await getDocs(query(collection(db,"asistencias"), orderBy("fecha","desc"), limit(10)));
-            const b = document.getElementById('punch-list'); b.innerHTML = "<h4>Actividad de Personal</h4>";
-            snap.forEach(d => b.innerHTML += `<div class="item-row"><span>${d.data().name} (${d.data().tipo})</span> <button onclick="window.delDoc('asistencias','${d.id}','loadPunch')">×</button></div>`);
+        window.loadPunchHist = async () => {
+            const snap = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(5)));
+            const box = document.getElementById('punch-hist'); box.innerHTML = "<h4>Última Actividad</h4>";
+            snap.forEach(d => box.innerHTML += `<div class="item-row"><span>${d.data().name} (${d.data().tipo})</span> <button onclick="window.delDoc('asistencias','${d.id}','loadPunchHist')">×</button></div>`);
         };
 
-        // --- ADMIN & PAYROLL ---
+        // --- ADMIN ---
         window.addUser = async () => {
-            await addDoc(collection(db,"usuarios"), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: document.getElementById('u-rol').value });
+            await addDoc(collection(db, "usuarios"), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: document.getElementById('u-rol').value });
             loadStaff();
         };
 
         window.loadStaff = async () => {
-            const snap = await getDocs(collection(db,"usuarios"));
+            const snap = await getDocs(collection(db, "usuarios"));
             const l = document.getElementById('staff-list'); l.innerHTML = "";
-            snap.forEach(d => {
-                l.innerHTML += `<div class="item-row"><span>${d.data().nombre}</span> <button class="btn-gold" style="padding:5px 10px; width:auto;" onclick="window.editUser('${d.id}')">Editar</button></div>`;
-            });
+            snap.forEach(d => l.innerHTML += `<div class="item-row"><span>${d.data().nombre}</span> <button class="btn-gold" style="padding:5px 15px; width:auto; border-radius:15px" onclick="window.editUser('${d.id}')">Editar</button></div>`);
             loadPayroll();
         };
 
         window.editUser = async (id) => {
-            const all = await getDocs(collection(db,"usuarios"));
+            const all = await getDocs(collection(db, "usuarios"));
             const u = all.docs.find(x => x.id === id).data();
-            editId = id;
+            editUid = id;
             document.getElementById('u-nom').value = u.nombre;
             document.getElementById('u-pin').value = u.pin;
             document.getElementById('u-pag').value = u.sueldo;
             document.getElementById('u-rol').value = u.rol;
-            document.getElementById('u-add-btn').style.display='none';
-            document.getElementById('u-edit-ctrl').style.display='flex';
+            document.getElementById('add-user-btn').style.display='none';
+            document.getElementById('edit-btns').style.display='flex';
         };
 
-        window.upUser = async () => {
-            await updateDoc(doc(db,"usuarios", editId), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: document.getElementById('u-rol').value });
+        window.updateUser = async () => {
+            await updateDoc(doc(db, "usuarios", editUid), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: document.getElementById('u-rol').value });
             window.cancelEdit(); loadStaff();
         };
 
-        window.cancelEdit = () => { editId=null; document.getElementById('u-add-btn').style.display='block'; document.getElementById('u-edit-ctrl').style.display='none'; };
+        window.cancelEdit = () => { editUid=null; document.getElementById('add-user-btn').style.display='block'; document.getElementById('edit-btns').style.display='none'; };
 
         window.loadPayroll = async () => {
-            const uS = await getDocs(collection(db,"usuarios"));
-            const aS = await getDocs(collection(db,"asistencias"));
-            const l = document.getElementById('payroll-list'); l.innerHTML = "";
+            const uS = await getDocs(collection(db, "usuarios"));
+            const aS = await getDocs(collection(db, "asistencias"));
+            const box = document.getElementById('payroll-box'); box.innerHTML = "";
             uS.forEach(uDoc => {
                 const u = uDoc.data();
                 const hits = aS.docs.map(d=>d.data()).filter(p=>p.uid===uDoc.id).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
                 let hrs = 0;
                 for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs+=(new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
-                const total = hrs * u.sueldo;
-                l.innerHTML += `<div class="item-row"><b>${u.nombre}</b> <span>$${total.toFixed(0)} <button class="btn-gold" style="width:auto; padding:5px" onclick="window.payPopup('${uDoc.id}','${u.nombre}',${total})">PAGAR</button></span></div>`;
+                const pay = hrs * (u.sueldo || 0);
+                box.innerHTML += `<div class="item-row"><b>${u.nombre}</b> <span>$${pay.toFixed(0)} <button class="btn-gold" style="padding:5px 10px; width:auto; border-radius:10px" onclick="window.prepPay('${uDoc.id}','${u.nombre}',${pay})">Pagar</button></span></div>`;
             });
         };
 
-        window.payPopup = (id, n, a) => {
-            currentPay = {id, n, a};
-            const b = document.getElementById('m-body');
-            b.innerHTML = `<h3>Pagar a ${n}</h3><h1 style="text-align:center; margin:20px 0;">$${a.toFixed(2)}</h1>
-                           <button class="btn-p btn-gold" onclick="window.doPay('CAJA')">EFECTIVO</button><br><br>
-                           <button class="btn-p btn-gold" onclick="window.doPay('BANCO')">TRANSFERENCIA</button>`;
-            document.getElementById('m-app').style.display='flex';
+        window.prepPay = (id, n, a) => {
+            window.pop(`<h3>Pagar a ${n}</h3><br><h1 style="font-size:3rem">$${a.toFixed(2)}</h1><br>
+                <button class="btn-p btn-gold" onclick="window.execPay('${n}',${a},'CAJA')">Efectivo (Caja)</button><br><br>
+                <button class="btn-p btn-gold" onclick="window.execPay('${n}',${a},'BANCO')">Transferencia (Banco)</button>`);
         };
 
-        window.doPay = async (c) => {
-            await addDoc(collection(db,"pagos"), { name:currentPay.n, amount:currentPay.a, canal:c, fecha:new Date().toISOString() });
-            await addDoc(collection(db,"finanzas"), { desc: "PAGO NÓMINA: "+currentPay.n, monto:currentPay.a, tipo:"GASTO", canal:c, fecha:new Date().toISOString() });
-            document.getElementById('m-app').style.display='none';
-            boot();
+        window.execPay = async (n, a, c) => {
+            await addDoc(collection(db, "pagos"), { nombre: n, monto: a, canal: c, fecha: new Date().toISOString() });
+            await addDoc(collection(db, "finanzas"), { desc: "PAGO NÓMINA: "+n, monto: a, tipo: "GASTO", canal: c, fecha: new Date().toISOString() });
+            document.getElementById('m-sys').style.display='none'; boot();
         };
 
         window.loadPayLog = async () => {
-            const snap = await getDocs(query(collection(db,"pagos"), orderBy("fecha","desc"), limit(10)));
-            const l = document.getElementById('pay-log'); l.innerHTML = "";
-            snap.forEach(d => l.innerHTML += `<div class="item-row"><span>${d.data().name} ($${d.data().amount})</span> <button onclick="window.delDoc('pagos','${d.id}','loadPayLog')">×</button></div>`);
+            const snap = await getDocs(query(collection(db, "pagos"), orderBy("fecha", "desc"), limit(10)));
+            const box = document.getElementById('pay-log-render'); box.innerHTML = "";
+            snap.forEach(d => box.innerHTML += `<div class="item-row"><span>${d.data().nombre} ($${d.data().monto})</span> <button onclick="window.delDoc('pagos','${d.id}','loadPayLog')">×</button></div>`);
         };
 
         window.addTask = async () => {
-            await addDoc(collection(db,"tareas"), { tarea: document.getElementById('t-nom').value });
+            await addDoc(collection(db, "tareas"), { tarea: document.getElementById('t-nom').value });
             document.getElementById('t-nom').value = ""; loadTasks();
         };
         window.loadTasks = async () => {
-            const snap = await getDocs(collection(db,"tareas"));
-            const l = document.getElementById('tasks-render'); l.innerHTML = "";
+            const snap = await getDocs(collection(db, "tareas"));
+            const l = document.getElementById('task-list'); l.innerHTML = "";
             snap.forEach(d => l.innerHTML += `<div class="item-row">${d.data().tarea} <button onclick="window.delDoc('tareas','${d.id}','loadTasks')">×</button></div>`);
         };
 
         // --- BODEGA ---
         window.saveRec = async () => {
-            await addDoc(collection(db,"recetas"), { platillo:document.getElementById('r-nom').value, costo:document.getElementById('r-cos').value, detalles:document.getElementById('r-det').value });
+            await addDoc(collection(db, "recetas"), { platillo: document.getElementById('r-nom').value, costo: document.getElementById('r-cos').value, detalles: document.getElementById('r-det').value });
             loadBodega();
         };
         window.saveInv = async () => {
-            await addDoc(collection(db,"inventario"), { insumo:document.getElementById('i-nom').value, cant:document.getElementById('i-can').value });
+            await addDoc(collection(db, "inventario"), { insumo: document.getElementById('i-nom').value, cant: document.getElementById('i-can').value });
             loadBodega();
         };
         window.loadBodega = async () => {
-            const rS = await getDocs(collection(db,"recetas"));
-            const iS = await getDocs(collection(db,"inventario"));
-            document.getElementById('rec-list').innerHTML = "<h4>Recetas</h4>";
+            const rS = await getDocs(collection(db, "recetas"));
+            const iS = await getDocs(collection(db, "inventario"));
+            document.getElementById('rec-list').innerHTML = "<h4>Recetario</h4>";
             rS.forEach(d => document.getElementById('rec-list').innerHTML += `<div class="item-row">${d.data().platillo} ($${d.data().costo})</div>`);
-            document.getElementById('inv-list').innerHTML = "<h4>Stock</h4>";
+            document.getElementById('inv-list').innerHTML = "<h4>Existencias</h4>";
             iS.forEach(d => document.getElementById('inv-list').innerHTML += `<div class="item-row">${d.data().insumo} (${d.data().cant})</div>`);
         };
 
-        // --- INIT ---
-        window.delDoc = (c, id, cb) => { window.popup("¿Eliminar registro?", true, async () => { await deleteDoc(doc(db, c, id)); window[cb](); loadFin(); }); };
+        // --- GLOBAL ---
+        window.delDoc = async (c, id, cb) => {
+            if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, c, id)); window[cb](); loadFin(); }
+        };
 
         const boot = () => {
             window.go('reloj'); loadFin(); loadAg(); loadBodega();
-            if(user.rol==='Socio') { loadStaff(); loadPunch(); loadPayLog(); loadTasks(); }
+            if(user.rol === 'Socio') { loadStaff(); loadPunchHist(); loadPayLog(); loadTasks(); }
             setInterval(() => {
-                const n = new Date();
-                document.getElementById('clock-txt').innerText = n.toLocaleTimeString();
-                document.getElementById('date-txt').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+                const now = new Date();
+                document.getElementById('live-clock').innerText = now.toLocaleTimeString();
+                document.getElementById('live-date').innerText = now.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
             }, 1000);
         };
 
-        renderPad();
+        drawPad();
     </script>
 </body>
 </html>
