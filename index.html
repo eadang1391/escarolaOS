@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v15.5 - Enterprise System</title>
+    <title>EscarolaOS v15.6 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -23,176 +23,218 @@
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* SCROLL HIDE & CORE */
+        /* ESTRUCTURA BASE Y OCULTAR SCROLLBAR */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--verde-bosque); color: var(--cantera); height: 100vh; overflow: hidden; user-select: none; }
-        .main-viewport { display: none; height: 100vh; overflow-y: auto; padding: 35px 20px 200px 20px; max-width: 850px; margin: 0 auto; animation: slideUp 0.6s ease; -ms-overflow-style: none; scrollbar-width: none; }
-        .main-viewport::-webkit-scrollbar { display: none; }
+        
+        .main-viewport { 
+            display: none; height: 100vh; overflow-y: auto; 
+            padding: 35px 20px 200px 20px; max-width: 850px; margin: 0 auto; 
+            animation: slideUp 0.6s ease;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .main-viewport::-webkit-scrollbar { display: none; } /* Chrome, Safari, Opera */
 
+        @keyframes glowPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--dorado)); opacity: 0.8; } 50% { filter: drop-shadow(0 0 25px var(--dorado)); opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* UI ELEMENTS */
+        /* COMPONENTES UI */
         .card-panel { background: var(--verde-oscuro); border-radius: 35px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: var(--shadow-premium); }
         .tag-header { border-left: 6px solid var(--dorado); padding-left: 18px; margin-bottom: 25px; letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; color: var(--dorado); font-weight: 900; }
-        .input-premium { width: 100%; padding: 18px 28px; border-radius: var(--pill); background: rgba(0,0,0,0.6); border: 1px solid var(--border); color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none; transition: 0.3s; }
-        .input-premium:focus { border-color: var(--dorado); }
-        .btn-premium { width: 100%; padding: 20px; border-radius: var(--pill); border: none; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: 0.3s; }
+        
+        .input-premium { width: 100%; padding: 18px 28px; border-radius: var(--pill); background: rgba(0,0,0,0.6); border: 1px solid var(--border); color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none; transition: var(--transition); }
+        .input-premium:focus { border-color: var(--dorado); box-shadow: 0 0 15px rgba(197, 160, 89, 0.2); }
+        
+        .btn-premium { width: 100%; padding: 20px; border-radius: var(--pill); border: none; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 12px; }
         .gold-btn { background: var(--dorado); color: var(--negro); }
-        .list-row { background: var(--glass); padding: 18px 25px; border-radius: var(--pill); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06); }
-        .alert-low { border: 1px solid var(--terracota) !important; background: rgba(176, 65, 62, 0.1) !important; }
+        .red-btn { background: var(--terracota); color: #fff; }
+        .btn-action-small { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--border); background: var(--glass); color: var(--dorado); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* ANALYTICS GRAPH */
-        .metric-container { margin: 20px 0; }
-        .bar-wrap { height: 12px; background: #000; border-radius: 10px; overflow: hidden; display: flex; border: 1px solid var(--border); }
-        .bar-i { background: var(--dorado); height: 100%; transition: 1s ease; }
-        .bar-g { background: var(--terracota); height: 100%; transition: 1s ease; }
+        .list-row { background: var(--glass); padding: 18px 25px; border-radius: var(--pill); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06); transition: 0.3s; }
+        .alert-low { border-color: var(--terracota); background: rgba(176, 65, 62, 0.15); box-shadow: 0 0 10px var(--terracota); }
 
-        /* NAV */
-        #command-bar { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 750px; background: rgba(13, 26, 18, 0.98); border-radius: var(--pill); display: none; grid-template-columns: repeat(7, 1fr); padding: 15px; border: 1px solid var(--dorado); backdrop-filter: blur(25px); z-index: 9999; }
-        .cmd-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.55rem; font-weight: 800; cursor: pointer; }
-        .cmd-item.active { opacity: 1; color: var(--dorado); }
+        /* ANALYTICS */
+        .bar-wrap { height: 12px; background: #000; border-radius: 10px; overflow: hidden; display: flex; margin: 15px 0; border: 1px solid var(--border); }
+        .bar-i { background: var(--dorado); height: 100%; transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1); width: 0%; }
+        .bar-g { background: var(--terracota); height: 100%; transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1); width: 0%; }
+
+        /* NAV BAR */
+        #command-bar { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 750px; 
+            background: rgba(13, 26, 18, 0.98); border-radius: var(--pill); display: none; grid-template-columns: repeat(7, 1fr); 
+            padding: 15px; border: 1px solid var(--dorado); backdrop-filter: blur(25px); z-index: 9999;
+        }
+        .cmd-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.55rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .cmd-item.active { opacity: 1; color: var(--dorado); transform: translateY(-5px); }
         .cmd-item i { font-size: 1.5rem; display: block; margin-bottom: 6px; }
 
-        /* MODALES */
+        /* MODAL OS */
         .modal-os { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 1000000; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(15px); }
-        .modal-os-box { background: var(--verde-oscuro); padding: 40px; border-radius: 40px; width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; }
+        .modal-os-box { background: var(--verde-oscuro); padding: 45px; border-radius: 45px; width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; box-shadow: 0 0 50px rgba(0,0,0,1); }
 
-        /* PINPAD */
-        #login-screen { position: fixed; inset: 0; background: radial-gradient(circle, var(--verde-bosque), var(--negro)); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999; }
-        .dot { width: 15px; height: 15px; border: 2px solid var(--dorado); border-radius: 50%; margin: 0 8px; }
-        .dot.active { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); }
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 300px; margin-top: 40px; }
-        .key { aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: var(--dorado); cursor: pointer; }
+        /* PINPAD LOGIN */
+        #login-screen { 
+            position: fixed; inset: 0; background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro) 100%); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999; 
+        }
+        .pin-indicator { display: flex; margin-bottom: 40px; gap: 18px; }
+        .dot { width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; transition: var(--transition); }
+        .dot.active { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); transform: scale(1.3); }
+        .numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 320px; }
+        .key { aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--dorado); background: var(--glass); cursor: pointer; transition: var(--transition); }
+        .key:active { transform: scale(0.9); background: var(--dorado); color: var(--negro); }
+
+        /* CALENDARIO */
+        .cal-box { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .cal-unit { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 15px; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
+        .cal-unit.active { background: var(--dorado); color: var(--negro); font-weight: 900; }
+        .cal-unit.marked { border-bottom: 4px solid var(--terracota); }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <h2 style="letter-spacing:10px; font-weight:200; margin-bottom:30px">ESCAROLA <b style="color:var(--dorado)">OS</b></h2>
-        <div style="display:flex"><div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-        <div class="numpad" id="pin-render"></div>
+        <img src="logo.png" style="width:110px; margin-bottom: 25px; animation: glowPulse 4s infinite" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448636.png'">
+        <h2 style="letter-spacing: 8px; margin-bottom: 35px; font-weight: 200;">ESCAROLA <span style="font-weight:900; color:var(--dorado)">OS</span></h2>
+        <div class="pin-indicator">
+            <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div id="numpad-logic" class="numpad-container"></div>
     </div>
 
-    <div id="shell">
+    <div id="os-shell">
+        
         <div id="view-finanzas" class="main-viewport">
-            <div class="card-panel" style="text-align:center">
-                <span style="letter-spacing:4px; opacity:0.5; font-size:0.7rem">CAPITAL TOTAL</span>
-                <h1 id="neto-val" style="font-size:3.5rem; margin:15px 0">$0</h1>
-                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; border-top:1px solid var(--border); padding-top:20px">
-                    <div><small>CAJA</small><br><b id="cash-val" style="color:var(--dorado)">$0</b></div>
-                    <div><small>CHICA</small><br><b id="small-cash-val" style="color:var(--dorado)">$0</b></div>
+            <div class="card-panel" style="text-align:center; padding: 40px 20px;">
+                <span style="font-size:0.7rem; letter-spacing:5px; opacity:0.6;">CAPITAL OPERATIVO</span>
+                <h1 id="neto-val" style="font-size:3.5rem; margin:10px 0; font-weight: 900;">$0</h1>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:20px; border-top:1px solid var(--border); padding-top:20px">
+                    <div><small>CAJA GRAL</small><br><b id="cash-val" style="color:var(--dorado)">$0</b></div>
+                    <div><small>CAJA CHICA</small><br><b id="small-cash-val" style="color:var(--dorado)">$0</b></div>
                     <div><small>BANCO</small><br><b id="bank-val" style="color:var(--dorado)">$0</b></div>
                 </div>
             </div>
 
             <div class="card-panel">
-                <div class="tag-header">Analítica de Flujo</div>
-                <div class="bar-wrap"><div id="bar-i" class="bar-i"></div><div id="bar-g" class="bar-g"></div></div>
-                <div style="display:flex; justify-content:space-between; margin-top:10px; font-size:0.7rem">
-                    <span id="util-txt" style="color:var(--dorado)">0% UTILIDAD</span>
+                <div class="tag-header">Análisis de Flujo</div>
+                <div class="bar-wrap">
+                    <div id="bar-i" class="bar-i"></div>
+                    <div id="bar-g" class="bar-g"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:700">
+                    <span id="util-txt" style="color:var(--dorado)">UTILIDAD: 0%</span>
                     <span style="opacity:0.4">INGRESOS VS GASTOS</span>
                 </div>
             </div>
 
             <div class="card-panel">
-                <div class="tag-header">Nuevo Registro</div>
-                <input type="text" id="f-desc" class="input-premium" placeholder="Concepto">
-                <input type="number" id="f-monto" class="input-premium" placeholder="Monto $">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                    <select id="f-tipo" class="input-premium"><option value="INGRESO">Entrada (+)</option><option value="GASTO">Salida (-)</option></select>
-                    <select id="f-canal" class="input-premium"><option value="CAJA">Caja Gral</option><option value="CAJA_CHICA">Caja Chica</option><option value="BANCO">Banco</option></select>
+                <div class="tag-header">Nuevo Movimiento</div>
+                <input type="text" id="f-desc" class="input-premium" placeholder="Concepto de la transacción">
+                <input type="number" id="f-monto" class="input-premium" placeholder="Monto exacto $">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
+                    <select id="f-tipo" class="input-premium" style="margin:0"><option value="INGRESO">Entrada (+)</option><option value="GASTO">Salida (-)</option></select>
+                    <select id="f-canal" class="input-premium" style="margin:0">
+                        <option value="CAJA">Caja Gral</option>
+                        <option value="CAJA_CHICA">Caja Chica</option>
+                        <option value="BANCO">Banco / Transf.</option>
+                    </select>
                 </div>
-                <button class="btn-premium gold-btn" onclick="window.saveFinance()">ASENTAR</button>
+                <button class="btn-premium gold-btn" onclick="window.saveFinance()">ASENTAR EN LIBROS</button>
             </div>
             <div id="lista-finanzas"></div>
         </div>
 
         <div id="view-agenda" class="main-viewport">
             <div class="card-panel">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                    <button onclick="window.navMonth(-1)" style="background:none; border:none; color:var(--dorado)"><i class="fa-solid fa-chevron-left"></i></button>
-                    <h2 id="cal-month-display" style="font-size:1rem; letter-spacing:3px"></h2>
-                    <button onclick="window.navMonth(1)" style="background:none; border:none; color:var(--dorado)"><i class="fa-solid fa-chevron-right"></i></button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+                    <button onclick="window.navMonth(-1)" class="btn-premium" style="width:60px; background:var(--glass); padding:0"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h2 id="cal-month-display" style="font-size:1rem; letter-spacing:4px; font-weight:900"></h2>
+                    <button onclick="window.navMonth(1)" class="btn-premium" style="width:60px; background:var(--glass); padding:0"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
-                <div id="cal-grid-render" style="display:grid; grid-template-columns:repeat(7, 1fr); gap:8px"></div>
+                <div id="cal-grid-render" class="cal-box"></div>
             </div>
             <div class="card-panel">
-                <div class="tag-header" id="cal-selected-label">Agenda</div>
-                <input type="text" id="ev-tit" class="input-premium" placeholder="Evento">
+                <div class="tag-header" id="cal-selected-label">Agenda de Eventos</div>
+                <input type="text" id="ev-tit" class="input-premium" placeholder="Título del evento">
                 <input type="time" id="ev-hor" class="input-premium">
-                <button class="btn-premium gold-btn" onclick="window.saveEvent()">GUARDAR</button>
+                <button class="btn-premium gold-btn" onclick="window.saveEvent()">GUARDAR FECHA</button>
             </div>
             <div id="lista-agenda"></div>
         </div>
 
         <div id="view-reloj" class="main-viewport">
-            <div class="card-panel" style="text-align:center; padding:60px 0">
-                <h1 id="live-time" style="font-size:4.5rem; font-weight:100">00:00:00</h1>
-                <p id="live-date" style="color:var(--dorado); letter-spacing:5px; font-weight:800; margin-top:10px"></p>
+            <div class="card-panel" style="text-align:center; padding:80px 0;">
+                <h1 id="live-time" style="font-size:5rem; font-weight:100;">00:00:00</h1>
+                <p id="live-date" style="color:var(--dorado); letter-spacing:6px; font-weight:900;"></p>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
-                <button class="btn-premium gold-btn" style="height:150px; flex-direction:column" onclick="window.handlePunch('ENTRADA')"><i class="fa-solid fa-fingerprint fa-3x"></i>ENTRADA</button>
-                <button class="btn-premium red-btn" style="height:150px; flex-direction:column" onclick="window.handlePunch('SALIDA')"><i class="fa-solid fa-door-open fa-3x"></i>SALIDA</button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:25px;">
+                <button class="btn-premium gold-btn" style="height:180px; flex-direction:column" onclick="window.handlePunch('ENTRADA')"><i class="fa-solid fa-fingerprint fa-4x"></i>ENTRADA</button>
+                <button class="btn-premium red-btn" style="height:180px; flex-direction:column" onclick="window.handlePunch('SALIDA')"><i class="fa-solid fa-door-open fa-4x"></i>SALIDA</button>
             </div>
-            <div id="lista-asistencias" style="margin-top:30px"></div>
+            <div id="lista-asistencias" style="margin-top:40px"></div>
         </div>
 
         <div id="view-limpieza" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Checklist Higiene</div>
-                <div style="display:flex; gap:10px">
-                    <input type="text" id="clean-in" class="input-premium" style="margin:0" placeholder="Nueva tarea...">
-                    <button class="btn-premium gold-btn" style="width:60px" onclick="window.addCleanTask()">+</button>
+                <div class="tag-header">Checklist de Higiene</div>
+                <div style="display:flex; gap:15px; margin-bottom:20px">
+                    <input type="text" id="clean-task-in" class="input-premium" placeholder="Nueva tarea de limpieza..." style="margin:0">
+                    <button class="btn-premium gold-btn" style="width:75px; padding:0" onclick="window.addCleanTask()">+</button>
                 </div>
-                <div id="render-clean-tasks" style="margin-top:20px"></div>
+                <div id="render-clean-tasks"></div>
             </div>
             <div class="card-panel">
-                <div class="tag-header">Log Diario</div>
+                <div class="tag-header">Historial de Hoy</div>
                 <div id="render-clean-history"></div>
             </div>
         </div>
 
         <div id="view-bodega" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Inventario Crítico</div>
-                <input type="text" id="search-inv" class="input-premium" placeholder=" Buscar insumo..." oninput="window.loadBodega()">
-                <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:10px">
-                    <input type="text" id="inv-nom" class="input-premium" placeholder="Item">
-                    <input type="number" id="inv-can" class="input-premium" placeholder="Stock">
-                    <input type="number" id="inv-min" class="input-premium" placeholder="Mín.">
+                <div class="tag-header">Gestión de Stock</div>
+                <input type="text" id="search-inv" class="input-premium" placeholder=" Buscar en almacén..." oninput="window.loadBodega()">
+                <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; margin-bottom:12px">
+                    <input type="text" id="inv-nom" class="input-premium" placeholder="Insumo" style="margin:0">
+                    <input type="number" id="inv-can" class="input-premium" placeholder="Cant." style="margin:0">
+                    <input type="number" id="inv-min" class="input-premium" placeholder="Mín." style="margin:0">
                 </div>
-                <button class="btn-premium gold-btn" onclick="window.saveInv()">REGISTRAR STOCK</button>
-                <div id="lista-inventario" style="margin-top:20px"></div>
+                <button class="btn-premium gold-btn" onclick="window.saveInv()">ACTUALIZAR INVENTARIO</button>
+                <div id="lista-inventario" style="margin-top:25px"></div>
             </div>
             <div class="card-panel">
-                <div class="tag-header">Recetario Maestro</div>
+                <div class="tag-header">Costeo de Recetas</div>
                 <input type="text" id="search-rec" class="input-premium" placeholder=" Buscar receta..." oninput="window.loadBodega()">
-                <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px">
-                    <input type="text" id="rec-nom" class="input-premium" placeholder="Plato">
-                    <input type="number" id="rec-cos" class="input-premium" placeholder="Costo $">
+                <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:12px">
+                    <input type="text" id="rec-nom" class="input-premium" placeholder="Nombre Platillo" style="margin:0">
+                    <input type="number" id="rec-cos" class="input-premium" placeholder="Costo $" style="margin:0">
                 </div>
-                <button class="btn-premium gold-btn" style="margin-top:10px" onclick="window.saveRecipe()">NUEVA RECETA</button>
-                <div id="lista-recetas" style="margin-top:20px"></div>
+                <textarea id="rec-det" class="input-premium" placeholder="Instrucciones detalladas..." style="height:100px; border-radius: 25px"></textarea>
+                <button class="btn-premium gold-btn" onclick="window.saveRecipe()">GUARDAR EN RECETARIO</button>
+                <div id="lista-recetas" style="margin-top:25px"></div>
             </div>
         </div>
 
         <div id="view-admin" class="main-viewport">
-            <div class="card-panel"><div class="tag-header">Nómina Activa</div><div id="render-nomina"></div></div>
             <div class="card-panel">
-                <div class="tag-header">Staff Management</div>
-                <input type="text" id="st-nom" class="input-premium" placeholder="Nombre">
-                <input type="number" id="st-pin" class="input-premium" placeholder="PIN">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                    <input type="number" id="st-pag" class="input-premium" placeholder="Pago/Hr">
-                    <select id="st-rol" class="input-premium">
+                <div class="tag-header">Nómina (Números Enteros)</div>
+                <div id="render-nomina"></div>
+            </div>
+            <div class="card-panel">
+                <div class="tag-header">Control de Colaboradores</div>
+                <input type="text" id="st-nom" class="input-premium" placeholder="Nombre Completo">
+                <input type="number" id="st-pin" class="input-premium" placeholder="PIN de 4 dígitos">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
+                    <input type="number" id="st-pag" class="input-premium" placeholder="Pago por Hora" style="margin:0">
+                    <select id="st-rol" class="input-premium" style="margin:0">
                         <option value="Staff">Staff</option>
                         <option value="Cocina">Cocina</option>
                         <option value="Limpieza">Limpieza</option>
-                        <option value="Socio">Socio</option>
+                        <option value="Socio">Socio / Gerente</option>
                     </select>
                 </div>
-                <button class="btn-premium gold-btn" onclick="window.addStaff()">REGISTRAR</button>
-                <div id="lista-staff" style="margin-top:20px"></div>
+                <button class="btn-premium gold-btn" onclick="window.addStaffMember()">REGISTRAR NUEVO PERSONAL</button>
+                <div id="lista-staff" style="margin-top:25px"></div>
             </div>
         </div>
     </div>
@@ -207,198 +249,363 @@
         <div class="cmd-item" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>OFF</div>
     </nav>
 
-    <div id="os-modal" class="modal-os"><div class="modal-os-box" id="os-modal-content"></div></div>
+    <div id="os-modal" class="modal-os">
+        <div class="modal-os-box" id="os-modal-content"></div>
+    </div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
-        let gPin = "", sUser = null, cDate = new Date(), sDay = null;
+        let gPin = "";
+        let sUser = null;
+        let cDate = new Date();
+        let sDay = null;
 
-        // --- CORE UI ---
+        // --- SISTEMA DE NOTIFICACIONES Y DIÁLOGOS ---
         window.notify = (t, m) => {
-            document.getElementById('os-modal-content').innerHTML = `<h2>${t}</h2><p style="margin:20px 0; opacity:0.7">${m}</p><button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">ENTENDIDO</button>`;
+            document.getElementById('os-modal-content').innerHTML = `
+                <h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2>
+                <p style="opacity:0.8; margin-bottom:30px">${m}</p>
+                <button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">CERRAR</button>
+            `;
             document.getElementById('os-modal').style.display = 'flex';
         };
 
-        window.ask = (t, m, cb) => {
-            document.getElementById('os-modal-content').innerHTML = `<h2>${t}</h2><p style="margin:20px 0; opacity:0.7">${m}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px"><button class="btn-premium" onclick="document.getElementById('os-modal').style.display='none'">NO</button><button class="btn-premium gold-btn" id="m-ok">SI</button></div>`;
+        window.ask = (t, m, callback) => {
+            document.getElementById('os-modal-content').innerHTML = `
+                <h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2>
+                <p style="opacity:0.8; margin-bottom:30px">${m}</p>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
+                    <button class="btn-premium" style="background:var(--glass)" onclick="document.getElementById('os-modal').style.display='none'">CANCELAR</button>
+                    <button class="btn-premium gold-btn" id="modal-confirm-btn">CONFIRMAR</button>
+                </div>
+            `;
             document.getElementById('os-modal').style.display = 'flex';
-            document.getElementById('m-ok').onclick = () => { document.getElementById('os-modal').style.display='none'; cb(); };
+            document.getElementById('modal-confirm-btn').onclick = () => {
+                document.getElementById('os-modal').style.display = 'none';
+                callback();
+            };
         };
 
-        // --- LOGIN ---
+        // --- LÓGICA DE ACCESO PINPAD ---
         const initKeys = () => {
-            const r = document.getElementById('pin-render');
-            for(let i=1; i<=9; i++) r.innerHTML += `<div class="key" onclick="window.pk(${i})">${i}</div>`;
-            r.innerHTML += `<div class="key" onclick="window.pk('C')"><i class="fa-solid fa-backspace"></i></div>`;
-            r.innerHTML += `<div class="key" onclick="window.pk(0)">0</div>`;
-            r.innerHTML += `<div class="key" onclick="location.reload()"><i class="fa-solid fa-power-off"></i></div>`;
+            const cont = document.getElementById('numpad-logic');
+            for(let i=1; i<=9; i++) cont.innerHTML += `<div class="key" onclick="window.press(${i})">${i}</div>`;
+            cont.innerHTML += `<div class="key" onclick="window.press('C')" style="color:var(--terracota)"><i class="fa-solid fa-backspace"></i></div>`;
+            cont.innerHTML += `<div class="key" onclick="window.press(0)">0</div>`;
+            cont.innerHTML += `<div class="key" onclick="location.reload()"><i class="fa-solid fa-power-off"></i></div>`;
         };
-        window.pk = async (v) => {
-            if(v==='C'){ gPin=""; upD(); return; }
-            if(gPin.length < 4) gPin += v; upD();
+
+        window.press = async (v) => {
+            if(v==='C'){ gPin=""; upDots(); return; }
+            if(gPin.length < 4) gPin += v;
+            upDots();
             if(gPin.length === 4){
                 const q = query(collection(db, "usuarios"), where("pin", "==", gPin));
-                const s = await getDocs(q);
-                if(!s.empty){ sUser = {id: s.docs[0].id, ...s.docs[0].data()}; document.getElementById('login-screen').style.display='none'; document.getElementById('command-bar').style.display='grid'; startApp(); }
-                else { gPin=""; upD(); window.notify("ERROR", "PIN Incorrecto"); }
+                const snap = await getDocs(q);
+                if(!snap.empty){
+                    sUser = { id: snap.docs[0].id, ...snap.docs[0].data() };
+                    document.getElementById('login-screen').style.display = 'none';
+                    document.getElementById('command-bar').style.display = 'grid';
+                    startApp();
+                } else { gPin=""; upDots(); window.notify("ACCESO DENEGADO", "PIN Incorrecto"); }
             }
         };
-        const upD = () => document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i < gPin.length));
+        const upDots = () => document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i < gPin.length));
 
-        // --- NAVIGATION ---
+        // --- NAVEGACIÓN Y PERMISOS ---
         window.nav = (v) => {
-            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return window.notify("DENEGADO", "Solo Gerencia");
-            document.querySelectorAll('.main-viewport').forEach(x => x.style.display='none');
-            document.getElementById(`view-${v}`).style.display='block';
+            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return window.notify("RESTRINGIDO", "Requiere nivel Socio/Gerente.");
+            document.querySelectorAll('.main-viewport').forEach(view => view.style.display = 'none');
+            document.querySelectorAll('.cmd-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(`view-${v}`).style.display = 'block';
+            
             if(v==='finanzas') loadFin();
-            if(v==='bodega') loadBodega();
-            if(v==='admin') loadAdmin();
             if(v==='agenda') renderCal();
             if(v==='limpieza') loadClean();
+            if(v==='bodega') loadBodega();
+            if(v==='admin') loadAdmin();
         };
 
-        // --- FINANZAS ---
+        // --- MÓDULO CAPITAL (FINANZAS + GRÁFICA) ---
         window.saveFinance = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
             const d = document.getElementById('f-desc').value;
             if(!m || !d) return;
             await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('f-tipo').value, canal: document.getElementById('f-canal').value, fecha: new Date().toISOString() });
-            document.getElementById('f-monto').value=""; document.getElementById('f-desc').value=""; loadFin();
-        };
-        window.loadFin = async () => {
-            const s = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let c=0, sc=0, b=0, ing=0, gas=0;
-            const l = document.getElementById('lista-finanzas'); l.innerHTML = "";
-            s.forEach(doc => {
-                const x = doc.data(); const amt = x.tipo==='GASTO'?-x.monto:x.monto;
-                if(x.tipo==='GASTO') gas += x.monto; else ing += x.monto;
-                if(x.canal==='CAJA') c += amt; else if(x.canal==='CAJA_CHICA') sc += amt; else b += amt;
-                l.innerHTML += `<div class="list-row"><div><b>${x.desc}</b><br><small>${x.canal}</small></div><b style="color:${amt<0?'var(--terracota)':'var(--dorado)'}">$${x.monto} <button onclick="window.secureDel('finanzas','${doc.id}','loadFin')" style="background:none; border:none; color:inherit; margin-left:10px">×</button></b></div>`;
-            });
-            document.getElementById('neto-val').innerText = `$${Math.round(c+sc+b)}`;
-            document.getElementById('cash-val').innerText = `$${Math.round(c)}`;
-            document.getElementById('small-cash-val').innerText = `$${Math.round(sc)}`;
-            document.getElementById('bank-val').innerText = `$${Math.round(b)}`;
-            const tot = ing + gas;
-            if(tot > 0){
-                document.getElementById('bar-i').style.width = (ing/tot*100) + "%";
-                document.getElementById('bar-g').style.width = (gas/tot*100) + "%";
-                document.getElementById('util-txt').innerText = `${Math.round((ing-gas)/ing*100)}% MARGEN UTILIDAD`;
-            }
+            document.getElementById('f-monto').value = ""; document.getElementById('f-desc').value = "";
+            loadFin();
         };
 
-        // --- BODEGA (BUSCADORES + ALERTAS + EDICION) ---
-        window.saveInv = async () => {
-            await addDoc(collection(db, "inventario"), { item: document.getElementById('inv-nom').value, qty: parseFloat(document.getElementById('inv-can').value), min: parseFloat(document.getElementById('inv-min').value) });
-            loadBodega();
-        };
-        window.saveRecipe = async () => {
-            await addDoc(collection(db, "recetas"), { nom: document.getElementById('rec-nom').value, cost: document.getElementById('rec-cos').value });
-            loadBodega();
-        };
-        window.loadBodega = async () => {
-            const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas"));
-            const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas');
-            const qI = document.getElementById('search-inv').value.toLowerCase();
-            const qR = document.getElementById('search-rec').value.toLowerCase();
-            iL.innerHTML = ""; rL.innerHTML = "";
+        window.loadFin = async () => {
+            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
+            let mainCash = 0, smallCash = 0, bank = 0, totalIngresado = 0, totalGastado = 0;
+            const list = document.getElementById('lista-finanzas'); list.innerHTML = "";
             
-            iS.forEach(d => {
-                const x = d.data(); if(!x.item.toLowerCase().includes(qI)) return;
-                const low = x.qty <= (x.min || 0);
-                iL.innerHTML += `<div class="list-row ${low?'alert-low':''}">
-                    <span>${x.item} <small>(Mín: ${x.min})</small></span>
-                    <div style="display:flex; align-items:center; gap:10px">
-                        <b onclick="window.editStock('${d.id}',${x.qty})">${x.qty} un.</b>
-                        <button onclick="window.secureDel('inventario','${d.id}','loadBodega')" style="background:none; border:none; color:var(--terracota)">×</button>
+            snap.forEach(dDoc => {
+                const data = dDoc.data();
+                const isG = data.tipo === 'GASTO';
+                const amt = isG ? -data.monto : data.monto;
+                
+                if(isG) totalGastado += data.monto; else totalIngresado += data.monto;
+                if(data.canal === 'CAJA') mainCash += amt;
+                else if(data.canal === 'CAJA_CHICA') smallCash += amt;
+                else bank += amt;
+                
+                list.innerHTML += `<div class="list-row">
+                    <div><b>${data.desc}</b><br><small>${data.canal.replace('_',' ')}</small></div>
+                    <div style="display:flex; align-items:center; gap:15px">
+                        <b style="color:${isG?'var(--terracota)':'var(--dorado)'}">$${data.monto}</b>
+                        <button class="btn-action-small" onclick="window.secureDel('finanzas','${dDoc.id}','loadFin')"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>`;
             });
+            
+            document.getElementById('neto-val').innerText = `$${Math.round(mainCash + smallCash + bank)}`;
+            document.getElementById('cash-val').innerText = `$${Math.round(mainCash)}`;
+            document.getElementById('small-cash-val').innerText = `$${Math.round(smallCash)}`;
+            document.getElementById('bank-val').innerText = `$${Math.round(bank)}`;
+            
+            // Render Gráfica
+            const totalFlujo = totalIngresado + totalGastado;
+            if(totalFlujo > 0) {
+                document.getElementById('bar-i').style.width = (totalIngresado / totalFlujo * 100) + "%";
+                document.getElementById('bar-g').style.width = (totalGastado / totalFlujo * 100) + "%";
+                const margen = totalIngresado > 0 ? ((totalIngresado - totalGastado) / totalIngresado * 100) : 0;
+                document.getElementById('util-txt').innerText = `UTILIDAD: ${Math.round(margen)}%`;
+            }
+        };
+
+        // --- MÓDULO BODEGA (STOCK + ALERTAS + BUSCADORES) ---
+        window.saveInv = async () => {
+            const n = document.getElementById('inv-nom').value;
+            const c = parseFloat(document.getElementById('inv-can').value);
+            const m = parseFloat(document.getElementById('inv-min').value) || 0;
+            if(!n) return;
+            await addDoc(collection(db, "inventario"), { item: n, qty: c, min: m });
+            loadBodega();
+        };
+
+        window.loadBodega = async () => {
+            const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas"));
+            const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas');
+            const searchI = document.getElementById('search-inv').value.toLowerCase();
+            const searchR = document.getElementById('search-rec').value.toLowerCase();
+            
+            iL.innerHTML = ""; rL.innerHTML = "";
+            
+            iS.forEach(d => {
+                const data = d.data();
+                if(!data.item.toLowerCase().includes(searchI)) return;
+                const isLow = data.qty <= (data.min || 0);
+                iL.innerHTML += `<div class="list-row ${isLow ? 'alert-low' : ''}">
+                    <div><b>${data.item}</b><br><small>Mín: ${data.min || 0}</small></div>
+                    <div style="display:flex; align-items:center; gap:15px">
+                        <b style="cursor:pointer" onclick="window.restockModal('${d.id}', '${data.item}', ${data.qty})">${data.qty} un.</b>
+                        <button class="btn-action-small" onclick="window.secureDel('inventario','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+
             rS.forEach(d => {
-                const x = d.data(); if(!x.nom.toLowerCase().includes(qR)) return;
-                rL.innerHTML += `<div class="list-row"><span>${x.nom}</span> <b>$${x.cost} <button onclick="window.secureDel('recetas','${d.id}','loadBodega')" style="background:none; border:none; color:var(--terracota); margin-left:10px">×</button></b></div>`;
+                const data = d.data();
+                if(!data.nom.toLowerCase().includes(searchR)) return;
+                rL.innerHTML += `<div class="list-row">
+                    <div><b>${data.nom}</b><br><small>$${data.cost} por porción</small></div>
+                    <button class="btn-action-small" onclick="window.secureDel('recetas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
             });
         };
-        window.editStock = (id, old) => {
-            document.getElementById('os-modal-content').innerHTML = `<h2>RESTOCK</h2><input type="number" id="n-stk" class="input-premium" value="${old}"><button class="btn-premium gold-btn" id="sav-stk">ACTUALIZAR</button>`;
+
+        window.restockModal = (id, nom, qtyActual) => {
+            document.getElementById('os-modal-content').innerHTML = `
+                <h2 style="color:var(--dorado); margin-bottom:15px">RESTOCK: ${nom}</h2>
+                <input type="number" id="new-stock-val" class="input-premium" value="${qtyActual}">
+                <button class="btn-premium gold-btn" id="save-restock-btn">ACTUALIZAR STOCK</button>
+            `;
             document.getElementById('os-modal').style.display = 'flex';
-            document.getElementById('sav-stk').onclick = async () => {
-                await updateDoc(doc(db, "inventario", id), { qty: parseFloat(document.getElementById('n-stk').value) });
-                document.getElementById('os-modal').style.display='none'; loadBodega();
+            document.getElementById('save-restock-btn').onclick = async () => {
+                const nVal = parseFloat(document.getElementById('new-stock-val').value);
+                await updateDoc(doc(db, "inventario", id), { qty: nVal });
+                document.getElementById('os-modal').style.display = 'none';
+                loadBodega();
             };
         };
 
-        // --- ADMIN (EDICION OS) ---
-        window.addStaff = async () => {
-            await addDoc(collection(db, "usuarios"), { nombre: document.getElementById('st-nom').value, pin: document.getElementById('st-pin').value, sueldo: parseFloat(document.getElementById('st-pag').value), rol: document.getElementById('st-rol').value, ultimoPago: new Date().toISOString() });
-            loadAdmin();
+        window.saveRecipe = async () => {
+            await addDoc(collection(db, "recetas"), { 
+                nom: document.getElementById('rec-nom').value, 
+                cost: document.getElementById('rec-cos').value, 
+                detail: document.getElementById('rec-det').value 
+            });
+            loadBodega();
         };
+
+        // --- MÓDULO ADMIN (EDICIÓN INTERNA + NÓMINA ENTERA) ---
         window.loadAdmin = async () => {
             const uS = await getDocs(collection(db, "usuarios")), aS = await getDocs(collection(db, "asistencias"));
             const sL = document.getElementById('lista-staff'), nL = document.getElementById('render-nomina');
             sL.innerHTML = ""; nL.innerHTML = "";
+            
             uS.forEach(uDoc => {
                 const u = uDoc.data();
-                sL.innerHTML += `<div class="list-row"><span>${u.nombre} (${u.rol})</span> <div style="display:flex; gap:10px"><button onclick="window.editStaff('${uDoc.id}','${u.pin}',${u.sueldo})" style="background:none; border:none; color:var(--dorado)"><i class="fa-solid fa-pen"></i></button><button onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')" style="background:none; border:none; color:var(--terracota)">×</button></div></div>`;
+                sL.innerHTML += `<div class="list-row">
+                    <span>${u.nombre} (${u.rol})</span>
+                    <div style="display:flex; gap:10px">
+                        <button class="btn-action-small" onclick="window.editStaffOS('${uDoc.id}', '${u.nombre}', '${u.pin}', ${u.sueldo})"><i class="fa-solid fa-pen"></i></button>
+                        <button class="btn-action-small" onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+                
                 const cut = new Date(u.ultimoPago || 0);
                 const hits = aS.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) > cut).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
-                let hrs = 0; for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
-                const tot = Math.round(hrs * (u.sueldo || 0));
-                nL.innerHTML += `<div class="list-row"><div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} hrs</small></div> <button class="btn-premium gold-btn" style="width:auto; padding:8px 15px; font-size:0.7rem" onclick="window.payStaff('${uDoc.id}','${u.nombre}',${tot})">PAGAR $${tot}</button></div>`;
-            });
-        };
-        window.editStaff = (id, pin, pay) => {
-            document.getElementById('os-modal-content').innerHTML = `<h2>EDITAR STAFF</h2><input type="number" id="ed-pin" class="input-premium" value="${pin}" placeholder="PIN"><input type="number" id="ed-pay" class="input-premium" value="${pay}" placeholder="Sueldo/Hr"><button class="btn-premium gold-btn" id="ed-sav">GUARDAR CAMBIOS</button>`;
-            document.getElementById('os-modal').style.display = 'flex';
-            document.getElementById('ed-sav').onclick = async () => {
-                await updateDoc(doc(db, "usuarios", id), { pin: document.getElementById('ed-pin').value, sueldo: parseFloat(document.getElementById('ed-pay').value) });
-                document.getElementById('os-modal').style.display='none'; loadAdmin();
-            };
-        };
-        window.payStaff = (id, nom, tot) => {
-            if(tot<=0) return;
-            window.ask("PAGAR NÓMINA", `¿Liquidar $${tot} a ${nom}?`, async () => {
-                await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: tot, tipo: 'GASTO', canal: 'CAJA', fecha: new Date().toISOString() });
-                await updateDoc(doc(db, "usuarios", id), { ultimoPago: new Date().toISOString() });
-                loadAdmin();
+                let hrs = 0;
+                for(let i=0; i<hits.length; i++){ 
+                    if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ 
+                        hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; 
+                    } 
+                }
+                const tot = Math.round(hrs * (u.sueldo || 0)); // REDONDEO A ENTERO
+                nL.innerHTML += `<div class="list-row">
+                    <div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} horas acumuladas</small></div> 
+                    <button class="btn-premium gold-btn" style="width:auto; padding:8px 20px; font-size:0.7rem" onclick="window.payMethodModal('${uDoc.id}','${u.nombre}',${tot})">PAGAR $${tot}</button>
+                </div>`;
             });
         };
 
-        // --- OTROS MÓDULOS (PRESERVADOS) ---
+        window.editStaffOS = (id, nom, pin, sueldo) => {
+            document.getElementById('os-modal-content').innerHTML = `
+                <h2 style="color:var(--dorado); margin-bottom:15px">EDITAR: ${nom}</h2>
+                <input type="number" id="ed-pin" class="input-premium" value="${pin}" placeholder="PIN">
+                <input type="number" id="ed-sueldo" class="input-premium" value="${sueldo}" placeholder="Sueldo/Hr">
+                <button class="btn-premium gold-btn" id="save-edit-staff">GUARDAR CAMBIOS</button>
+            `;
+            document.getElementById('os-modal').style.display = 'flex';
+            document.getElementById('save-edit-staff').onclick = async () => {
+                await updateDoc(doc(db, "usuarios", id), { 
+                    pin: document.getElementById('ed-pin').value, 
+                    sueldo: parseFloat(document.getElementById('ed-sueldo').value) 
+                });
+                document.getElementById('os-modal').style.display = 'none';
+                loadAdmin();
+            };
+        };
+
+        window.payMethodModal = (uid, nom, tot) => {
+            if(tot <= 0) return window.notify("ALERTA", "Sin saldo pendiente.");
+            document.getElementById('os-modal-content').innerHTML = `
+                <h2 style="color:var(--dorado); margin-bottom:15px">LIQUIDAR NÓMINA</h2>
+                <p style="margin-bottom:30px">¿Cómo deseas pagar $${tot} a ${nom}?</p>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
+                    <button class="btn-premium gold-btn" onclick="window.finalPay('${uid}','${nom}',${tot},'CAJA')">EFECTIVO</button>
+                    <button class="btn-premium gold-btn" onclick="window.finalPay('${uid}','${nom}',${tot},'BANCO')">BANCO</button>
+                </div>
+            `;
+            document.getElementById('os-modal').style.display = 'flex';
+        };
+
+        window.finalPay = async (uid, nom, tot, canal) => {
+            await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: tot, tipo: 'GASTO', canal: canal, fecha: new Date().toISOString() });
+            await updateDoc(doc(db, "usuarios", uid), { ultimoPago: new Date().toISOString() });
+            document.getElementById('os-modal').style.display = 'none';
+            loadAdmin(); loadFin();
+        };
+
+        window.addStaffMember = async () => {
+            const n = document.getElementById('st-nom').value;
+            const p = document.getElementById('st-pin').value;
+            const s = parseFloat(document.getElementById('st-pag').value);
+            if(!n || !p || !s) return;
+            await addDoc(collection(db, "usuarios"), { 
+                nombre: n, pin: p, sueldo: s, 
+                rol: document.getElementById('st-rol').value, 
+                ultimoPago: new Date().toISOString() 
+            });
+            loadAdmin();
+        };
+
+        // --- MÓDULOS DE AGENDA, ASISTENCIA Y LIMPIEZA (IDÉNTICOS AL ORIGINAL) ---
         window.navMonth = (d) => { cDate.setMonth(cDate.getMonth() + d); renderCal(); };
         window.renderCal = async () => {
             const grid = document.getElementById('cal-grid-render'); grid.innerHTML = "";
             document.getElementById('cal-month-display').innerText = cDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
-            const s = await getDocs(collection(db, "agenda")); const dates = s.docs.map(d => d.data().fecha);
+            const snap = await getDocs(collection(db, "agenda"));
+            const dates = snap.docs.map(d => d.data().fecha);
             const y = cDate.getFullYear(), m = cDate.getMonth();
-            const start = new Date(y, m, 1).getDay(); const days = new Date(y, m + 1, 0).getDate();
+            const start = new Date(y, m, 1).getDay();
+            const days = new Date(y, m + 1, 0).getDate();
             for(let i=0; i<start; i++) grid.innerHTML += `<div></div>`;
-            for(let i=1; i<=days; i++){ const k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`; grid.innerHTML += `<div class="cal-unit ${dates.includes(k)?'marked':''} ${sDay===k?'active':''}" onclick="window.pick('${k}')">${i}</div>`; }
+            for(let i=1; i<=days; i++) {
+                const k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                grid.innerHTML += `<div class="cal-unit ${dates.includes(k)?'marked':''} ${sDay===k?'active':''}" onclick="window.pick('${k}')">${i}</div>`;
+            }
         };
-        window.pick = (d) => { sDay = d; document.getElementById('cal-selected-label').innerText = `DÍA: ${d}`; renderCal(); loadEv(d); };
-        window.saveEvent = async () => { if(!sDay) return; await addDoc(collection(db, "agenda"), { tit: document.getElementById('ev-tit').value, hora: document.getElementById('ev-hor').value, fecha: sDay }); renderCal(); loadEv(sDay); };
-        window.loadEv = async (f) => { const s = await getDocs(query(collection(db, "agenda"), where("fecha", "==", f))); const l = document.getElementById('lista-agenda'); l.innerHTML = ""; s.forEach(d => l.innerHTML += `<div class="list-row">${d.data().hora} - ${d.data().tit} <button onclick="window.secureDel('agenda','${d.id}','renderCal')" style="background:none; border:none; color:var(--terracota)">×</button></div>`); };
-        
-        window.handlePunch = async (t) => { await addDoc(collection(db, "asistencias"), { uid: sUser.id, name: sUser.nombre, tipo: t, fecha: new Date().toISOString() }); loadPunches(); };
-        window.loadPunches = async () => { const s = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(6))); const l = document.getElementById('lista-asistencias'); l.innerHTML = "<h4>LOG RECIENTE</h4>"; s.forEach(d => l.innerHTML += `<div class="list-row"><span>${d.data().name}</span> <b>${d.data().tipo}</b></div>`); };
+        window.pick = (d) => { sDay = d; document.getElementById('cal-selected-label').innerText = `DÍA: ${d}`; renderCal(); loadEvents(d); };
+        window.saveEvent = async () => {
+            if(!sDay) return;
+            await addDoc(collection(db, "agenda"), { tit: document.getElementById('ev-tit').value, hora: document.getElementById('ev-hor').value, fecha: sDay });
+            renderCal(); loadEvents(sDay);
+        };
+        window.loadEvents = async (f) => {
+            const s = await getDocs(query(collection(db, "agenda"), where("fecha", "==", f)));
+            const l = document.getElementById('lista-agenda'); l.innerHTML = "";
+            s.forEach(d => l.innerHTML += `<div class="list-row">${d.data().hora} - ${d.data().tit} <button class="btn-action-small" onclick="window.secureDel('agenda','${d.id}','renderCal')"><i class="fa-solid fa-trash"></i></button></div>`);
+        };
 
-        window.addCleanTask = async () => { await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-in').value }); document.getElementById('clean-in').value=""; loadClean(); };
+        window.handlePunch = async (t) => {
+            await addDoc(collection(db, "asistencias"), { uid: sUser.id, name: sUser.nombre, tipo: t, fecha: new Date().toISOString() });
+            window.notify("RELOJ", `Marcaje de ${t} registrado con éxito.`);
+            loadPunches();
+        };
+        window.loadPunches = async () => {
+            const s = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(6)));
+            const l = document.getElementById('lista-asistencias'); l.innerHTML = "<h4>LOG DE HOY</h4>";
+            s.forEach(d => l.innerHTML += `<div class="list-row"><span>${d.data().name}</span> <b>${d.data().tipo}</b></div>`);
+        };
+
+        window.addCleanTask = async () => {
+            await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-task-in').value });
+            document.getElementById('clean-task-in').value = ""; loadClean();
+        };
         window.loadClean = async () => {
-            const t = await getDocs(collection(db, "tareas_limpieza")), h = await getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])));
-            const r = document.getElementById('render-clean-tasks'), hr = document.getElementById('render-clean-history');
-            const done = h.docs.map(x => x.data().taskId); r.innerHTML = ""; hr.innerHTML = "";
-            t.forEach(d => { const isD = done.includes(d.id); r.innerHTML += `<div class="list-row"><span>${d.data().tarea}</span> ${isD?'<i class="fa-solid fa-check"></i>':`<button class="btn-premium gold-btn" style="width:auto; padding:5px 15px" onclick="window.doClean('${d.id}','${d.data().tarea}')">LISTO</button>`}</div>`; });
-            h.forEach(d => hr.innerHTML += `<div class="list-row" style="font-size:0.7rem">${d.data().tarea} - ${d.data().empleado}</div>`);
+            const tasks = await getDocs(collection(db, "tareas_limpieza"));
+            const history = await getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])));
+            const render = document.getElementById('render-clean-tasks'); render.innerHTML = "";
+            const histRender = document.getElementById('render-clean-history'); histRender.innerHTML = "";
+            const doneIds = history.docs.map(h => h.data().taskId);
+            tasks.forEach(tDoc => {
+                const isDone = doneIds.includes(tDoc.id);
+                render.innerHTML += `<div class="list-row">
+                    <span>${tDoc.data().tarea}</span>
+                    <div style="display:flex; gap:12px; align-items:center">
+                        ${isDone ? '<i class="fa-solid fa-check-circle" style="color:var(--dorado)"></i>' : `<button class="btn-pay-row" onclick="window.doClean('${tDoc.id}','${tDoc.data().tarea}')" style="background:var(--dorado); border:none; padding:5px 10px; border-radius:5px">MARCAR</button>`}
+                        <button class="btn-action-small" onclick="window.secureDel('tareas_limpieza','${tDoc.id}','loadClean')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+            history.forEach(h => histRender.innerHTML += `<div class="list-row"><span>${h.data().tarea} por ${h.data().empleado}</span></div>`);
         };
-        window.doClean = async (id, nom) => { await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: nom, empleado: sUser.nombre, hora: new Date().toLocaleTimeString(), fecha_dia: new Date().toISOString().split('T')[0] }); loadClean(); };
+        window.doClean = async (id, nom) => {
+            await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: nom, empleado: sUser.nombre, hora: new Date().toLocaleTimeString(), fecha_dia: new Date().toISOString().split('T')[0] });
+            loadClean();
+        };
 
-        window.secureDel = (c, i, cb) => { window.ask("ELIMINAR", "¿Confirmas esta acción?", async () => { await deleteDoc(doc(db, c, i)); if(cb) window[cb](); }); };
+        window.secureDel = (c, i, cb) => {
+            window.ask("CONFIRMAR", "¿Estás seguro de eliminar este registro permanentemente?", async () => {
+                await deleteDoc(doc(db, c, i));
+                if(cb) window[cb]();
+            });
+        };
 
         const startApp = () => {
-            window.nav('reloj'); loadPunches();
-            setInterval(() => { const n = new Date(); document.getElementById('live-time').innerText = n.toLocaleTimeString('es-MX', { hour12: false }); document.getElementById('live-date').innerText = n.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' }); }, 1000);
+            window.nav('reloj'); loadFin(); loadPunches();
+            setInterval(() => {
+                const n = new Date();
+                document.getElementById('live-time').innerText = n.toLocaleTimeString('es-MX', { hour12: false });
+                document.getElementById('live-date').innerText = n.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' });
+            }, 1000);
         };
+
         initKeys();
     </script>
 </body>
