@@ -3,14 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v12.0 - Enterprise Management System</title>
+    <title>EscarolaOS v13.2 - Enterprise Gastronomic Engine</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
-        /* --- VARIABLES DE DISEÑO ESCAROLA --- */
+        /* ESCAROLA OS - ARQUITECTURA VISUAL 2026
+           Diseño de alta densidad para entornos de alto tráfico.
+        */
         :root {
             --verde-bosque: #1b3022;
             --verde-oscuro: #14241a;
@@ -20,1060 +23,1090 @@
             --negro: #0a0a0a;
             --azul-banco: #4a90e2;
             --blanco-trans: rgba(217, 212, 199, 0.12); 
-            --shadow-strong: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
-            --radius-xl: 40px;
-            --transition-soft: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --glass: rgba(255, 255, 255, 0.03);
+            --shadow-extreme: 0 35px 70px -15px rgba(0, 0, 0, 0.95);
+            --radius-max: 50px;
+            --radius-mid: 25px;
+            --transition-speed: 0.3s;
+            --safe-bottom: env(safe-area-inset-bottom);
         }
 
-        /* --- RESET GENERAL --- */
+        /* RESET Y NORMALIZACIÓN */
         * { 
             box-sizing: border-box; 
             -webkit-tap-highlight-color: transparent; 
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+            margin: 0; padding: 0;
+            font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
         }
 
         body { 
             background: var(--verde-bosque); 
             color: var(--cantera); 
-            margin: 0; 
             height: 100vh; 
+            width: 100vw;
             overflow: hidden; 
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
-        /* --- PANTALLA DE LOGIN (PINPAD) --- */
+        /* SISTEMA DE SEGURIDAD: PINPAD AUTH
+        */
         #login-screen { 
             position: fixed; 
-            inset: 0; 
-            background: radial-gradient(circle at center, var(--verde-bosque), var(--negro)); 
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at center, #1b3022, #050505); 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
-            z-index: 100000; 
-            padding: 40px; 
+            z-index: 999999; 
+            transition: opacity 0.6s ease;
         }
 
-        .login-logo {
-            text-align: center;
-            margin-bottom: 50px;
+        .login-branding { 
+            text-align: center; 
+            margin-bottom: 60px; 
+            animation: fadeInDown 0.8s ease;
+        }
+        @keyframes fadeInDown {
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .login-logo h1 {
-            letter-spacing: 12px; 
-            font-size: 2.8rem; 
-            margin: 0; 
-            font-weight: 900;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        .login-branding h1 { 
+            letter-spacing: 18px; 
+            font-size: 3.8rem; 
+            font-weight: 900; 
+            color: #fff;
+            text-shadow: 0 15px 35px rgba(0,0,0,0.7);
         }
-
-        .login-logo p {
+        .login-branding h1 span { color: var(--dorado); }
+        .login-branding p { 
             color: var(--dorado); 
-            letter-spacing: 5px; 
-            font-size: 0.7rem; 
-            font-weight: 800;
-            opacity: 0.8;
-            margin-top: 10px;
+            letter-spacing: 7px; 
+            font-size: 0.8rem; 
+            font-weight: 800; 
+            opacity: 0.7; 
+            margin-top: 15px;
+            text-transform: uppercase;
         }
 
-        .dot-container { 
+        .pin-container { 
             display: flex; 
-            gap: 25px; 
-            margin-bottom: 50px; 
+            gap: 30px; 
+            margin-bottom: 60px; 
         }
-
-        .pin-dot { 
-            width: 22px; 
-            height: 22px; 
-            border: 2px solid var(--dorado); 
+        .pin-slot { 
+            width: 25px; 
+            height: 25px; 
+            border: 3px solid var(--dorado); 
             border-radius: 50%; 
-            transition: var(--transition-soft); 
+            transition: all 0.25s cubic-bezier(0.68, -0.55, 0.265, 1.55); 
         }
-
-        .pin-dot.filled { 
+        .pin-slot.active { 
             background: var(--dorado); 
-            box-shadow: 0 0 25px var(--dorado); 
-            transform: scale(1.3); 
+            box-shadow: 0 0 30px var(--dorado); 
+            transform: scale(1.4); 
         }
 
         .pin-grid { 
             display: grid; 
             grid-template-columns: repeat(3, 1fr); 
-            gap: 20px; 
+            gap: 25px; 
             width: 100%; 
-            max-width: 320px; 
+            max-width: 360px; 
         }
 
         .pin-key { 
             aspect-ratio: 1; 
             border-radius: 50%; 
             border: 2px solid var(--blanco-trans); 
-            background: rgba(255,255,255,0.03); 
+            background: var(--glass); 
             color: var(--dorado); 
-            font-size: 2rem; 
+            font-size: 2.2rem; 
             font-weight: 300; 
-            cursor: pointer; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            transition: all 0.15s ease;
+            cursor: pointer; 
+            transition: transform 0.1s, background 0.1s;
+            user-select: none;
         }
 
         .pin-key:active { 
             background: var(--dorado); 
             color: var(--verde-oscuro); 
-            transform: scale(0.9);
+            transform: scale(0.9); 
             border-color: var(--dorado);
         }
 
-        /* --- LAYOUT DE LA APP --- */
-        .main-wrapper { 
+        /* VISTAS PRINCIPALES Y LAYOUT
+        */
+        .app-container {
+            position: relative;
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .view-content { 
             width: 100%; 
-            max-width: 1200px; 
+            max-width: 1400px; 
             margin: 0 auto; 
-            padding: 20px; 
+            padding: 30px; 
             display: none; 
             height: 100vh; 
             overflow-y: auto; 
-            padding-bottom: 180px; 
+            padding-bottom: 200px; 
+            scrollbar-width: none;
+            -ms-overflow-style: none;
         }
+        .view-content::-webkit-scrollbar { display: none; }
 
-        .main-wrapper::-webkit-scrollbar { display: none; }
-
-        .glass-card { 
+        .module-card { 
             background: var(--verde-oscuro); 
-            border-radius: var(--radius-xl); 
-            padding: 30px; 
-            margin-bottom: 25px; 
+            border-radius: var(--radius-max); 
+            padding: 40px; 
+            margin-bottom: 35px; 
             border: 1px solid var(--blanco-trans); 
-            box-shadow: var(--shadow-strong); 
+            box-shadow: var(--shadow-extreme); 
+            transition: transform 0.3s ease;
         }
 
-        .section-title {
+        .section-header {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-bottom: 25px;
-            color: var(--dorado);
-            font-size: 1.2rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 800;
+            justify-content: space-between;
+            margin-bottom: 35px;
+            border-left: 5px solid var(--dorado);
+            padding-left: 20px;
         }
 
-        /* --- DASHBOARD DE CAPITAL --- */
+        .section-header h2 {
+            font-size: 1.5rem;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            color: var(--dorado);
+            font-weight: 900;
+        }
+
+        /* MÓDULO FINANCIERO: CAPITAL
+        */
         .capital-hero {
             text-align: center;
-            padding: 40px 20px;
-            background: linear-gradient(180deg, rgba(20,36,26,1) 0%, rgba(10,10,10,1) 100%);
-            border-bottom: 4px solid var(--dorado);
-            border-radius: var(--radius-xl);
-            margin-bottom: 30px;
+            padding: 70px 30px;
+            margin-bottom: 40px;
+            background: linear-gradient(145deg, #14241a 0%, #050505 100%);
+            border-radius: var(--radius-max);
+            border: 2px solid var(--blanco-trans);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
         }
 
-        .net-value {
-            font-size: 4rem;
+        .capital-hero .label {
+            font-size: 0.8rem;
             font-weight: 900;
-            margin: 10px 0;
-            letter-spacing: -2px;
+            text-transform: uppercase;
+            letter-spacing: 5px;
+            color: var(--dorado);
+            opacity: 0.6;
+        }
+
+        .capital-hero .total-amount {
+            font-size: 5.5rem;
+            font-weight: 900;
             color: #fff;
+            letter-spacing: -5px;
+            margin: 20px 0;
+            text-shadow: 0 10px 40px rgba(0,0,0,0.8);
         }
 
-        .stats-grid { 
-            display: grid; 
-            grid-template-columns: repeat(2, 1fr); 
-            gap: 15px; 
-            margin-bottom: 30px; 
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        @media (min-width: 1024px) {
+            .kpi-grid { grid-template-columns: repeat(4, 1fr); }
         }
 
-        @media (min-width: 1024px) { 
-            .stats-grid { grid-template-columns: repeat(4, 1fr); } 
-        }
-
-        .mini-stat { 
-            padding: 25px; 
-            border-radius: 25px; 
-            background: rgba(255,255,255,0.02); 
-            border: 1px solid var(--blanco-trans); 
+        .kpi-card {
+            background: var(--glass);
+            padding: 35px 20px;
+            border-radius: 35px;
+            border: 1px solid var(--blanco-trans);
             text-align: center;
-            transition: var(--transition-soft);
+            transition: 0.3s;
         }
+        .kpi-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.06); }
+        .kpi-card h4 { font-size: 2rem; color: #fff; margin-top: 10px; font-weight: 800; }
+        .kpi-card span { font-size: 0.7rem; font-weight: 900; opacity: 0.5; text-transform: uppercase; }
 
-        .mini-stat:hover {
-            background: rgba(255,255,255,0.05);
-            transform: translateY(-5px);
-        }
-
-        .mini-stat h4 { margin: 5px 0; font-size: 1.6rem; color: #fff; }
-        .mini-label { font-size: 0.7rem; font-weight: 900; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; }
-
-        /* --- CALENDARIO TRADICIONAL --- */
+        /* MÓDULO CALENDARIO: AGENDA 2026
+        */
         .calendar-box {
-            background: #0d1510;
-            border-radius: 30px;
-            padding: 20px;
+            background: #0b130e;
+            border-radius: 40px;
+            padding: 35px;
             border: 1px solid var(--blanco-trans);
         }
 
-        .cal-ctrls {
+        .calendar-controls {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
+            margin-bottom: 40px;
         }
 
-        .cal-month-name {
+        .current-month {
+            font-size: 1.4rem;
             font-weight: 900;
             text-transform: uppercase;
-            letter-spacing: 3px;
+            letter-spacing: 6px;
             color: var(--dorado);
         }
 
-        .cal-grid-system {
+        .grid-calendar {
             display: grid;
             grid-template-columns: repeat(7, 1fr);
-            gap: 8px;
+            gap: 12px;
         }
 
-        .cal-day-label {
+        .day-label {
             text-align: center;
-            font-size: 0.65rem;
+            font-size: 0.75rem;
             font-weight: 900;
             color: var(--dorado);
-            padding-bottom: 10px;
+            padding-bottom: 20px;
+            opacity: 0.5;
         }
 
-        .cal-date-cell {
+        .day-square {
             aspect-ratio: 1;
-            background: rgba(255,255,255,0.02);
-            border-radius: 12px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 18px;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
-            position: relative;
+            font-size: 1.1rem;
             cursor: pointer;
             border: 1px solid transparent;
             transition: 0.2s;
+            position: relative;
         }
-
-        .cal-date-cell.active-today {
-            border-color: var(--dorado);
-            background: rgba(197,160,89,0.1);
-            color: var(--dorado);
-            font-weight: 900;
-        }
-
-        .cal-date-cell.has-event::after {
+        .day-square.active-day { border-color: var(--dorado); background: rgba(197,160,89,0.1); color: var(--dorado); font-weight: 900; }
+        .day-square.has-data::after {
             content: '';
-            width: 6px;
-            height: 6px;
+            width: 8px;
+            height: 8px;
             background: var(--dorado);
             border-radius: 50%;
             position: absolute;
-            bottom: 8px;
+            bottom: 12px;
             box-shadow: 0 0 10px var(--dorado);
         }
+        .day-square.blur-day { opacity: 0.15; pointer-events: none; }
+        .day-square:active { transform: scale(0.85); }
 
-        .cal-date-cell.not-current { opacity: 0.2; }
-
-        /* --- RELOJ CHECADOR --- */
-        .clock-container {
+        /* MÓDULO RELOJ: ASISTENCIA STAFF
+        */
+        .reloj-hero {
             text-align: center;
-            padding: 50px 20px;
-            background: radial-gradient(circle, #1a2e21 0%, #050505 100%);
-            border-radius: 40px;
-            border: 2px solid var(--dorado);
-            margin-bottom: 30px;
-            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+            padding: 80px 20px;
+            background: radial-gradient(circle at top, #1a2e21, #000);
+            border-radius: 60px;
+            border: 3px solid var(--dorado);
+            margin-bottom: 50px;
+            box-shadow: 0 0 60px rgba(0,0,0,0.7);
         }
 
-        #clock-time { 
-            font-size: 18vw; 
-            line-height: 1; 
+        #digital-clock { 
+            font-size: 24vw; 
             font-weight: 900; 
-            margin: 0; 
-            color: #fff;
-            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            color: #fff; 
+            line-height: 0.8; 
+            text-shadow: 0 20px 40px rgba(0,0,0,0.9); 
         }
+        @media (min-width: 1024px) { #digital-clock { font-size: 10rem; } }
         
-        @media (min-width: 768px) { #clock-time { font-size: 7rem; } }
-
-        #clock-date {
-            color: var(--dorado);
-            font-weight: 800;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            margin-top: 15px;
-            font-size: 0.9rem;
+        #digital-date { 
+            color: var(--dorado); 
+            font-weight: 800; 
+            letter-spacing: 8px; 
+            text-transform: uppercase; 
+            margin-top: 30px; 
+            font-size: 1.2rem; 
         }
 
-        /* --- COMPONENTES DE FORMULARIO --- */
-        .btn-action {
-            width: 100%;
-            padding: 22px;
+        .punch-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 30px; 
+        }
+
+        .btn-action-punch {
+            height: 210px;
             border-radius: 50px;
             border: none;
             font-weight: 900;
-            font-size: 0.9rem;
             text-transform: uppercase;
+            letter-spacing: 4px;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 25px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-size: 1.1rem;
+        }
+        .btn-action-punch i { font-size: 4rem; }
+        .btn-in { background: var(--dorado); color: var(--verde-oscuro); box-shadow: 0 20px 40px rgba(197,160,89,0.2); }
+        .btn-out { background: var(--terracota); color: #fff; box-shadow: 0 20px 40px rgba(176,65,62,0.2); }
+        .btn-action-punch:active { transform: scale(0.92); filter: brightness(1.2); }
+
+        /* COMPONENTES DE FORMULARIO
+        */
+        .field-group { margin-bottom: 30px; }
+        .field-group label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 900;
+            color: var(--dorado);
+            text-transform: uppercase;
+            margin: 0 0 12px 20px;
             letter-spacing: 2px;
+        }
+        .field-group input, .field-group select, .field-group textarea {
+            width: 100%;
+            padding: 26px;
+            border-radius: 25px;
+            background: #000;
+            border: 1px solid var(--blanco-trans);
+            color: #fff;
+            font-size: 1.15rem;
+            transition: 0.3s;
+        }
+        .field-group input:focus { border-color: var(--dorado); outline: none; box-shadow: 0 0 25px rgba(197,160,89,0.15); }
+
+        .btn-submit {
+            width: 100%;
+            padding: 28px;
+            border-radius: 70px;
+            border: none;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            transition: var(--transition-soft);
-        }
-
-        .btn-gold { background: var(--dorado); color: var(--verde-oscuro); }
-        .btn-red { background: var(--terracota); color: #fff; }
-        .btn-outline { background: transparent; border: 2px solid var(--dorado); color: var(--dorado); }
-        
-        .btn-action:active { transform: scale(0.96); opacity: 0.8; }
-
-        input, select, textarea {
-            width: 100%;
-            padding: 20px;
-            margin: 10px 0;
-            background: var(--negro);
-            border: 1px solid var(--blanco-trans);
-            border-radius: 18px;
-            color: #fff;
-            font-size: 1rem;
+            gap: 20px;
+            font-size: 1.1rem;
             transition: 0.3s;
         }
+        .btn-gold { background: var(--dorado); color: var(--verde-oscuro); }
+        .btn-outline { background: transparent; border: 2.5px solid var(--dorado); color: var(--dorado); }
 
-        input:focus { border-color: var(--dorado); outline: none; background: #000; }
-
-        label {
-            font-size: 0.7rem;
-            color: var(--dorado);
-            text-transform: uppercase;
-            font-weight: 900;
-            margin-left: 10px;
-            letter-spacing: 1.5px;
-        }
-
-        /* --- NAVEGACIÓN PRINCIPAL --- */
-        #navbar-bottom { 
+        /* SISTEMA DE NAVEGACIÓN INFERIOR (IOS READY)
+        */
+        #tab-bar { 
             position: fixed; 
-            bottom: 30px; 
+            bottom: 40px; 
             left: 50%; 
             transform: translateX(-50%); 
-            width: 94%; 
-            max-width: 600px; 
-            background: rgba(10, 10, 10, 0.96); 
-            border-radius: 50px; 
-            border: 1px solid var(--dorado); 
+            width: 95%; 
+            max-width: 700px; 
+            background: rgba(10, 10, 10, 0.98); 
+            border-radius: 70px; 
+            border: 2px solid var(--dorado); 
             display: none; 
             grid-template-columns: repeat(5, 1fr); 
-            padding: 15px 10px; 
-            z-index: 9999; 
-            backdrop-filter: blur(20px); 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            padding: 25px 15px; 
+            z-index: 99999; 
+            backdrop-filter: blur(40px); 
+            box-shadow: 0 40px 100px rgba(0,0,0,1);
+            padding-bottom: calc(25px + var(--safe-bottom));
         }
 
-        .nav-item { 
+        .tab-item { 
             text-align: center; 
             color: var(--cantera); 
-            opacity: 0.4; 
-            transition: 0.3s; 
-            cursor: pointer;
+            opacity: 0.3; 
+            cursor: pointer; 
+            transition: 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
         }
+        .tab-item.active { opacity: 1; color: var(--dorado); transform: translateY(-15px); }
+        .tab-item i { font-size: 2rem; display: block; margin-bottom: 10px; }
+        .tab-item span { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; }
 
-        .nav-item.active { 
-            opacity: 1; 
-            color: var(--dorado); 
-            transform: translateY(-8px); 
+        /* LISTADOS Y REGISTROS DINÁMICOS
+        */
+        .record-row { 
+            background: rgba(255,255,255,0.04); 
+            padding: 30px; 
+            border-radius: 30px; 
+            margin-bottom: 18px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-left: 8px solid transparent; 
+            animation: slideIn 0.5s ease;
         }
-
-        .nav-item i { font-size: 1.6rem; display: block; margin-bottom: 5px; }
-        .nav-item span { font-size: 0.6rem; font-weight: 900; text-transform: uppercase; }
-
-        /* --- LISTAS Y ELEMENTOS DINÁMICOS --- */
-        .dynamic-row {
-            background: rgba(255,255,255,0.03);
-            padding: 20px;
-            border-radius: 20px;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-left: 5px solid transparent;
-            animation: slideIn 0.3s ease-out;
-        }
-
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
+            from { opacity: 0; transform: translateX(-20px); }
             to { opacity: 1; transform: translateX(0); }
         }
 
-        .row-info b { font-size: 1.1rem; color: #fff; display: block; }
-        .row-info small { opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; }
+        .record-info b { font-size: 1.3rem; color: #fff; display: block; margin-bottom: 6px; }
+        .record-info small { opacity: 0.5; font-size: 0.85rem; text-transform: uppercase; font-weight: 800; }
 
-        .btn-round-del {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(176,65,62,0.1);
-            color: var(--terracota);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-        }
-
-        /* --- NOTIFICACIONES (TOAST) --- */
-        #notification-toast { 
-            position: fixed; 
-            top: 50px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            padding: 20px 45px; 
-            border-radius: 60px; 
-            font-weight: 900; 
-            display: none; 
-            z-index: 200000; 
-            text-align: center; 
-            font-size: 0.9rem;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-
-        /* --- MODALES --- */
-        .modal-overlay { 
-            display: none; 
-            position: fixed; 
-            inset: 0; 
-            background: rgba(0,0,0,0.98); 
-            z-index: 150000; 
+        .btn-delete { 
+            width: 55px; 
+            height: 55px; 
+            border-radius: 50%; 
+            border: none; 
+            background: rgba(176,65,62,0.2); 
+            color: var(--terracota); 
+            display: flex; 
             align-items: center; 
             justify-content: center; 
-            padding: 25px; 
+            cursor: pointer; 
+            transition: 0.3s;
+            font-size: 1.2rem;
+        }
+        .btn-delete:active { transform: scale(0.8); background: var(--terracota); color: #fff; }
+
+        /* MODALES Y NOTIFICACIONES
+        */
+        #toast-manager { 
+            position: fixed; top: 60px; left: 50%; transform: translateX(-50%); 
+            padding: 25px 60px; border-radius: 70px; font-weight: 900; display: none; 
+            z-index: 9999999; text-align: center; font-size: 1rem; 
+            box-shadow: 0 30px 60px rgba(0,0,0,0.8); border: 2px solid rgba(255,255,255,0.1);
         }
 
-        .modal-body { 
-            width: 100%; 
-            max-width: 500px; 
-            background: var(--verde-oscuro); 
-            border-radius: 40px; 
-            padding: 40px; 
-            border: 2px solid var(--dorado); 
-            box-shadow: var(--shadow-strong);
+        .modal-view { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.98); 
+            z-index: 1000000; align-items: center; justify-content: center; padding: 30px; 
+        }
+        .modal-wrapper { 
+            width: 100%; max-width: 600px; background: var(--verde-oscuro); 
+            border-radius: 60px; padding: 60px; border: 3px solid var(--dorado); 
+            box-shadow: 0 0 100px rgba(0,0,0,1);
         }
 
-        /* --- ALERTAS DE INVENTARIO --- */
-        .alert-low-stock {
-            border-left-color: var(--terracota) !important;
-            background: linear-gradient(90deg, rgba(176,65,62,0.15), transparent) !important;
-        }
+        /* ESTADOS CRÍTICOS */
+        .critical-pulse { border-left-color: var(--terracota) !important; background: rgba(176,65,62,0.12) !important; }
     </style>
 </head>
 <body>
 
-    <div id="notification-toast"></div>
+    <div id="toast-manager"></div>
 
     <div id="login-screen">
-        <div class="login-logo">
+        <div class="login-branding">
             <h1>ESCAROLA<span>OS</span></h1>
-            <p>SISTEMA DE GESTIÓN GASTRONÓMICA</p>
+            <p>SISTEMA CENTRAL DE OPERACIONES</p>
         </div>
-        <div class="dot-container">
-            <div id="dot-1" class="pin-dot"></div>
-            <div id="dot-2" class="pin-dot"></div>
-            <div id="dot-3" class="pin-dot"></div>
-            <div id="dot-4" class="pin-dot"></div>
+        <div class="pin-container">
+            <div id="slot-1" class="pin-slot"></div>
+            <div id="slot-2" class="pin-slot"></div>
+            <div id="slot-3" class="pin-slot"></div>
+            <div id="slot-4" class="pin-slot"></div>
         </div>
         <div class="pin-grid">
-            <button class="pin-key" onclick="window.handlePinInput('1')">1</button>
-            <button class="pin-key" onclick="window.handlePinInput('2')">2</button>
-            <button class="pin-key" onclick="window.handlePinInput('3')">3</button>
-            <button class="pin-key" onclick="window.handlePinInput('4')">4</button>
-            <button class="pin-key" onclick="window.handlePinInput('5')">5</button>
-            <button class="pin-key" onclick="window.handlePinInput('6')">6</button>
-            <button class="pin-key" onclick="window.handlePinInput('7')">7</button>
-            <button class="pin-key" onclick="window.handlePinInput('8')">8</button>
-            <button class="pin-key" onclick="window.handlePinInput('9')">9</button>
-            <button class="pin-key" onclick="window.resetPin()" style="color:var(--terracota); border-color:var(--terracota)">C</button>
-            <button class="pin-key" onclick="window.handlePinInput('0')">0</button>
-            <button class="pin-key" onclick="location.reload()"><i class="fa-solid fa-redo-alt"></i></button>
+            <div class="pin-key" onclick="window.typePin('1')">1</div>
+            <div class="pin-key" onclick="window.typePin('2')">2</div>
+            <div class="pin-key" onclick="window.typePin('3')">3</div>
+            <div class="pin-key" onclick="window.typePin('4')">4</div>
+            <div class="pin-key" onclick="window.typePin('5')">5</div>
+            <div class="pin-key" onclick="window.typePin('6')">6</div>
+            <div class="pin-key" onclick="window.typePin('7')">7</div>
+            <div class="pin-key" onclick="window.typePin('8')">8</div>
+            <div class="pin-key" onclick="window.typePin('9')">9</div>
+            <div class="pin-key" onclick="window.erasePin()" style="color:var(--terracota)">C</div>
+            <div class="pin-key" onclick="window.typePin('0')">0</div>
+            <div class="pin-key" onclick="location.reload()"><i class="fa-solid fa-rotate"></i></div>
         </div>
     </div>
 
-    <div id="view-finanzas" class="main-wrapper">
-        <div class="capital-hero">
-            <span class="mini-label">Balance Total Consolidado</span>
-            <h1 id="net-total-display" class="net-value">$0.00</h1>
-        </div>
-        <div class="stats-grid">
-            <div class="mini-stat">
-                <span class="mini-label">Efectivo Caja</span>
-                <h4 id="stat-caja">$0.00</h4>
+    <div class="app-container">
+        <div id="view-finanzas" class="view-content">
+            <div class="capital-hero">
+                <span class="label">Balance Consolidado</span>
+                <h1 id="net-wealth" class="total-amount">$0.00</h1>
             </div>
-            <div class="mini-stat">
-                <span class="mini-label">Bancos / Terminal</span>
-                <h4 id="stat-banco">$0.00</h4>
-            </div>
-            <div class="mini-stat">
-                <span class="mini-label">Total Egresos</span>
-                <h4 id="stat-gastos" style="color:var(--terracota)">$0.00</h4>
-            </div>
-            <div class="mini-stat">
-                <span class="mini-label">Ventas Netas</span>
-                <h4 id="stat-ventas" style="color:var(--dorado)">$0.00</h4>
-            </div>
-        </div>
-        <div class="glass-card">
-            <div class="section-title"><i class="fa-solid fa-file-invoice-dollar"></i> Registrar Flujo</div>
-            <label>Concepto de Operación</label>
-            <input type="text" id="flow-desc" placeholder="Ej: Venta de Cena o Pago de Proveedor">
-            <label>Monto</label>
-            <input type="number" id="flow-amount" step="0.01" placeholder="0.00">
-            <label>Canal de Dinero</label>
-            <select id="flow-method">
-                <option value="CAJA">Caja Física (Efectivo)</option>
-                <option value="BANCO">Banco (Transferencia/Terminal)</option>
-            </select>
-            <label>Vincular a Receta (Opcional para descontar stock)</label>
-            <select id="flow-recipe-link"><option value="">-- Sin receta vinculada --</option></select>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px">
-                <button class="btn-action btn-gold" onclick="window.processFinance('INGRESO')"><i class="fa-solid fa-arrow-down"></i> INGRESO</button>
-                <button class="btn-action btn-red" onclick="window.processFinance('GASTO')"><i class="fa-solid fa-arrow-up"></i> GASTO</button>
-            </div>
-        </div>
-        <div id="finance-history-list"></div>
-    </div>
-
-    <div id="view-agenda" class="main-wrapper">
-        <div class="calendar-box">
-            <div class="cal-ctrls">
-                <button onclick="window.changeCalMonth(-1)" class="btn-round-del" style="background:var(--blanco-trans); color:white"><i class="fa-solid fa-chevron-left"></i></button>
-                <h3 id="cal-month-title" class="cal-month-name">MES AÑO</h3>
-                <button onclick="window.changeCalMonth(1)" class="btn-round-del" style="background:var(--blanco-trans); color:white"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-            <div class="cal-grid-system" id="cal-grid-main"></div>
-        </div>
-        <div class="glass-card" style="margin-top:25px">
-            <div class="section-title"><i class="fa-solid fa-calendar-plus"></i> Nueva Reservación</div>
-            <label>Nombre del Cliente</label>
-            <input type="text" id="res-name" placeholder="Ej: Familia Martínez">
-            <label>Fecha y Hora</label>
-            <input type="datetime-local" id="res-date">
-            <label>Observaciones Especiales</label>
-            <textarea id="res-notes" rows="2" placeholder="Ej: Alergias o mesa específica..."></textarea>
-            <button class="btn-action btn-gold" onclick="window.saveReservation()"><i class="fa-solid fa-check"></i> AGENDAR SERVICIO</button>
-        </div>
-        <div id="day-detail-agenda"></div>
-    </div>
-
-    <div id="view-reloj" class="main-wrapper">
-        <div class="clock-container">
-            <h1 id="clock-time">00:00:00</h1>
-            <p id="clock-date">CARGANDO...</p>
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
-            <button class="btn-action btn-gold" style="height:150px; flex-direction:column; border-radius:40px" onclick="window.handleClockAction('ENTRADA')">
-                <i class="fa-solid fa-user-check" style="font-size:2.5rem"></i>
-                <span>REGISTRAR ENTRADA</span>
-            </button>
-            <button class="btn-action btn-red" style="height:150px; flex-direction:column; border-radius:40px" onclick="window.handleClockAction('SALIDA')">
-                <i class="fa-solid fa-user-clock" style="font-size:2.5rem"></i>
-                <span>REGISTRAR SALIDA</span>
-            </button>
-        </div>
-        <div id="clock-recent-logs" style="margin-top:30px"></div>
-    </div>
-
-    <div id="view-insumos" class="main-wrapper">
-        <div class="glass-card">
-            <div class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Entrada de Insumos</div>
-            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px">
-                <div><label>Insumo</label><input type="text" id="inv-item-name" placeholder="Nombre"></div>
-                <div><label>Cant.</label><input type="number" id="inv-item-qty" placeholder="0"></div>
-                <div><label>Unidad</label><input type="text" id="inv-item-unit" placeholder="Kg/L/Pz"></div>
-            </div>
-            <label>Stock Mínimo (Alerta Crítica)</label>
-            <input type="number" id="inv-item-min" placeholder="Avisar cuando quede menos de...">
-            <button class="btn-action btn-gold" style="margin-top:10px" onclick="window.updateInventory()"><i class="fa-solid fa-save"></i> GUARDAR EN BODEGA</button>
-        </div>
-        <div id="inventory-full-list"></div>
-
-        <div class="glass-card" style="margin-top:30px">
-            <div class="section-title"><i class="fa-solid fa-mortar-pestle"></i> Gestión de Recetas</div>
-            <label>Nombre del Platillo / Preparación</label>
-            <input type="text" id="rec-platillo-name" placeholder="Ej: Pizza Margarita">
-            <div id="rec-ingredients-container"></div>
-            <button class="btn-action btn-outline" style="margin:15px 0" onclick="window.addNewIngredientField()"><i class="fa-solid fa-plus"></i> AGREGAR INGREDIENTE</button>
-            <button class="btn-action btn-gold" onclick="window.saveMasterRecipe()"><i class="fa-solid fa-receipt"></i> GUARDAR RECETA MAESTRA</button>
-        </div>
-        <div id="recetario-full-list"></div>
-    </div>
-
-    <div id="view-admin" class="main-wrapper">
-        <div class="glass-card">
-            <div class="section-title"><i class="fa-solid fa-users-cog"></i> Gestión de Equipo</div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
-                <div><label>Nombre</label><input type="text" id="user-name-add"></div>
-                <div><label>PIN (4 dígitos)</label><input type="number" id="user-pin-add"></div>
-            </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
-                <div><label>Sueldo por Hora</label><input type="number" id="user-pay-add"></div>
-                <div><label>Rango / Rol</label>
-                    <select id="user-role-add">
-                        <option value="Staff">Operativo (Staff)</option>
-                        <option value="Socio">Administrador (Socio)</option>
-                    </select>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <span>Efectivo Caja</span>
+                    <h4 id="stat-caja">$0.00</h4>
+                </div>
+                <div class="kpi-card">
+                    <span>Banco / Terminal</span>
+                    <h4 id="stat-banco">$0.00</h4>
+                </div>
+                <div class="kpi-card">
+                    <span>Gasto Mensual</span>
+                    <h4 id="stat-gasto" style="color:var(--terracota)">$0.00</h4>
+                </div>
+                <div class="kpi-card">
+                    <span>Venta Bruta</span>
+                    <h4 id="stat-venta" style="color:var(--dorado)">$0.00</h4>
                 </div>
             </div>
-            <button class="btn-action btn-gold" onclick="window.createNewUser()"><i class="fa-solid fa-user-plus"></i> REGISTRAR COLABORADOR</button>
+            <div class="module-card">
+                <div class="section-header"><h2>Registrar Movimiento</h2><i class="fa-solid fa-money-bill-transfer fa-2x"></i></div>
+                <div class="field-group">
+                    <label>Concepto del Movimiento</label>
+                    <input type="text" id="fin-concept" placeholder="Ej: Pago Proveedor Carne">
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px">
+                    <div class="field-group">
+                        <label>Monto Total ($)</label>
+                        <input type="number" id="fin-val" step="0.01">
+                    </div>
+                    <div class="field-group">
+                        <label>Cuenta de Origen/Destino</label>
+                        <select id="fin-acc">
+                            <option value="CAJA">Caja Efectivo</option>
+                            <option value="BANCO">Banco / Digital</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label>Vincular a Receta (Descarga Stock)</label>
+                    <select id="fin-recipe-link"><option value="">-- Sin receta vinculada --</option></select>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; margin-top:20px">
+                    <button class="btn-submit btn-gold" onclick="window.pushMoney('INGRESO')">REGISTRAR INGRESO</button>
+                    <button class="btn-submit" style="background:var(--terracota); color:white" onclick="window.pushMoney('GASTO')">REGISTRAR GASTO</button>
+                </div>
+            </div>
+            <div id="finance-log-render"></div>
         </div>
-        <div id="admin-user-list-render"></div>
 
-        <div class="glass-card">
-            <div class="section-title"><i class="fa-solid fa-tasks"></i> Tareas de Cierre</div>
-            <div id="admin-checklist-render"></div>
-            <div style="display:flex; gap:10px; margin-top:15px">
-                <input type="text" id="task-desc-add" placeholder="Nueva tarea de limpieza o cierre...">
-                <button class="btn-action btn-gold" style="width:70px" onclick="window.addChecklistTask()"><i class="fa-solid fa-plus"></i></button>
+        <div id="view-agenda" class="view-content">
+            <div class="calendar-box">
+                <div class="calendar-controls">
+                    <button onclick="window.changeMo(-1)" class="btn-delete" style="background:var(--glass); color:#fff"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h3 id="calendar-title" class="current-month">MARZO 2026</h3>
+                    <button onclick="window.changeMo(1)" class="btn-delete" style="background:var(--glass); color:#fff"><i class="fa-solid fa-chevron-right"></i></button>
+                </div>
+                <div class="grid-calendar" id="calendar-body"></div>
+            </div>
+            <div class="module-card" style="margin-top:40px">
+                <div class="section-header"><h2>Nueva Reservación</h2><i class="fa-solid fa-calendar-check fa-2x"></i></div>
+                <div class="field-group"><label>Cliente / Empresa</label><input type="text" id="age-customer"></div>
+                <div class="field-group"><label>Fecha y Hora del Evento</label><input type="datetime-local" id="age-time"></div>
+                <div class="field-group"><label>Requerimientos Especiales</label><textarea id="age-memo" rows="2"></textarea></div>
+                <button class="btn-submit btn-gold" onclick="window.pushAgenda()">CONFIRMAR AGENDA</button>
+            </div>
+            <div id="agenda-day-render"></div>
+        </div>
+
+        <div id="view-reloj" class="view-content">
+            <div class="reloj-hero">
+                <h1 id="digital-clock">00:00:00</h1>
+                <p id="digital-date">CARGANDO SISTEMA...</p>
+            </div>
+            <div class="punch-grid">
+                <button class="btn-action-punch btn-in" onclick="window.handlePunch('ENTRADA')">
+                    <i class="fa-solid fa-id-badge"></i>
+                    <span>ENTRADA</span>
+                </button>
+                <button class="btn-action-punch btn-out" onclick="window.handlePunch('SALIDA')">
+                    <i class="fa-solid fa-clock-rotate-left"></i>
+                    <span>SALIDA</span>
+                </button>
+            </div>
+            <div id="punch-log-render" style="margin-top:50px"></div>
+        </div>
+
+        <div id="view-insumos" class="view-content">
+            <div class="module-card">
+                <div class="section-header"><h2>Inventario de Insumos</h2><i class="fa-solid fa-box-open fa-2x"></i></div>
+                <div class="field-group"><label>Nombre del Producto</label><input type="text" id="ins-title"></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:20px">
+                    <div class="field-group"><label>Cantidad</label><input type="number" id="ins-quantity"></div>
+                    <div class="field-group"><label>Medida</label><input type="text" id="ins-unit" placeholder="Kg/L/Pz"></div>
+                    <div class="field-group"><label>Stock Crítico</label><input type="number" id="ins-alert"></div>
+                </div>
+                <button class="btn-submit btn-gold" onclick="window.pushStock()">ACTUALIZAR INVENTARIO</button>
+            </div>
+            <div id="stock-log-render"></div>
+
+            <div class="module-card" style="margin-top:40px">
+                <div class="section-header"><h2>Gestión de Recetas</h2><i class="fa-solid fa-scroll fa-2x"></i></div>
+                <div class="field-group"><label>Nombre del Platillo</label><input type="text" id="rec-title"></div>
+                <div id="rec-ing-container"></div>
+                <button class="btn-submit btn-outline" style="margin:20px 0" onclick="window.appendIngRow()">+ AÑADIR INSUMO A RECETA</button>
+                <button class="btn-submit btn-gold" onclick="window.pushRecipe()">REGISTRAR RECETA MAESTRA</button>
+            </div>
+            <div id="recipe-log-render"></div>
+        </div>
+
+        <div id="view-admin" class="view-content">
+            <div class="module-card">
+                <div class="section-header"><h2>Control de Acceso Staff</h2><i class="fa-solid fa-users-gear fa-2x"></i></div>
+                <div class="field-group"><label>Nombre Completo</label><input type="text" id="adm-name"></div>
+                <div style="display:grid; grid-template-columns: 1fr 1fr; gap:25px">
+                    <div class="field-group"><label>PIN Acceso (4 Dígitos)</label><input type="number" id="adm-pin"></div>
+                    <div class="field-group"><label>Sueldo por Hora</label><input type="number" id="adm-wage"></div>
+                </div>
+                <div class="field-group">
+                    <label>Rango de Autorización</label>
+                    <select id="adm-role"><option value="Staff">Equipo Staff</option><option value="Socio">Socio / Gerente</option></select>
+                </div>
+                <button class="btn-submit btn-gold" onclick="window.pushUser()">DAR DE ALTA COLABORADOR</button>
+            </div>
+            <div id="user-log-render"></div>
+
+            <div class="module-card">
+                <div class="section-header"><h2>Checklist de Limpieza</h2><i class="fa-solid fa-broom fa-2x"></i></div>
+                <div id="task-log-render"></div>
+                <div style="display:flex; gap:20px; margin-top:30px">
+                    <input type="text" id="adm-task-val" placeholder="Nueva tarea de mantenimiento...">
+                    <button class="btn-submit btn-gold" style="width:120px" onclick="window.pushTask()"><i class="fa-solid fa-plus"></i></button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div id="modal-checklist" class="modal-overlay">
-        <div class="modal-body">
-            <h2 style="text-align:center; color:var(--dorado); margin-bottom:10px">PROTOCOLO DE CIERRE</h2>
-            <p style="text-align:center; opacity:0.6; font-size:0.8rem; margin-bottom:30px">Por seguridad y orden, marca las tareas completadas.</p>
-            <div id="modal-checklist-items" style="max-height:300px; overflow-y:auto; margin-bottom:30px"></div>
-            <button class="btn-action btn-gold" style="height:80px" onclick="window.confirmClockOut()">
-                <i class="fa-solid fa-clipboard-check"></i> FINALIZAR TURNO
-            </button>
+    <div id="modal-protocol" class="modal-view">
+        <div class="modal-wrapper">
+            <h2 style="text-align:center; color:var(--dorado); margin-bottom:20px">PROTOCOLO OBLIGATORIO</h2>
+            <p style="text-align:center; opacity:0.6; font-size:0.9rem; margin-bottom:40px">Marca las tareas concluidas para habilitar el cierre de sesión.</p>
+            <div id="checklist-render-box" style="margin-bottom:45px; max-height:300px; overflow-y:auto"></div>
+            <button class="btn-submit btn-gold" style="height:100px" onclick="window.finishPunchOut()">AUTORIZAR SALIDA</button>
         </div>
     </div>
 
-    <nav id="navbar-bottom">
-        <div class="nav-item" id="nav-finanzas" onclick="window.switchView('finanzas')"><i class="fa-solid fa-wallet"></i><span>Capital</span></div>
-        <div class="nav-item" id="nav-agenda" onclick="window.switchView('agenda')"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></div>
-        <div class="nav-item" id="nav-reloj" onclick="window.switchView('reloj')"><i class="fa-solid fa-clock"></i><span>Reloj</span></div>
-        <div class="nav-item" id="nav-insumos" onclick="window.switchView('insumos')"><i class="fa-solid fa-utensils"></i><span>Cocina</span></div>
-        <div class="nav-item" id="nav-admin" onclick="window.switchView('admin')"><i class="fa-solid fa-shield-halved"></i><span>Admin</span></div>
+    <nav id="tab-bar">
+        <div class="tab-item" id="t-finanzas" onclick="window.nav('finanzas')"><i class="fa-solid fa-vault"></i><span>Capital</span></div>
+        <div class="tab-item" id="t-agenda" onclick="window.nav('agenda')"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></div>
+        <div class="tab-item" id="t-reloj" onclick="window.nav('reloj')"><i class="fa-solid fa-fingerprint"></i><span>Reloj</span></div>
+        <div class="tab-item" id="t-insumos" onclick="window.nav('insumos')"><i class="fa-solid fa-kitchen-set"></i><span>Bodega</span></div>
+        <div class="tab-item" id="t-admin" onclick="window.nav('admin')"><i class="fa-solid fa-sliders"></i><span>Admin</span></div>
     </nav>
 
     <script type="module">
-        /* ==========================================================================
-           ESCAROLA OS - NÚCLEO OPERATIVO (FIREBASE INTEGRATION)
-           ========================================================================== */
-        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit, onSnapshot } from './firebase-config.js';
+        /* ESCAROLA OS - CORE ENGINE v13.2
+           Lógica distribuida para manejo de datos en tiempo real.
+        */
+        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
-        // Variables de sesión
-        window.activePin = ""; 
-        window.currentUser = null; 
-        window.calendarReference = new Date();
+        // Estado Global del Sistema
+        window.tempPin = ""; 
+        window.activeUser = null; 
+        window.calendarRef = new Date();
 
-        /* --- CONTROL DE ACCESO --- */
-        window.handlePinInput = (digit) => {
-            if(window.activePin.length < 4) {
-                window.activePin += digit;
-                window.syncPinDots();
-                if(window.activePin.length === 4) window.executeLogin();
+        /* ==========================================================
+           1. SISTEMA DE AUTENTICACIÓN (PINPAD)
+           ========================================================== */
+        window.typePin = (n) => {
+            if(window.tempPin.length < 4) {
+                window.tempPin += n;
+                window.refreshPinSlots();
+                if(window.tempPin.length === 4) {
+                    // Pequeño retardo visual para que el usuario vea el último slot lleno
+                    setTimeout(() => window.authSystem(), 180);
+                }
             }
         };
 
-        window.resetPin = () => { 
-            window.activePin = ""; 
-            window.syncPinDots(); 
+        window.erasePin = () => { 
+            window.tempPin = ""; 
+            window.refreshPinSlots(); 
         };
 
-        window.syncPinDots = () => {
+        window.refreshPinSlots = () => {
             for(let i=1; i<=4; i++) {
-                document.getElementById(`dot-${i}`).classList.toggle('filled', i <= window.activePin.length);
+                const s = document.getElementById(`slot-${i}`);
+                if(i <= window.tempPin.length) s.classList.add('active');
+                else s.classList.remove('active');
             }
         };
 
-        window.executeLogin = async () => {
+        window.authSystem = async () => {
             try {
-                const q = query(collection(db, "usuarios"), where("pin", "==", window.activePin));
-                const snap = await getDocs(q);
-                if(!snap.empty) {
-                    window.currentUser = { id: snap.docs[0].id, ...snap.docs[0].data() };
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('navbar-bottom').style.display = 'grid';
-                    window.bootApp();
+                // El PIN se busca como cadena para mantener la integridad de ceros iniciales
+                const userRef = collection(db, "usuarios");
+                const q = query(userRef, where("pin", "==", window.tempPin));
+                const querySnapshot = await getDocs(q);
+                
+                if(!querySnapshot.empty) {
+                    const foundData = querySnapshot.docs[0].data();
+                    window.activeUser = { id: querySnapshot.docs[0].id, ...foundData };
+                    
+                    // Transición exitosa
+                    const loginScreen = document.getElementById('login-screen');
+                    loginScreen.style.opacity = '0';
+                    setTimeout(() => {
+                        loginScreen.style.display = 'none';
+                        document.getElementById('tab-bar').style.display = 'grid';
+                        window.bootApp();
+                    }, 500);
                 } else {
-                    window.showToast("PIN INCORRECTO", true);
-                    window.resetPin();
+                    window.showAlert("PIN DE ACCESO INCORRECTO", true);
+                    window.erasePin();
                 }
-            } catch(e) { console.error(e); }
-        };
-
-        /* --- GESTIÓN DE VISTAS --- */
-        window.switchView = (viewId) => {
-            // Protección de rutas para No-Administradores
-            if((viewId === 'finanzas' || viewId === 'admin') && window.currentUser.rol !== 'Socio') {
-                return window.showToast("SOLO ADMINISTRADORES", true);
+            } catch(err) { 
+                console.error("Critical Auth Error:", err);
+                window.showAlert("FALLA DE COMUNICACIÓN CON NÚCLEO", true);
             }
-            document.querySelectorAll('.main-wrapper').forEach(v => v.style.display = 'none');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.getElementById(`view-${viewId}`).style.display = 'block';
-            document.getElementById(`nav-${viewId}`).classList.add('active');
         };
 
-        /* --- MÓDULO FINANCIERO CON DEDUCCIÓN --- */
-        window.processFinance = async (type) => {
-            const amt = parseFloat(document.getElementById('flow-amount').value);
-            const dsc = document.getElementById('flow-desc').value;
-            const met = document.getElementById('flow-method').value;
-            const recId = document.getElementById('flow-recipe-link').value;
+        /* ==========================================================
+           2. MOTOR DE NAVEGACIÓN Y PERMISOS
+           ========================================================== */
+        window.nav = (v) => {
+            // Protección de datos financieros y administrativos
+            if((v === 'finanzas' || v === 'admin') && window.activeUser.rol !== 'Socio') {
+                return window.showAlert("PERMISOS DE SOCIO REQUERIDOS", true);
+            }
 
-            if(!amt || !dsc) return window.showToast("DATOS INCOMPLETOS", true);
+            // Gestión de capas de visualización
+            const views = document.querySelectorAll('.view-content');
+            const tabs = document.querySelectorAll('.tab-item');
+            
+            views.forEach(view => view.style.display = 'none');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            document.getElementById(`view-${v}`).style.display = 'block';
+            document.getElementById(`t-${v}`).classList.add('active');
+        };
+
+        /* ==========================================================
+           3. MÓDULO FINANCIERO (CAPITAL)
+           ========================================================== */
+        window.pushMoney = async (type) => {
+            const val = parseFloat(document.getElementById('fin-val').value);
+            const concept = document.getElementById('fin-concept').value;
+            const acc = document.getElementById('fin-acc').value;
+            const recId = document.getElementById('fin-recipe-link').value;
+
+            if(!val || !concept) return window.showAlert("TODOS LOS CAMPOS SON OBLIGATORIOS", true);
 
             try {
-                await addDoc(collection(db, "finanzas"), {
-                    monto: amt, desc: dsc, metodo: met, tipo: type,
-                    recipeId: recId || null,
+                const entry = {
+                    monto: val,
+                    desc: concept,
+                    metodo: acc,
+                    tipo: type,
+                    referencia: recId || null,
                     fecha: new Date().toISOString(),
-                    autor: window.currentUser.nombre
-                });
+                    operador: window.activeUser.nombre
+                };
 
-                // Si hay una receta vinculada y es un ingreso, descontamos stock
+                await addDoc(collection(db, "finanzas"), entry);
+
+                // Si es un ingreso vinculado a receta, descontar stock automáticamente
                 if(type === 'INGRESO' && recId) {
-                    await window.deductStockFromRecipe(recId);
+                    await window.runAutoStockDeduct(recId);
                 }
 
-                window.showToast("OPERACIÓN EXITOSA");
-                document.getElementById('flow-amount').value = "";
-                document.getElementById('flow-desc').value = "";
-                window.refreshFinanceUI();
-            } catch(e) { window.showToast("ERROR AL GUARDAR", true); }
+                window.showAlert("MOVIMIENTO REGISTRADO CON ÉXITO");
+                document.getElementById('fin-val').value = "";
+                document.getElementById('fin-concept').value = "";
+                window.renderFinanceState();
+            } catch(e) { window.showAlert("ERROR AL PROCESAR TRANSACCIÓN", true); }
         };
 
-        window.refreshFinanceUI = async () => {
+        window.renderFinanceState = async () => {
             const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let totalCaja = 0, totalBanco = 0, totalGastos = 0, totalVentas = 0;
-            const list = document.getElementById('finance-history-list');
-            list.innerHTML = "<h4 style='margin:20px 0 10px 10px; opacity:0.5'>Últimos Movimientos</h4>";
+            let totalCaja = 0, totalBanco = 0, totalGasto = 0, totalVenta = 0;
+            const logBox = document.getElementById('finance-log-render');
+            logBox.innerHTML = "<h4 style='opacity:0.3; margin:40px 0 20px'>Historial de Operaciones</h4>";
 
             snap.forEach(d => {
                 const f = d.data();
                 if(f.tipo === 'INGRESO') {
-                    totalVentas += f.monto;
+                    totalVenta += f.monto;
                     if(f.metodo === 'CAJA') totalCaja += f.monto; else totalBanco += f.monto;
                 } else {
-                    totalGastos += f.monto;
+                    totalGasto += f.monto;
                     if(f.metodo === 'CAJA') totalCaja -= f.monto; else totalBanco -= f.monto;
                 }
 
-                list.innerHTML += `
-                    <div class="dynamic-row" style="border-left-color:${f.tipo==='INGRESO'?'var(--dorado)':'var(--terracota)'}">
-                        <div class="row-info">
+                logBox.innerHTML += `
+                    <div class="record-row" style="border-left-color:${f.tipo==='INGRESO'?'var(--dorado)':'var(--terracota)'}">
+                        <div class="record-info">
                             <b>${f.desc}</b>
                             <small>${f.metodo} • ${new Date(f.fecha).toLocaleDateString()}</small>
                         </div>
                         <div style="text-align:right">
-                            <b style="color:${f.tipo==='INGRESO'?'var(--dorado)':'var(--terracota)'}">$${f.monto.toFixed(2)}</b><br>
-                            <button class="btn-round-del" onclick="window.deleteEntry('finanzas','${d.id}','refreshFinanceUI')"><i class="fa-solid fa-trash-can"></i></button>
+                            <b style="color:${f.tipo==='INGRESO'?'#fff':'var(--terracota)'}">${f.tipo==='INGRESO'?'+':'-'}$${f.monto.toFixed(2)}</b><br>
+                            <button class="btn-delete" style="margin-top:10px" onclick="window.removeDoc('finanzas','${d.id}','renderFinanceState')"><i class="fa-solid fa-trash-can"></i></button>
                         </div>
                     </div>`;
             });
 
             document.getElementById('stat-caja').innerText = `$${totalCaja.toFixed(2)}`;
             document.getElementById('stat-banco').innerText = `$${totalBanco.toFixed(2)}`;
-            document.getElementById('stat-gastos').innerText = `$${totalGastos.toFixed(2)}`;
-            document.getElementById('stat-ventas').innerText = `$${totalVentas.toFixed(2)}`;
-            document.getElementById('net-total-display').innerText = `$${(totalCaja + totalBanco).toFixed(2)}`;
+            document.getElementById('stat-gasto').innerText = `$${totalGasto.toFixed(2)}`;
+            document.getElementById('stat-venta').innerText = `$${totalVenta.toFixed(2)}`;
+            document.getElementById('net-wealth').innerText = `$${(totalCaja + totalBanco).toFixed(2)}`;
         };
 
-        /* --- CALENDARIO TRADICIONAL 7x6 --- */
-        window.renderMasterCalendar = async () => {
-            const grid = document.getElementById('cal-grid-main');
-            grid.innerHTML = "";
-            const month = window.calendarReference.getMonth();
-            const year = window.calendarReference.getFullYear();
+        /* ==========================================================
+           4. MÓDULO DE AGENDA Y CALENDARIO
+           ========================================================== */
+        window.renderCalMatrix = async () => {
+            const body = document.getElementById('calendar-body');
+            body.innerHTML = "";
+            const mo = window.calendarRef.getMonth();
+            const yr = window.calendarRef.getFullYear();
             
-            document.getElementById('cal-month-title').innerText = window.calendarReference.toLocaleDateString('es-MX', {month:'long', year:'numeric'});
+            document.getElementById('calendar-title').innerText = window.calendarRef.toLocaleDateString('es-MX', {month:'long', year:'numeric'});
 
-            const weekdays = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
-            weekdays.forEach(wd => grid.innerHTML += `<div class="cal-day-label">${wd}</div>`);
+            const labels = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
+            labels.forEach(l => body.innerHTML += `<div class="day-label">${l}</div>`);
 
-            const firstDay = new Date(year, month, 1).getDay();
-            const totalDays = new Date(year, month + 1, 0).getDate();
-            const prevMonthTotal = new Date(year, month, 0).getDate();
+            const startDay = new Date(yr, mo, 1).getDay();
+            const daysInMo = new Date(yr, mo + 1, 0).getDate();
+            const prevDays = new Date(yr, mo, 0).getDate();
 
-            // Cargar eventos para marcar puntos
-            const evSnap = await getDocs(collection(db, "agenda"));
-            let busyDates = [];
-            evSnap.forEach(e => busyDates.push(e.data().fecha.split('T')[0]));
+            const agendaSnap = await getDocs(collection(db, "agenda"));
+            let datesMarked = []; agendaSnap.forEach(e => datesMarked.push(e.data().fecha.split('T')[0]));
 
-            // Días mes anterior
-            for(let i = firstDay; i > 0; i--) {
-                grid.innerHTML += `<div class="cal-date-cell not-current">${prevMonthTotal - i + 1}</div>`;
-            }
+            for(let i = startDay; i > 0; i--) body.innerHTML += `<div class="day-square blur-day">${prevDays - i + 1}</div>`;
 
-            // Días mes actual
-            for(let d = 1; d <= totalDays; d++) {
-                const dateString = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-                const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
-                const hasEvent = busyDates.includes(dateString);
+            for(let d = 1; d <= daysInMo; d++) {
+                const dateKey = `${yr}-${(mo+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                const isToday = new Date().toDateString() === new Date(yr, mo, d).toDateString();
+                const hasData = datesMarked.includes(dateKey);
 
-                grid.innerHTML += `
-                    <div class="cal-date-cell ${isToday?'active-today':''} ${hasEvent?'has-event':''}" onclick="window.viewDayEvents('${dateString}')">
+                body.innerHTML += `
+                    <div class="day-square ${isToday?'active-day':''} ${hasData?'has-data':''}" onclick="window.openDay('${dateKey}')">
                         ${d}
                     </div>`;
             }
         };
 
-        window.viewDayEvents = async (dateStr) => {
-            const q = query(collection(db, "agenda"), where("fecha", ">=", dateStr), where("fecha", "<=", dateStr + "T23:59"));
+        window.pushAgenda = async () => {
+            const cli = document.getElementById('age-customer').value;
+            const tim = document.getElementById('age-time').value;
+            if(!cli || !tim) return;
+            await addDoc(collection(db, "agenda"), { cliente: cli, fecha: tim, nota: document.getElementById('age-memo').value });
+            window.showAlert("RESERVACIÓN CONFIRMADA"); window.renderCalMatrix();
+        };
+
+        window.openDay = async (key) => {
+            const q = query(collection(db, "agenda"), where("fecha", ">=", key), where("fecha", "<=", key + "T23:59"));
             const s = await getDocs(q);
-            const container = document.getElementById('day-detail-agenda');
-            container.innerHTML = `<h4 style="margin:20px 0 10px">Reservas para: ${dateStr}</h4>`;
-            
-            if(s.empty) container.innerHTML += "<p style='opacity:0.4'>Sin actividades programadas.</p>";
-            
+            const render = document.getElementById('agenda-day-render');
+            render.innerHTML = `<h4 style="margin:30px 0 15px">Compromisos: ${key}</h4>`;
+            if(s.empty) render.innerHTML += "<p style='opacity:0.2'>No hay eventos programados.</p>";
             s.forEach(doc => {
-                const r = doc.data();
-                container.innerHTML += `
-                    <div class="dynamic-row">
-                        <div class="row-info"><b>${r.cliente}</b><small>${r.fecha.split('T')[1]}h</small></div>
-                        <button class="btn-round-del" onclick="window.deleteEntry('agenda','${doc.id}','renderMasterCalendar')">✕</button>
+                const a = doc.data();
+                render.innerHTML += `
+                    <div class="record-row">
+                        <div class="record-info"><b>${a.cliente}</b><small>${a.fecha.split('T')[1]}h</small></div>
+                        <button class="btn-delete" onclick="window.removeDoc('agenda','${doc.id}','renderCalMatrix')"><i class="fa-solid fa-xmark"></i></button>
                     </div>`;
             });
         };
 
-        window.saveReservation = async () => {
-            const name = document.getElementById('res-name').value;
-            const date = document.getElementById('res-date').value;
-            const notes = document.getElementById('res-notes').value;
-            if(!name || !date) return window.showToast("FALTAN DATOS", true);
-            
-            await addDoc(collection(db, "agenda"), { cliente: name, fecha: date, notas: notes });
-            window.showToast("RESERVA GUARDADA");
-            window.renderMasterCalendar();
-        };
-
-        /* --- BODEGA E INVENTARIO --- */
-        window.updateInventory = async () => {
-            const nom = document.getElementById('inv-item-name').value;
-            const qty = parseFloat(document.getElementById('inv-item-qty').value);
-            const uni = document.getElementById('inv-item-unit').value;
-            const min = parseFloat(document.getElementById('inv-item-min').value || 0);
-
-            if(!nom || isNaN(qty)) return;
-
-            await addDoc(collection(db, "inventario"), { 
-                nombre: nom, stock: qty, unidad: uni, min: min 
-            });
-            window.showToast("STOCK ACTUALIZADO");
-            window.refreshInventoryUI();
-        };
-
-        window.refreshInventoryUI = async () => {
-            const snap = await getDocs(collection(db, "inventario"));
-            const list = document.getElementById('inventory-full-list');
-            list.innerHTML = "<h4 style='margin:20px 0 10px 10px; opacity:0.5'>Stock en Almacén</h4>";
-
-            snap.forEach(d => {
-                const i = d.data();
-                const isLow = i.stock <= i.min;
-                list.innerHTML += `
-                    <div class="dynamic-row ${isLow?'alert-low-stock':''}">
-                        <div class="row-info">
-                            <b>${i.nombre}</b>
-                            <small>${isLow?'¡PEDIR URGENTE!':'Suficiente'} • Mín: ${i.min}</small>
-                        </div>
-                        <div style="text-align:right">
-                            <b style="font-size:1.3rem">${i.stock} <small>${i.unidad}</small></b><br>
-                            <button class="btn-round-del" onclick="window.deleteEntry('inventario','${d.id}','refreshInventoryUI')"><i class="fa-solid fa-times"></i></button>
-                        </div>
-                    </div>`;
-            });
-        };
-
-        /* --- RECETARIO Y AUTO-DEDUCCIÓN --- */
-        window.addNewIngredientField = () => {
-            const div = document.createElement('div');
-            div.style.display = "grid";
-            div.style.gridTemplateColumns = "2fr 1fr";
-            div.style.gap = "10px";
-            div.innerHTML = `<input type="text" class="rec-ing-name" placeholder="Insumo"><input type="number" class="rec-ing-qty" placeholder="Cant.">`;
-            document.getElementById('rec-ingredients-container').appendChild(div);
-        };
-
-        window.saveMasterRecipe = async () => {
-            const name = document.getElementById('rec-platillo-name').value;
-            const ings = [];
-            const names = document.querySelectorAll('.rec-ing-name');
-            const qtys = document.querySelectorAll('.rec-ing-qty');
-
-            names.forEach((n, i) => {
-                if(n.value) ings.push({ nombre: n.value, cantidad: parseFloat(qtys[i].value) });
-            });
-
-            await addDoc(collection(db, "recetas"), { platillo: name, ingredientes: ings });
-            window.showToast("RECETA REGISTRADA");
-            window.refreshRecipesUI();
-        };
-
-        window.deductStockFromRecipe = async (recipeId) => {
-            const recSnap = await getDocs(collection(db, "recetas"));
-            const receta = recSnap.docs.find(r => r.id === recipeId).data();
-
-            for(const ing of receta.ingredientes) {
-                const invQ = query(collection(db, "inventario"), where("nombre", "==", ing.nombre));
-                const invS = await getDocs(invQ);
-                if(!invS.empty) {
-                    const item = invS.docs[0];
-                    const newStock = item.data().stock - ing.cantidad;
-                    await updateDoc(doc(db, "inventario", item.id), { stock: newStock });
-                }
-            }
-            window.refreshInventoryUI();
-        };
-
-        window.refreshRecipesUI = async () => {
-            const snap = await getDocs(collection(db, "recetas"));
-            const list = document.getElementById('recetario-full-list');
-            const select = document.getElementById('flow-recipe-link');
-            
-            list.innerHTML = "<h4 style='margin:20px 0 10px 10px; opacity:0.5'>Recetario</h4>";
-            select.innerHTML = "<option value=''>-- Sin receta vinculada --</option>";
-
-            snap.forEach(d => {
-                const r = d.data();
-                list.innerHTML += `<div class="dynamic-row"><b>${r.platillo}</b><button class="btn-round-del" onclick="window.deleteEntry('recetas','${d.id}','refreshRecipesUI')">✕</button></div>`;
-                select.innerHTML += `<option value="${d.id}">${r.platillo}</option>`;
-            });
-        };
-
-        /* --- RELOJ Y ASISTENCIA --- */
-        window.handleClockAction = async (actionType) => {
-            if(actionType === 'SALIDA') {
-                const snap = await getDocs(collection(db, "tareas"));
+        /* ==========================================================
+           5. CONTROL DE RELOJ Y ASISTENCIA
+           ========================================================== */
+        window.handlePunch = async (mode) => {
+            if(mode === 'SALIDA') {
+                const taskSnap = await getDocs(collection(db, "tareas"));
                 let html = "";
-                snap.forEach(d => {
-                    html += `<div style="padding:15px; border-bottom:1px solid #333; display:flex; align-items:center; gap:15px">
-                        <input type="checkbox" class="modal-chk" style="width:25px; height:25px">
-                        <span>${d.data().tarea}</span>
+                taskSnap.forEach(d => {
+                    html += `<div style="padding:25px; border-bottom:1.5px solid #222; display:flex; gap:25px; align-items:center">
+                        <input type="checkbox" class="task-check-item" style="width:35px; height:35px; border-radius:10px">
+                        <span style="font-size:1.2rem; font-weight:600">${d.data().tarea}</span>
                     </div>`;
                 });
-                document.getElementById('modal-checklist-items').innerHTML = html || "No hay tareas configuradas.";
-                document.getElementById('modal-checklist').style.display = 'flex';
+                document.getElementById('checklist-render-box').innerHTML = html || "No hay tareas pendientes.";
+                document.getElementById('modal-protocol').style.display = 'flex';
             } else {
-                await window.saveTimeLog('ENTRADA');
+                await window.executeSavePunch('ENTRADA');
             }
         };
 
-        window.confirmClockOut = async () => {
-            const checks = document.querySelectorAll('.modal-chk');
-            const allDone = Array.from(checks).every(c => c.checked);
-            
-            if(checks.length > 0 && !allDone) {
-                return window.showToast("LIMPIEZA PENDIENTE", true);
+        window.finishPunchOut = async () => {
+            const items = document.querySelectorAll('.task-check-item');
+            if(items.length > 0 && !Array.from(items).every(i => i.checked)) {
+                return window.showAlert("PROTOCOLOS DE LIMPIEZA INCOMPLETOS", true);
             }
-
-            document.getElementById('modal-checklist').style.display = 'none';
-            await window.saveTimeLog('SALIDA');
-            location.reload(); // Logout automático al salir
+            await window.executeSaveSavePunch('SALIDA');
+            location.reload(); 
         };
 
-        window.saveTimeLog = async (type) => {
+        window.executeSavePunch = async (t) => {
             await addDoc(collection(db, "asistencias"), {
-                uid: window.currentUser.id,
-                nombre: window.currentUser.nombre,
-                tipo: type,
-                fecha: new Date().toISOString()
+                uid: window.activeUser.id,
+                staff: window.activeUser.nombre,
+                accion: t,
+                momento: new Date().toISOString()
             });
-            window.showToast("REGISTRO " + type + " OK");
-            window.refreshClockLogs();
+            window.showAlert("OPERACIÓN " + t + " REGISTRADA");
+            window.renderPunchHistory();
         };
 
-        window.refreshClockLogs = async () => {
-            const q = query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(10));
+        window.renderPunchHistory = async () => {
+            const q = query(collection(db, "asistencias"), orderBy("momento", "desc"), limit(10));
             const s = await getDocs(q);
-            const l = document.getElementById('clock-recent-logs');
-            l.innerHTML = "<h4 style='opacity:0.5; margin-bottom:10px'>Actividad Reciente</h4>";
+            const box = document.getElementById('punch-log-render');
+            box.innerHTML = "<h4 style='opacity:0.3; margin-bottom:25px'>Registros de Jornada (Hoy)</h4>";
             s.forEach(d => {
-                const a = d.data();
-                l.innerHTML += `<div class="dynamic-row"><span>${a.nombre}</span> <b style="color:var(--dorado)">${a.tipo}</b></div>`;
+                const p = d.data();
+                box.innerHTML += `<div class="record-row"><span>${p.staff}</span> <b style="color:var(--dorado)">${p.accion}</b></div>`;
             });
         };
 
-        /* --- PANEL DE ADMINISTRACIÓN --- */
-        window.createNewUser = async () => {
-            const n = document.getElementById('user-name-add').value;
-            const p = document.getElementById('user-pin-add').value;
-            const s = document.getElementById('user-pay-add').value;
-            const r = document.getElementById('user-role-add').value;
-
-            if(!n || p.length !== 4) return window.showToast("PIN DEBE SER DE 4 DÍGITOS", true);
-
-            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, sueldo: parseFloat(s), rol: r });
-            window.showToast("USUARIO CREADO");
-            window.refreshAdminUI();
+        /* ==========================================================
+           6. BODEGA, STOCK Y RECETARIO
+           ========================================================== */
+        window.pushStock = async () => {
+            const n = document.getElementById('ins-title').value;
+            const q = parseFloat(document.getElementById('ins-quantity').value);
+            const u = document.getElementById('ins-unit').value;
+            const a = parseFloat(document.getElementById('ins-alert').value || 0);
+            if(!n || isNaN(q)) return;
+            await addDoc(collection(db, "inventario"), { nombre: n, stock: q, unidad: u, minimo: a });
+            window.showAlert("INVENTARIO ACTUALIZADO"); window.renderInventory();
         };
 
-        window.addChecklistTask = async () => {
-            const t = document.getElementById('task-desc-add').value;
+        window.renderInventory = async () => {
+            const s = await getDocs(collection(db, "inventario"));
+            const l = document.getElementById('stock-log-render');
+            l.innerHTML = "<h4 style='opacity:0.3; margin:35px 0 20px'>Existencias en Bodega</h4>";
+            s.forEach(d => {
+                const i = d.data();
+                const isLow = i.stock <= i.minimo;
+                l.innerHTML += `
+                    <div class="record-row ${isLow?'critical-pulse':''}">
+                        <div class="record-info"><b>${i.nombre}</b><small>Alerta bajo: ${i.minimo} ${i.unidad}</small></div>
+                        <div style="text-align:right">
+                            <b style="font-size:1.6rem">${i.stock} <small>${i.unidad}</small></b><br>
+                            <button class="btn-delete" style="margin-top:10px" onclick="window.removeDoc('inventario','${d.id}','renderInventory')"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+            });
+        };
+
+        window.appendIngRow = () => {
+            const wrap = document.createElement('div');
+            wrap.style.display = 'grid'; wrap.style.gridTemplateColumns = '2fr 1fr'; wrap.style.gap = '20px'; wrap.style.marginBottom = '15px';
+            wrap.innerHTML = `<input type="text" class="ri-n" placeholder="Insumo"><input type="number" class="ri-q" placeholder="Cant.">`;
+            document.getElementById('rec-ing-container').appendChild(wrap);
+        };
+
+        window.pushRecipe = async () => {
+            const tit = document.getElementById('rec-title').value;
+            const ings = [];
+            const nNodes = document.querySelectorAll('.ri-n');
+            const qNodes = document.querySelectorAll('.ri-q');
+            nNodes.forEach((node, i) => { if(node.value) ings.push({ n: node.value, q: parseFloat(qNodes[i].value) }); });
+            await addDoc(collection(db, "recetas"), { platillo: tit, componentes: ings });
+            window.showAlert("RECETA MAESTRA GUARDADA"); window.renderRecipes();
+        };
+
+        window.renderRecipes = async () => {
+            const snap = await getDocs(collection(db, "recetas"));
+            const log = document.getElementById('recipe-log-render');
+            const sel = document.getElementById('fin-recipe-link');
+            log.innerHTML = ""; sel.innerHTML = "<option value=''>-- Sin receta vinculada --</option>";
+            snap.forEach(d => {
+                log.innerHTML += `<div class="record-row"><b>${d.data().platillo}</b><button class="btn-delete" onclick="window.removeDoc('recetas','${d.id}','renderRecipes')"><i class="fa-solid fa-trash-can"></i></button></div>`;
+                sel.innerHTML += `<option value="${d.id}">${d.data().platillo}</option>`;
+            });
+        };
+
+        window.runAutoStockDeduct = async (recipeId) => {
+            const allRecs = await getDocs(collection(db, "recetas"));
+            const targetRec = allRecs.docs.find(d => d.id === recipeId).data();
+            for(let component of targetRec.componentes) {
+                const stockQuery = query(collection(db, "inventario"), where("nombre", "==", component.n));
+                const stockSnap = await getDocs(stockQuery);
+                if(!stockSnap.empty) {
+                    const item = stockSnap.docs[0];
+                    await updateDoc(doc(db, "inventario", item.id), { stock: item.data().stock - component.q });
+                }
+            }
+            window.renderInventory();
+        };
+
+        /* ==========================================================
+           7. ADMINISTRACIÓN (PERSONAL Y TAREAS)
+           ========================================================== */
+        window.pushUser = async () => {
+            const n = document.getElementById('adm-name').value;
+            const p = document.getElementById('adm-pin').value;
+            const s = document.getElementById('adm-wage').value;
+            const r = document.getElementById('adm-role').value;
+            if(!n || p.length !== 4) return window.showAlert("PIN DEBE SER DE 4 DÍGITOS", true);
+            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p.toString(), sueldo: parseFloat(s), rol: r });
+            window.showAlert("COLABORADOR REGISTRADO"); window.renderAdminLog();
+        };
+
+        window.pushTask = async () => {
+            const t = document.getElementById('adm-task-val').value;
             if(!t) return;
             await addDoc(collection(db, "tareas"), { tarea: t });
-            document.getElementById('task-desc-add').value = "";
-            window.refreshAdminUI();
+            document.getElementById('adm-task-val').value = ""; window.renderAdminLog();
         };
 
-        window.refreshAdminUI = async () => {
+        window.renderAdminLog = async () => {
             const uSnap = await getDocs(collection(db, "usuarios"));
             const tSnap = await getDocs(collection(db, "tareas"));
-            
-            const uList = document.getElementById('admin-user-list-render');
-            const tList = document.getElementById('admin-checklist-render');
-
-            uList.innerHTML = "<h4>Colaboradores</h4>";
-            uSnap.forEach(d => uList.innerHTML += `<div class="dynamic-row"><span>${d.data().nombre} (${d.data().rol})</span><button class="btn-round-del" onclick="window.deleteEntry('usuarios','${d.id}','refreshAdminUI')">✕</button></div>`);
-
-            tList.innerHTML = "";
-            tSnap.forEach(d => tList.innerHTML += `<div class="dynamic-row"><span>${d.data().tarea}</span><button class="btn-round-del" onclick="window.deleteEntry('tareas','${d.id}','refreshAdminUI')">✕</button></div>`);
+            const uLog = document.getElementById('user-log-render');
+            const tLog = document.getElementById('task-log-render');
+            uLog.innerHTML = "<h4>Staff Activo en Sistema</h4>";
+            uSnap.forEach(d => uLog.innerHTML += `<div class="record-row"><span>${d.data().nombre} (${d.data().rol})</span><button class="btn-delete" onclick="window.removeDoc('usuarios','${d.id}','renderAdminLog')"><i class="fa-solid fa-trash"></i></button></div>`);
+            tLog.innerHTML = "";
+            tSnap.forEach(d => tLog.innerHTML += `<div class="record-row"><span>${d.data().tarea}</span><button class="btn-delete" onclick="window.removeDoc('tareas','${d.id}','renderAdminLog')"><i class="fa-solid fa-trash"></i></button></div>`);
         };
 
-        /* --- UTILIDADES GLOBALES --- */
-        window.showToast = (msg, isErr = false) => {
-            const t = document.getElementById('notification-toast');
-            t.innerText = msg;
-            t.style.display = 'block';
-            t.style.background = isErr ? 'var(--terracota)' : 'var(--dorado)';
-            t.style.color = isErr ? '#fff' : 'var(--verde-oscuro)';
-            setTimeout(() => t.style.display = 'none', 3000);
+        /* ==========================================================
+           8. UTILIDADES DE SISTEMA Y BOOT
+           ========================================================== */
+        window.showAlert = (m, e = false) => {
+            const t = document.getElementById('toast-manager'); 
+            t.innerText = m; t.style.display = 'block';
+            t.style.background = e ? 'var(--terracota)' : 'var(--dorado)';
+            t.style.color = e ? '#fff' : 'var(--verde-oscuro)';
+            setTimeout(() => t.style.display = 'none', 4000);
         };
 
-        window.deleteEntry = async (col, id, callback) => {
-            if(confirm("¿Seguro que deseas eliminar este registro permanente?")) {
-                await deleteDoc(doc(db, col, id));
+        window.removeDoc = async (c, id, callback) => {
+            if(confirm("¿CONFIRMAS LA ELIMINACIÓN PERMANENTE?")) {
+                await deleteDoc(doc(db, c, id));
                 if(window[callback]) window[callback]();
             }
         };
 
-        window.changeCalMonth = (offset) => {
-            window.calendarReference.setMonth(window.calendarReference.getMonth() + offset);
-            window.renderMasterCalendar();
+        window.changeMo = (n) => { 
+            window.calendarRef.setMonth(window.calendarRef.getMonth() + n); 
+            window.renderCalMatrix(); 
         };
 
         window.bootApp = () => {
-            window.switchView(window.currentUser.rol === 'Socio' ? 'finanzas' : 'reloj');
-            window.renderMasterCalendar();
-            window.refreshClockLogs();
-            window.refreshInventoryUI();
-            window.refreshRecipesUI();
-            if(window.currentUser.rol === 'Socio') {
-                window.refreshFinanceUI();
-                window.refreshAdminUI();
+            // Decidir vista inicial por rol
+            window.nav(window.activeUser.rol === 'Socio' ? 'finanzas' : 'reloj');
+            
+            // Cargas paralelas
+            window.renderCalMatrix(); 
+            window.renderPunchHistory(); 
+            window.renderInventory(); 
+            window.renderRecipes();
+            
+            if(window.activeUser.rol === 'Socio') { 
+                window.renderFinanceState(); 
+                window.renderAdminLog(); 
             }
             
-            // Iniciar Reloj en Vivo
+            // Reloj en tiempo real
             setInterval(() => {
-                const n = new Date();
-                document.getElementById('clock-time').innerText = n.toLocaleTimeString('es-MX', {hour12:false});
-                document.getElementById('clock-date').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+                const now = new Date();
+                document.getElementById('digital-clock').innerText = now.toLocaleTimeString('es-MX', {hour12:false});
+                document.getElementById('digital-date').innerText = now.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
             }, 1000);
         };
     </script>
