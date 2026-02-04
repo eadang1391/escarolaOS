@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v14.3</title>
+    <title>EscarolaOS v14.4</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -53,7 +53,7 @@
         .btn-p { 
             width: 100%; padding: 18px; border-radius: var(--pill); border: none; 
             font-weight: 900; letter-spacing: 1px; text-transform: uppercase; 
-            cursor: pointer; transition: 0.2s; 
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px;
         }
         .btn-gold { background: var(--dorado); color: var(--negro); }
         .btn-red { background: var(--terracota); color: #fff; }
@@ -61,24 +61,21 @@
         .f-input { 
             width: 100%; padding: 16px 25px; border-radius: var(--pill); 
             background: rgba(0,0,0,0.4); border: 1px solid var(--border); 
-            color: #fff; margin-bottom: 12px; font-size: 1rem;
+            color: #fff; margin-bottom: 12px; font-size: 1rem; outline: none;
         }
 
         .item-row { 
             background: var(--glass); padding: 16px 22px; border-radius: var(--pill); 
             margin-bottom: 10px; display: flex; justify-content: space-between; 
-            align-items: center; border: 1px solid rgba(255,255,255,0.05); 
+            align-items: center; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
         }
+        .item-row:active { background: rgba(255,255,255,0.1); }
 
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 15px; }
         .cal-day { 
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
             background: rgba(255,255,255,0.03); border-radius: 12px; font-size: 0.9rem; 
             position: relative; border: 1px solid rgba(197, 160, 89, 0.1);
-        }
-        .cal-day.has-event::after { 
-            content: ''; width: 6px; height: 6px; background: var(--terracota); 
-            border-radius: 50%; position: absolute; bottom: 6px; 
         }
 
         #main-nav { 
@@ -95,18 +92,25 @@
         .txt-gasto { color: var(--terracota) !important; font-weight: 800; }
         .txt-ingreso { color: var(--dorado) !important; font-weight: 800; }
 
+        /* MODALES UNIFICADOS */
         .modal { 
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); 
-            z-index: 1000000; align-items: center; justify-content: center; padding: 20px; 
+            z-index: 1000000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px);
         }
         .modal-content { 
             background: var(--verde-oscuro); padding: 35px; border-radius: 40px; 
-            width: 100%; max-width: 450px; border: 2px solid var(--dorado); text-align: center; 
+            width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; 
+            box-shadow: 0 0 50px rgba(0,0,0,1);
         }
 
-        .report-bar { height: 12px; background: #333; border-radius: 6px; overflow: hidden; margin: 10px 0; display: flex; }
-        .bar-fill-v { background: var(--dorado); height: 100%; }
-        .bar-fill-g { background: var(--terracota); height: 100%; }
+        /* GRÁFICA Y MÉTRICAS */
+        .report-bar { height: 16px; background: #000; border-radius: 10px; overflow: hidden; margin: 15px 0; display: flex; border: 1px solid var(--border); }
+        .bar-fill-v { background: var(--dorado); height: 100%; transition: width 1s ease; }
+        .bar-fill-g { background: var(--terracota); height: 100%; transition: width 1s ease; }
+        
+        .stat-mini { text-align: center; padding: 10px; }
+        .stat-mini span { display: block; font-size: 0.6rem; opacity: 0.5; margin-bottom: 5px; }
+        .stat-mini b { font-size: 1.1rem; }
     </style>
 </head>
 <body>
@@ -127,35 +131,36 @@
                 <h1 id="neto-display" style="font-size:3.5rem; margin:10px 0">$0.00</h1>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px">
-                <div class="card" style="margin:0; padding:15px; text-align:center">
-                    <span style="font-size:0.6rem">CAJA EFECTIVO</span>
-                    <h3 id="caja-efectivo" class="txt-ingreso">$0</h3>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px">
+                <div class="card" style="margin:0; padding:20px; border-color: var(--dorado);">
+                    <div class="stat-mini"><span>VENTAS TOTALES</span><b id="tot-ventas" class="txt-ingreso">$0</b></div>
                 </div>
-                <div class="card" style="margin:0; padding:15px; text-align:center">
-                    <span style="font-size:0.6rem">BANCO/TRANSF</span>
-                    <h3 id="caja-banco" class="txt-ingreso">$0</h3>
+                <div class="card" style="margin:0; padding:20px; border-color: var(--terracota);">
+                    <div class="stat-mini"><span>GASTOS TOTALES</span><b id="tot-gastos" class="txt-gasto">$0</b></div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="header-s">Reporte de Rendimiento</div>
+                <div class="header-s">Análisis de Rendimiento</div>
                 <div class="report-bar">
                     <div id="bar-v" class="bar-fill-v" style="width: 50%"></div>
                     <div id="bar-g" class="bar-fill-g" style="width: 50%"></div>
                 </div>
-                <div id="perc-rend" style="font-size:0.7rem; text-align:center; color:var(--dorado)">0% Utilidad</div>
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem">
+                    <span id="perc-rend" class="txt-ingreso">0% UTILIDAD</span>
+                    <span style="opacity:0.5">ESTADO: SALUDABLE</span>
+                </div>
             </div>
 
             <div class="card">
                 <div class="header-s">Registrar Operación</div>
-                <input type="text" id="f-desc" class="f-input" placeholder="Concepto">
+                <input type="text" id="f-desc" class="f-input" placeholder="Concepto de la transacción">
                 <input type="number" id="f-monto" class="f-input" placeholder="Monto $">
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px">
-                    <select id="f-tipo" class="f-input" style="margin:0"><option value="INGRESO">Venta (+)</option><option value="GASTO">Gasto (-)</option></select>
-                    <select id="f-canal" class="f-input" style="margin:0"><option value="CAJA">Caja</option><option value="BANCO">Banco</option></select>
+                    <select id="f-tipo" class="f-input" style="margin:0"><option value="INGRESO">Ingreso (+)</option><option value="GASTO">Egreso (-)</option></select>
+                    <select id="f-canal" class="f-input" style="margin:0"><option value="CAJA">Caja Efectivo</option><option value="BANCO">Banco / Transf</option></select>
                 </div>
-                <button class="btn-p btn-gold" onclick="window.saveFin()">Registrar</button>
+                <button class="btn-p btn-gold" onclick="window.saveFin()"><i class="fa-solid fa-file-invoice-dollar"></i> REGISTRAR</button>
             </div>
             <div id="fin-list"></div>
         </div>
@@ -170,10 +175,10 @@
                 <div id="cal-render" class="cal-grid"></div>
             </div>
             <div class="card">
-                <input type="text" id="ag-tit" class="f-input" placeholder="Nombre de Reserva">
+                <input type="text" id="ag-tit" class="f-input" placeholder="Nombre del evento">
                 <input type="date" id="ag-fec" class="f-input">
                 <input type="time" id="ag-hor" class="f-input">
-                <button class="btn-p btn-gold" onclick="window.saveAg()">Crear Evento</button>
+                <button class="btn-p btn-gold" onclick="window.saveAg()">RESERVAR FECHA</button>
             </div>
             <div id="ag-day-details"></div>
         </div>
@@ -192,50 +197,50 @@
 
         <div id="v-bodega" class="view-frame">
             <div class="card">
-                <div class="header-s">Recetario y Costeos</div>
+                <div class="header-s">Recetario Maestro</div>
                 <input type="text" id="r-nom" class="f-input" placeholder="Nombre del Platillo">
                 <input type="number" id="r-cos" class="f-input" placeholder="Costo de Producción $">
-                <textarea id="r-det" class="f-input" placeholder="Detalle de Ingredientes..." style="border-radius:20px; height:80px"></textarea>
-                <button class="btn-p btn-gold" onclick="window.saveReceta()">Guardar Receta</button>
+                <textarea id="r-det" class="f-input" placeholder="Ingredientes y pasos..." style="border-radius:20px; height:80px"></textarea>
+                <button class="btn-p btn-gold" onclick="window.saveReceta()">GUARDAR RECETA</button>
                 <div id="recetas-list" style="margin-top:20px"></div>
             </div>
             <div class="card">
-                <div class="header-s">Control de Stock</div>
+                <div class="header-s">Inventario Crítico</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
                     <input type="text" id="i-nom" class="f-input" placeholder="Insumo">
                     <input type="number" id="i-can" class="f-input" placeholder="Cant.">
                 </div>
-                <button class="btn-p btn-gold" onclick="window.saveStock()">Agregar Insumo</button>
+                <button class="btn-p btn-gold" onclick="window.saveStock()">ACTUALIZAR STOCK</button>
                 <div id="stock-list" style="margin-top:20px"></div>
             </div>
         </div>
 
         <div id="v-admin" class="view-frame">
             <div class="card">
-                <div class="header-s">Panel de Nómina</div>
+                <div class="header-s">Nóminas por Liquidar</div>
                 <div id="payroll-render"></div>
             </div>
             <div class="card">
-                <div class="header-s">Gestión de Staff</div>
+                <div class="header-s">Directorio de Staff</div>
                 <input type="text" id="u-nom" class="f-input" placeholder="Nombre Completo">
-                <input type="number" id="u-pin" class="f-input" placeholder="PIN de 4 dígitos">
-                <input type="number" id="u-pag" class="f-input" placeholder="Sueldo por Hora $">
+                <input type="number" id="u-pin" class="f-input" placeholder="PIN de Acceso">
+                <input type="number" id="u-pag" class="f-input" placeholder="Pago x Hora $">
                 <select id="u-rol" class="f-input">
-                    <option value="Socio">Socio</option>
-                    <option value="Chef">Chef</option>
-                    <option value="Barman">Barman</option>
-                    <option value="Barista">Barista</option>
-                    <option value="Staff">Staff</option>
+                    <option value="Socio">Socio / Dueño</option>
+                    <option value="Chef">Chef / Cocina</option>
+                    <option value="Barman">Bar / Mixología</option>
+                    <option value="Barista">Café / Barista</option>
+                    <option value="Staff">Piso / Staff</option>
                 </select>
                 <div id="u-edit-btns" style="display:none; gap:10px">
-                    <button class="btn-p btn-gold" onclick="window.updateStaff()">Actualizar</button>
-                    <button class="btn-p btn-red" onclick="window.cancelStaffEdit()">X</button>
+                    <button class="btn-p btn-gold" onclick="window.updateStaff()">GUARDAR CAMBIOS</button>
+                    <button class="btn-p btn-red" onclick="window.cancelStaffEdit()">CANCELAR</button>
                 </div>
-                <button id="u-add-btn" class="btn-p btn-gold" onclick="window.addStaff()">Dar de Alta</button>
+                <button id="u-add-btn" class="btn-p btn-gold" onclick="window.addStaff()">REGISTRAR NUEVO</button>
                 <div id="staff-render" style="margin-top:20px"></div>
             </div>
             <div class="card">
-                <div class="header-s">Checklist de Limpieza</div>
+                <div class="header-s">Tareas de Limpieza</div>
                 <div style="display:flex; gap:10px">
                     <input type="text" id="t-nom" class="f-input" placeholder="Nueva tarea..." style="margin:0">
                     <button class="btn-p btn-gold" style="width:60px; padding:0" onclick="window.addTask()"><i class="fa-solid fa-plus"></i></button>
@@ -254,7 +259,9 @@
         <div class="nav-item" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>OFF</div>
     </nav>
 
-    <div id="modal-sys" class="modal"><div class="modal-content" id="modal-body"></div></div>
+    <div id="modal-sys" class="modal">
+        <div class="modal-content" id="modal-body"></div>
+    </div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
@@ -264,13 +271,13 @@
         let activeMonth = new Date();
         let editingStaffId = null;
 
-        // --- SISTEMA DE POPUPS ---
-        window.showMsg = (tit, txt, tipo = 'gold') => {
-            const btnClass = tipo === 'gold' ? 'btn-gold' : 'btn-red';
+        // --- POPUPS ESTILO ESCAROLAOS ---
+        window.showAppMsg = (tit, txt, esError = false) => {
             document.getElementById('modal-body').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:15px">${tit}</h2>
-                <p style="margin-bottom:25px; opacity:0.8">${txt}</p>
-                <button class="btn-p ${btnClass}" onclick="document.getElementById('modal-sys').style.display='none'">ENTENDIDO</button>
+                <div style="margin-bottom:20px"><i class="fa-solid ${esError ? 'fa-triangle-exclamation' : 'fa-circle-check'} fa-3x" style="color:var(--dorado)"></i></div>
+                <h2 style="margin-bottom:10px; letter-spacing:2px">${tit}</h2>
+                <p style="opacity:0.7; margin-bottom:30px">${txt}</p>
+                <button class="btn-p btn-gold" onclick="document.getElementById('modal-sys').style.display='none'">ENTENDIDO</button>
             `;
             document.getElementById('modal-sys').style.display = 'flex';
         };
@@ -308,56 +315,46 @@
             if((view === 'finanzas' || view === 'admin') && currentUser.rol !== 'Socio') return;
             document.querySelectorAll('.view-frame').forEach(f => f.style.display = 'none');
             document.getElementById(`v-${view}`).style.display = 'block';
+            document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
         };
 
-        // --- FINANZAS REINTEGRADO ---
+        // --- FINANZAS AVANZADAS ---
         window.saveFin = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
             const d = document.getElementById('f-desc').value;
-            if(!m || !d) return;
-            await addDoc(collection(db, "finanzas"), { 
-                desc: d, monto: m, 
-                tipo: document.getElementById('f-tipo').value, 
-                canal: document.getElementById('f-canal').value, 
-                fecha: new Date().toISOString() 
-            });
-            window.showMsg("ÉXITO", "Operación guardada correctamente");
+            if(!m || !d) { window.showAppMsg("ERROR", "Completa todos los campos", true); return; }
+            await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('f-tipo').value, canal: document.getElementById('f-canal').value, fecha: new Date().toISOString() });
+            window.showAppMsg("ÉXITO", "Transacción registrada en libros");
+            document.getElementById('f-monto').value = ""; document.getElementById('f-desc').value = "";
             loadFinData();
         };
 
         window.loadFinData = async () => {
             const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let total = 0, v = 0, g = 0, cEf = 0, cBa = 0;
+            let v = 0, g = 0;
             const list = document.getElementById('fin-list'); list.innerHTML = "";
             snap.forEach(docSnap => {
                 const data = docSnap.data();
-                const isGasto = data.tipo === 'GASTO';
-                const val = isGasto ? -data.monto : data.monto;
-                
-                if(isGasto) g += data.monto; else v += data.monto;
-                if(data.canal === 'CAJA') cEf += val; else cBa += val;
-                total += val;
-
+                if(data.tipo === 'GASTO') g += data.monto; else v += data.monto;
                 list.innerHTML += `<div class="item-row">
-                    <span>${data.desc} <small>(${data.canal})</small></span> 
-                    <b class="${isGasto ? 'txt-gasto' : 'txt-ingreso'}">$${data.monto} 
-                    <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')">×</button></b>
+                    <div><b>${data.desc}</b><br><small style="opacity:0.5">${data.canal}</small></div>
+                    <b class="${data.tipo === 'GASTO' ? 'txt-gasto' : 'txt-ingreso'}">$${data.monto} <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')">×</button></b>
                 </div>`;
             });
-            document.getElementById('neto-display').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('caja-efectivo').innerText = `$${cEf.toFixed(2)}`;
-            document.getElementById('caja-banco').innerText = `$${cBa.toFixed(2)}`;
+            document.getElementById('neto-display').innerText = `$${(v - g).toFixed(2)}`;
+            document.getElementById('tot-ventas').innerText = `$${v.toFixed(2)}`;
+            document.getElementById('tot-gastos').innerText = `$${g.toFixed(2)}`;
             
-            const totalFlujo = v + g;
-            if(totalFlujo > 0) {
-                document.getElementById('bar-v').style.width = (v/totalFlujo*100) + "%";
-                document.getElementById('bar-g').style.width = (g/totalFlujo*100) + "%";
-                document.getElementById('perc-rend').innerText = `${((v-g)/v*100).toFixed(1)}% Rendimiento Real`;
+            const total = v + g;
+            if(total > 0) {
+                document.getElementById('bar-v').style.width = (v / total * 100) + "%";
+                document.getElementById('bar-g').style.width = (g / total * 100) + "%";
+                const ut = v > 0 ? ((v - g) / v * 100).toFixed(1) : 0;
+                document.getElementById('perc-rend').innerText = `${ut}% UTILIDAD SOBRE VENTAS`;
             }
         };
 
         // --- AGENDA ---
-        window.moveMonth = (dir) => { activeMonth.setMonth(activeMonth.getMonth() + dir); loadAgenda(); };
         window.loadAgenda = async () => {
             const grid = document.getElementById('cal-render');
             const events = await getDocs(collection(db, "agenda"));
@@ -367,36 +364,37 @@
             const daysInMonth = new Date(activeMonth.getFullYear(), activeMonth.getMonth() + 1, 0).getDate();
             for(let i=1; i<=daysInMonth; i++) {
                 const dateStr = `${activeMonth.getFullYear()}-${String(activeMonth.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                grid.innerHTML += `<div class="cal-day ${activeDates.includes(dateStr) ? 'has-event' : ''}" onclick="window.showDayTasks('${dateStr}')">${i}</div>`;
+                grid.innerHTML += `<div class="cal-day" style="${activeDates.includes(dateStr) ? 'border-color:var(--dorado); background:rgba(197,160,89,0.1)' : ''}" onclick="window.showDayTasks('${dateStr}')">${i}</div>`;
             }
         };
 
         window.saveAg = async () => {
             await addDoc(collection(db, "agenda"), { tit: document.getElementById('ag-tit').value, fecha: document.getElementById('ag-fec').value, hora: document.getElementById('ag-hor').value });
-            window.showMsg("AGENDA", "Evento reservado");
+            window.showAppMsg("AGENDA", "Evento confirmado en el calendario");
             loadAgenda();
         };
 
         window.showDayTasks = async (fecha) => {
             const snap = await getDocs(query(collection(db, "agenda"), where("fecha", "==", fecha)));
             const container = document.getElementById('ag-day-details');
-            container.innerHTML = `<h4>Eventos para ${fecha}:</h4>`;
+            container.innerHTML = `<h4>Eventos: ${fecha}</h4>`;
             snap.forEach(d => container.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.removeDoc('agenda','${d.id}','loadAgenda')">×</button></div>`);
         };
 
-        // --- RELOJ ---
+        // --- RELOJ Y TURNOS ---
         window.handlePunch = async (tipo) => {
             if(tipo === 'SALIDA') {
                 const tasks = await getDocs(collection(db, "tareas"));
-                let html = `<h3>CHECKLIST SALIDA</h3>`;
-                tasks.forEach(t => html += `<label style="display:block; margin:10px 0; text-align:left"><input type="checkbox" class="exit-chk"> ${t.data().tarea}</label>`);
-                html += `<button class="btn-p btn-gold" onclick="window.confirmExit()">FINALIZAR TURNO</button>`;
+                let html = `<h2 style="margin-bottom:20px">LIMPIEZA DE CIERRE</h2>`;
+                tasks.forEach(t => html += `<label class="item-row" style="text-align:left"><input type="checkbox"> ${t.data().tarea}</label>`);
+                html += `<button class="btn-p btn-gold" style="margin-top:20px" onclick="window.confirmExit()">MARCAR SALIDA</button>`;
                 document.getElementById('modal-body').innerHTML = html;
                 document.getElementById('modal-sys').style.display = 'flex';
-            } else { recordPunch('ENTRADA'); window.showMsg("RELOJ", "Entrada registrada"); }
+            } else { recordPunch('ENTRADA'); window.showAppMsg("RELOJ", "Entrada exitosa. ¡A darle!"); }
         };
 
-        window.confirmExit = () => { recordPunch('SALIDA'); window.showMsg("RELOJ", "Turno finalizado. Hasta mañana"); setTimeout(() => location.reload(), 2000); };
+        window.confirmExit = () => { recordPunch('SALIDA'); window.showAppMsg("RELOJ", "Turno cerrado. ¡Buen descanso!"); setTimeout(() => location.reload(), 2000); };
+        
         const recordPunch = async (t) => {
             await addDoc(collection(db, "asistencias"), { uid: currentUser.id, name: currentUser.nombre, tipo: t, fecha: new Date().toISOString() });
             if(currentUser.rol === 'Socio') loadPunchHistory();
@@ -404,14 +402,14 @@
 
         window.loadPunchHistory = async () => {
             const snap = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(5)));
-            const list = document.getElementById('last-punches'); list.innerHTML = "<h4>Actividad Reciente</h4>";
-            snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().name} (${d.data().tipo})</span> <button onclick="window.removeDoc('asistencias','${d.id}','loadPunchHistory')">×</button></div>`);
+            const list = document.getElementById('last-punches'); list.innerHTML = "<h4>Actividad de Hoy</h4>";
+            snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().name} - ${d.data().tipo}</span> <button onclick="window.removeDoc('asistencias','${d.id}','loadPunchHistory')">×</button></div>`);
         };
 
         // --- BODEGA ---
         window.saveReceta = async () => {
             await addDoc(collection(db, "recetas"), { platillo: document.getElementById('r-nom').value, costo: document.getElementById('r-cos').value, detalles: document.getElementById('r-det').value });
-            window.showMsg("RECETARIO", "Platillo costeado y guardado");
+            window.showAppMsg("BODEGA", "Receta guardada en el catálogo");
             loadBodegaData();
         };
 
@@ -423,24 +421,19 @@
         window.loadBodegaData = async () => {
             const recS = await getDocs(collection(db, "recetas"));
             const invS = await getDocs(collection(db, "inventario"));
-            document.getElementById('recetas-list').innerHTML = "<h4>Recetas</h4>";
-            recS.forEach(d => document.getElementById('recetas-list').innerHTML += `<div class="item-row">${d.data().platillo} ($${d.data().costo}) <button onclick="window.removeDoc('recetas','${d.id}','loadBodegaData')">×</button></div>`);
-            document.getElementById('stock-list').innerHTML = "<h4>Existencias</h4>";
-            invS.forEach(d => document.getElementById('stock-list').innerHTML += `<div class="item-row" onclick="window.editInsumo('${d.id}','${d.data().insumo}',${d.data().cant})">${d.data().insumo}: ${d.data().cant} <button onclick="window.removeDoc('inventario','${d.id}','loadBodegaData')">×</button></div>`);
+            document.getElementById('recetas-list').innerHTML = "<h4>Catálogo de Recetas</h4>";
+            recS.forEach(d => document.getElementById('recetas-list').innerHTML += `<div class="item-row"><b>${d.data().platillo}</b> <span>$${d.data().costo} <button onclick="window.removeDoc('recetas','${d.id}','loadBodegaData')">×</button></span></div>`);
+            document.getElementById('stock-list').innerHTML = "<h4>Inventario Actual</h4>";
+            invS.forEach(d => document.getElementById('stock-list').innerHTML += `<div class="item-row" onclick="window.editInsumo('${d.id}','${d.data().insumo}',${d.data().cant})">${d.data().insumo}: <b>${d.data().cant}</b> <button onclick="window.removeDoc('inventario','${d.id}','loadBodegaData')">×</button></div>`);
         };
 
-        window.editInsumo = (id, n, c) => { const nc = prompt(`Nuevo stock para ${n}:`, c); if(nc !== null) updateDoc(doc(db, "inventario", id), { cant: parseFloat(nc) }).then(() => loadBodegaData()); };
+        window.editInsumo = (id, n, c) => { const nc = prompt(`Actualizar stock de ${n}:`, c); if(nc !== null) updateDoc(doc(db, "inventario", id), { cant: parseFloat(nc) }).then(() => loadBodegaData()); };
 
-        // --- ADMIN & STAFF ---
-        window.addStaff = async () => {
-            await addDoc(collection(db, "usuarios"), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: document.getElementById('u-rol').value });
-            loadStaffData();
-        };
-
+        // --- ADMIN & PAGO ---
         window.loadStaffData = async () => {
             const snap = await getDocs(collection(db, "usuarios"));
             const list = document.getElementById('staff-render'); list.innerHTML = "";
-            snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().nombre}</span> <div><button class="btn-gold" style="width:auto; padding:5px 15px; border-radius:12px" onclick="window.prepEditStaff('${d.id}')">EDITAR</button> <button onclick="window.removeDoc('usuarios','${d.id}','loadStaffData')" style="background:none; border:none; color:var(--terracota); margin-left:10px; font-size:1.2rem">×</button></div></div>`);
+            snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().nombre} (${d.data().rol})</span> <div><button class="btn-gold" style="padding:5px 15px; border-radius:15px; font-size:0.7rem" onclick="window.prepEditStaff('${d.id}')">EDITAR</button> <button onclick="window.removeDoc('usuarios','${d.id}','loadStaffData')" style="margin-left:10px; color:var(--terracota); background:none; border:none; font-size:1.2rem">×</button></div></div>`);
             loadPayroll();
         };
 
@@ -454,44 +447,37 @@
                 let hrs = 0;
                 for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs+=(new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
                 const monto = hrs * (u.sueldo || 0);
-                render.innerHTML += `<div class="item-row"><b>${u.nombre}</b> <span>$${monto.toFixed(0)} <button class="btn-gold" style="width:auto; padding:5px 10px; border-radius:10px" onclick="window.payPopup('${u.nombre}',${monto})">Pagar</button></span></div>`;
+                render.innerHTML += `<div class="item-row"><b>${u.nombre}</b> <span>$${monto.toFixed(0)} <button class="btn-gold" style="padding:5px 10px; border-radius:10px" onclick="window.payStaffPopup('${u.nombre}',${monto})">PAGAR</button></span></div>`;
             });
         };
 
-        window.payPopup = (nom, monto) => {
+        window.payStaffPopup = (nom, monto) => {
             document.getElementById('modal-body').innerHTML = `
-                <h3>Pagar a ${nom}</h3>
-                <p>Monto: $${monto.toFixed(0)}</p><br>
-                <button class="btn-p btn-gold" onclick="window.confirmPay('${nom}',${monto},'CAJA')">EFECTIVO (CAJA)</button><br><br>
-                <button class="btn-p btn-gold" onclick="window.confirmPay('${nom}',${monto},'BANCO')">TRANSFERENCIA</button><br><br>
-                <button class="btn-p btn-red" onclick="document.getElementById('modal-sys').style.display='none'">CANCELAR</button>
+                <h2 style="margin-bottom:10px">LIQUIDAR NÓMINA</h2>
+                <p style="margin-bottom:20px">Total a pagar a <b>${nom}</b>: $${monto.toFixed(0)}</p>
+                <button class="btn-p btn-gold" style="margin-bottom:10px" onclick="window.confirmPayStaff('${nom}',${monto},'CAJA')">PAGO EN EFECTIVO</button>
+                <button class="btn-p btn-gold" style="margin-bottom:20px" onclick="window.confirmPayStaff('${nom}',${monto},'BANCO')">TRANSFERENCIA BANCARIA</button>
+                <button class="btn-p btn-red" onclick="document.getElementById('modal-sys').style.display='none'">VOLVER</button>
             `;
             document.getElementById('modal-sys').style.display = 'flex';
         };
 
-        window.confirmPay = async (nom, monto, canal) => {
-            await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: monto, tipo: 'GASTO', canal: canal, fecha: new Date().toISOString() });
+        window.confirmPayStaff = async (nom, monto, canal) => {
+            await addDoc(collection(db, "finanzas"), { desc: `PAGO NÓMINA: ${nom}`, monto: monto, tipo: 'GASTO', canal: canal, fecha: new Date().toISOString() });
             document.getElementById('modal-sys').style.display = 'none';
-            window.showMsg("NÓMINA", "Pago registrado en libros");
+            window.showAppMsg("NÓMINA", `Pago de $${monto} registrado desde ${canal}`);
             loadFinData();
         };
 
-        window.addTask = async () => { await addDoc(collection(db, "tareas"), { tarea: document.getElementById('t-nom').value }); document.getElementById('t-nom').value = ""; loadTasks(); };
-        window.loadTasks = async () => {
-            const snap = await getDocs(collection(db, "tareas"));
-            const list = document.getElementById('task-render'); list.innerHTML = "";
-            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().tarea} <button onclick="window.removeDoc('tareas','${d.id}','loadTasks')">×</button></div>`);
-        };
-
-        window.removeDoc = async (col, id, cb) => { if(confirm("¿Eliminar registro?")) { await deleteDoc(doc(db, col, id)); window[cb](); } };
+        window.removeDoc = async (col, id, cb) => { if(confirm("¿Seguro que quieres eliminar este registro?")) { await deleteDoc(doc(db, col, id)); window[cb](); } };
 
         const startApp = () => {
             window.goTo('reloj'); loadFinData(); loadAgenda(); loadBodegaData();
-            if(currentUser.rol === 'Socio') { loadStaffData(); loadTasks(); }
+            if(currentUser.rol === 'Socio') { loadStaffData(); loadPunchHistory(); }
             setInterval(() => {
-                const now = new Date();
-                document.getElementById('main-clock').innerText = now.toLocaleTimeString();
-                document.getElementById('main-date').innerText = now.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+                const n = new Date();
+                document.getElementById('main-clock').innerText = n.toLocaleTimeString();
+                document.getElementById('main-date').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
             }, 1000);
         };
 
