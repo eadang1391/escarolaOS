@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v14.5</title>
+    <title>EscarolaOS - Enterprise Edition</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;700;900&display=swap" rel="stylesheet">
 
     <style>
+        /* VARIABLES DE DISEÑO ESCAROLA OS */
         :root {
             --verde-bosque: #1b3022;
             --verde-oscuro: #0d1a12;
@@ -18,17 +20,26 @@
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(197, 160, 89, 0.3);
             --pill: 50px;
+            --shadow: 0 15px 35px rgba(0,0,0,0.5);
         }
 
+        /* RESET Y BASE */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--verde-bosque); color: var(--cantera); height: 100vh; overflow: hidden; }
 
+        /* ANIMACIONES */
         @keyframes glow {
             0%, 100% { filter: drop-shadow(0 0 5px var(--dorado)); opacity: 0.8; }
             50% { filter: drop-shadow(0 0 20px var(--dorado)); opacity: 1; }
         }
+        @keyframes slideUp {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
         .logo-app { width: 110px; margin-bottom: 25px; animation: glow 3s infinite ease-in-out; }
 
+        /* PANTALLA DE BLOQUEO */
         #login-screen { 
             position: fixed; inset: 0; 
             background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro) 100%); 
@@ -36,42 +47,94 @@
             z-index: 999999; 
         }
 
-        .pin-dot { width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; margin: 0 12px; transition: 0.3s; }
+        .pin-dot { 
+            width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; 
+            margin: 0 12px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
         .pin-dot.filled { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); transform: scale(1.3); }
 
-        .view-frame { display: none; height: 100vh; overflow-y: auto; padding: 25px 20px 180px 20px; }
+        /* NAVEGACIÓN Y ESTRUCTURA */
+        .view-frame { display: none; height: 100vh; overflow-y: auto; padding: 25px 20px 180px 20px; animation: slideUp 0.4s ease-out; }
+        
         .card { 
             background: var(--verde-oscuro); border-radius: 30px; padding: 25px; 
             margin-bottom: 20px; border: 1px solid var(--border); 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.4); 
+            box-shadow: var(--shadow); 
         }
-        .header-s { border-left: 4px solid var(--dorado); padding-left: 15px; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; font-size: 0.75rem; color: var(--dorado); }
 
-        .btn-p { width: 100%; padding: 18px; border-radius: var(--pill); border: none; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .header-s { 
+            border-left: 4px solid var(--dorado); padding-left: 15px; 
+            margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; 
+            font-size: 0.75rem; color: var(--dorado); font-weight: 900;
+        }
+
+        /* BOTONES Y INPUTS */
+        .btn-p { 
+            width: 100%; padding: 18px; border-radius: var(--pill); border: none; 
+            font-weight: 900; letter-spacing: 1px; text-transform: uppercase; 
+            cursor: pointer; transition: 0.2s; display: flex; align-items: center; 
+            justify-content: center; gap: 10px; font-size: 0.8rem;
+        }
         .btn-gold { background: var(--dorado); color: var(--negro); }
         .btn-red { background: var(--terracota); color: #fff; }
+        .btn-gold:active { transform: scale(0.96); }
 
-        .f-input { width: 100%; padding: 16px 25px; border-radius: var(--pill); background: rgba(0,0,0,0.4); border: 1px solid var(--border); color: #fff; margin-bottom: 12px; font-size: 1rem; outline: none; }
+        .f-input { 
+            width: 100%; padding: 16px 25px; border-radius: var(--pill); 
+            background: rgba(0,0,0,0.4); border: 1px solid var(--border); 
+            color: #fff; margin-bottom: 12px; font-size: 1rem; outline: none;
+        }
 
-        .item-row { background: var(--glass); padding: 16px 22px; border-radius: var(--pill); margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .item-row { 
+            background: var(--glass); padding: 16px 22px; border-radius: var(--pill); 
+            margin-bottom: 10px; display: flex; justify-content: space-between; 
+            align-items: center; border: 1px solid rgba(255,255,255,0.05); 
+        }
 
-        /* CALENDARIO CORREGIDO */
+        /* CALENDARIO AVANZADO */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 15px; font-size: 0.85rem; border: 1px solid transparent; transition: 0.2s; }
-        .cal-day.active-day { border-color: var(--dorado); background: rgba(197, 160, 89, 0.15); color: var(--dorado); font-weight: 800; }
+        .cal-day { 
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
+            background: rgba(255,255,255,0.03); border-radius: 12px; font-size: 0.85rem; 
+            border: 1px solid transparent; transition: 0.2s; 
+        }
         .cal-day.has-event { border-bottom: 3px solid var(--terracota); }
+        .cal-day.active-day { 
+            background: var(--dorado); color: var(--negro); font-weight: 900; 
+            box-shadow: 0 0 15px var(--dorado); transform: scale(1.1);
+        }
 
-        #main-nav { position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); width: 94%; max-width: 500px; background: rgba(13, 26, 18, 0.96); border-radius: var(--pill); display: none; grid-template-columns: repeat(6, 1fr); padding: 12px 10px; border: 1px solid var(--dorado); backdrop-filter: blur(20px); z-index: 9999; }
+        /* MENÚ INFERIOR */
+        #main-nav { 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            width: 94%; max-width: 500px; background: rgba(13, 26, 18, 0.96); 
+            border-radius: var(--pill); display: none; grid-template-columns: repeat(6, 1fr); 
+            padding: 12px 10px; border: 1px solid var(--dorado); 
+            backdrop-filter: blur(20px); z-index: 9999; 
+        }
         .nav-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.55rem; font-weight: 700; }
         .nav-item.active { opacity: 1; color: var(--dorado); }
         .nav-item i { font-size: 1.4rem; display: block; margin-bottom: 4px; }
 
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); z-index: 1000000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(10px); }
-        .modal-content { background: var(--verde-oscuro); padding: 35px; border-radius: 40px; width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; }
+        /* POPUPS UNIFICADOS */
+        .modal { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); 
+            z-index: 1000000; align-items: center; justify-content: center; padding: 20px; 
+            backdrop-filter: blur(10px); 
+        }
+        .modal-content { 
+            background: var(--verde-oscuro); padding: 35px; border-radius: 40px; 
+            width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; 
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+        }
 
+        /* MÉTRICAS */
+        .txt-gasto { color: var(--terracota) !important; font-weight: 800; }
+        .txt-ingreso { color: var(--dorado) !important; font-weight: 800; }
         .report-bar { height: 16px; background: #000; border-radius: 10px; overflow: hidden; margin: 15px 0; display: flex; border: 1px solid var(--border); }
-        .bar-fill-v { background: var(--dorado); height: 100%; }
-        .bar-fill-g { background: var(--terracota); height: 100%; }
+        .bar-fill-v { background: var(--dorado); height: 100%; transition: 0.5s; }
+        .bar-fill-g { background: var(--terracota); height: 100%; transition: 0.5s; }
+
     </style>
 </head>
 <body>
@@ -86,29 +149,46 @@
     </div>
 
     <div id="app-shell">
+        
         <div id="v-finanzas" class="view-frame">
             <div class="card" style="text-align:center">
                 <span style="font-size:0.7rem; letter-spacing:3px; opacity:0.6">PATRIMONIO NETO</span>
                 <h1 id="neto-display" style="font-size:3.5rem; margin:10px 0">$0.00</h1>
             </div>
+
             <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px">
-                <div class="card" style="margin:0; padding:20px; border-color: var(--dorado);"><div class="stat-mini" style="text-align:center"><span>VENTAS</span><h3 id="tot-ventas" style="color:var(--dorado)">$0</h3></div></div>
-                <div class="card" style="margin:0; padding:20px; border-color: var(--terracota);"><div class="stat-mini" style="text-align:center"><span>GASTOS</span><h3 id="tot-gastos" style="color:var(--terracota)">$0</h3></div></div>
+                <div class="card" style="margin:0; padding:20px; border-color: var(--dorado);">
+                    <div style="text-align:center">
+                        <span style="font-size:0.6rem; opacity:0.5">INGRESOS TOTALES</span>
+                        <h3 id="tot-ventas" class="txt-ingreso">$0</h3>
+                    </div>
+                </div>
+                <div class="card" style="margin:0; padding:20px; border-color: var(--terracota);">
+                    <div style="text-align:center">
+                        <span style="font-size:0.6rem; opacity:0.5">GASTOS TOTALES</span>
+                        <h3 id="tot-gastos" class="txt-gasto">$0</h3>
+                    </div>
+                </div>
             </div>
+
             <div class="card">
-                <div class="header-s">Rendimiento</div>
-                <div class="report-bar"><div id="bar-v" class="bar-fill-v"></div><div id="bar-g" class="bar-fill-g"></div></div>
-                <p id="perc-rend" style="text-align:center; font-size:0.7rem"></p>
+                <div class="header-s">Rendimiento de Operación</div>
+                <div class="report-bar">
+                    <div id="bar-v" class="bar-fill-v"></div>
+                    <div id="bar-g" class="bar-fill-g"></div>
+                </div>
+                <p id="perc-rend" style="text-align:center; font-size:0.7rem; color:var(--dorado)"></p>
             </div>
+
             <div class="card">
-                <div class="header-s">Nueva Operación</div>
+                <div class="header-s">Registrar Movimiento</div>
                 <input type="text" id="f-desc" class="f-input" placeholder="Concepto">
                 <input type="number" id="f-monto" class="f-input" placeholder="Monto $">
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px">
-                    <select id="f-tipo" class="f-input" style="margin:0"><option value="INGRESO">Venta</option><option value="GASTO">Gasto</option></select>
-                    <select id="f-canal" class="f-input" style="margin:0"><option value="CAJA">Caja</option><option value="BANCO">Banco</option></select>
+                    <select id="f-tipo" class="f-input" style="margin:0"><option value="INGRESO">Venta (+)</option><option value="GASTO">Gasto (-)</option></select>
+                    <select id="f-canal" class="f-input" style="margin:0"><option value="CAJA">Caja Efectivo</option><option value="BANCO">Banco / Transf</option></select>
                 </div>
-                <button class="btn-p btn-gold" onclick="window.saveFin()">REGISTRAR</button>
+                <button class="btn-p btn-gold" onclick="window.saveFin()"><i class="fa-solid fa-plus"></i> REGISTRAR</button>
             </div>
             <div id="fin-list"></div>
         </div>
@@ -116,17 +196,18 @@
         <div id="v-agenda" class="view-frame">
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                    <button onclick="window.changeCalMonth(-1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-angle-left"></i></button>
-                    <h2 id="cal-month-title" style="font-size:1rem; letter-spacing:2px; text-transform:uppercase"></h2>
-                    <button onclick="window.changeCalMonth(1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-angle-right"></i></button>
+                    <button onclick="window.changeCalMonth(-1)" class="btn-p" style="width:45px; padding:0; background:var(--glass)"><i class="fa-solid fa-angle-left"></i></button>
+                    <h2 id="cal-month-title" style="font-size:1.1rem; letter-spacing:2px; text-transform:uppercase"></h2>
+                    <button onclick="window.changeCalMonth(1)" class="btn-p" style="width:45px; padding:0; background:var(--glass)"><i class="fa-solid fa-angle-right"></i></button>
                 </div>
                 <div id="cal-render" class="cal-grid"></div>
             </div>
+            
             <div class="card">
                 <div class="header-s" id="selected-date-label">Selecciona un día</div>
-                <input type="text" id="ag-tit" class="f-input" placeholder="Título del evento">
+                <input type="text" id="ag-tit" class="f-input" placeholder="Nombre de la Reserva">
                 <input type="time" id="ag-hor" class="f-input">
-                <button class="btn-p btn-gold" onclick="window.saveAg()">GUARDAR EVENTO</button>
+                <button class="btn-p btn-gold" onclick="window.saveAg()">CONFIRMAR RESERVA</button>
             </div>
             <div id="ag-day-details"></div>
         </div>
@@ -145,23 +226,27 @@
 
         <div id="v-bodega" class="view-frame">
             <div class="card">
-                <div class="header-s">Recetario</div>
-                <input type="text" id="r-nom" class="f-input" placeholder="Platillo">
-                <input type="number" id="r-cos" class="f-input" placeholder="Costo $">
-                <textarea id="r-det" class="f-input" placeholder="Ingredientes..." style="height:80px; border-radius:20px"></textarea>
-                <button class="btn-p btn-gold" onclick="window.saveReceta()">GUARDAR</button>
+                <div class="header-s">Costo de Recetas</div>
+                <input type="text" id="r-nom" class="f-input" placeholder="Nombre del Platillo">
+                <input type="number" id="r-cos" class="f-input" placeholder="Costo de Producción $">
+                <textarea id="r-det" class="f-input" placeholder="Ingredientes y gramajes..." style="height:80px; border-radius:20px"></textarea>
+                <button class="btn-p btn-gold" onclick="window.saveReceta()">GUARDAR EN RECETARIO</button>
                 <div id="recetas-list" style="margin-top:20px"></div>
             </div>
         </div>
 
         <div id="v-admin" class="view-frame">
-            <div class="card"><div class="header-s">Nómina (Horas trabajadas)</div><div id="payroll-render"></div></div>
             <div class="card">
-                <div class="header-s">Nuevo Colaborador</div>
+                <div class="header-s">Control de Nómina Actual</div>
+                <p style="font-size:0.6rem; opacity:0.5; margin-bottom:15px">Las horas se calculan desde el último pago realizado.</p>
+                <div id="payroll-render"></div>
+            </div>
+            <div class="card">
+                <div class="header-s">Gestión de Personal</div>
                 <input type="text" id="u-nom" class="f-input" placeholder="Nombre">
-                <input type="number" id="u-pin" class="f-input" placeholder="PIN">
-                <input type="number" id="u-pag" class="f-input" placeholder="Sueldo/Hora $">
-                <button class="btn-p btn-gold" onclick="window.addStaff()">REGISTRAR</button>
+                <input type="number" id="u-pin" class="f-input" placeholder="PIN 4 Dígitos">
+                <input type="number" id="u-pag" class="f-input" placeholder="Sueldo por Hora $">
+                <button class="btn-p btn-gold" onclick="window.addStaff()">AGREGAR STAFF</button>
                 <div id="staff-render" style="margin-top:20px"></div>
             </div>
         </div>
@@ -176,19 +261,32 @@
         <div class="nav-item" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>OFF</div>
     </nav>
 
-    <div id="modal-sys" class="modal"><div class="modal-content" id="modal-body"></div></div>
+    <div id="modal-sys" class="modal">
+        <div class="modal-content" id="modal-body"></div>
+    </div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
-        let currentPin = "", currentUser = null, activeMonth = new Date(), selectedDate = null;
+        // VARIABLES DE ESTADO GLOBAL
+        let currentPin = "";
+        let currentUser = null;
+        let activeMonth = new Date();
+        let selectedDate = null;
 
-        // --- NAVEGACIÓN Y POPUPS ---
-        window.showMsg = (tit, txt) => {
-            document.getElementById('modal-body').innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">${tit}</h2><p style="margin-bottom:25px; opacity:0.8">${txt}</p><button class="btn-p btn-gold" onclick="document.getElementById('modal-sys').style.display='none'">OK</button>`;
+        // --- SISTEMA DE POPUPS ---
+        window.showAppMsg = (tit, txt, esError = false) => {
+            const color = esError ? 'var(--terracota)' : 'var(--dorado)';
+            document.getElementById('modal-body').innerHTML = `
+                <div style="margin-bottom:20px"><i class="fa-solid ${esError ? 'fa-triangle-exclamation' : 'fa-circle-check'} fa-3x" style="color:${color}"></i></div>
+                <h2 style="margin-bottom:10px; color:${color}">${tit}</h2>
+                <p style="opacity:0.8; margin-bottom:25px">${txt}</p>
+                <button class="btn-p btn-gold" onclick="document.getElementById('modal-sys').style.display='none'">ENTENDIDO</button>
+            `;
             document.getElementById('modal-sys').style.display = 'flex';
         };
 
+        // --- SISTEMA DE LOGIN ---
         const initNumpad = () => {
             const grid = document.getElementById('numpad-grid');
             for(let i=1; i<=9; i++) grid.innerHTML += `<div class="key-btn" style="width:80px; height:80px; border-radius:50%; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--dorado); background:var(--glass)" onclick="window.pressKey(${i})">${i}</div>`;
@@ -199,7 +297,8 @@
 
         window.pressKey = async (val) => {
             if(val === 'C') { currentPin = ""; updateDots(); return; }
-            if(currentPin.length < 4) currentPin += val; updateDots();
+            if(currentPin.length < 4) currentPin += val;
+            updateDots();
             if(currentPin.length === 4) {
                 const q = query(collection(db, "usuarios"), where("pin", "==", currentPin));
                 const snap = await getDocs(q);
@@ -208,23 +307,34 @@
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('main-nav').style.display = 'grid';
                     startApp();
-                } else { currentPin = ""; updateDots(); }
+                } else { 
+                    currentPin = ""; updateDots(); 
+                    window.showAppMsg("PIN INCORRECTO", "El código no coincide con ningún usuario.", true);
+                }
             }
         };
 
         const updateDots = () => document.querySelectorAll('.pin-dot').forEach((d, i) => d.classList.toggle('filled', i < currentPin.length));
 
+        // --- NAVEGACIÓN ---
         window.goTo = (v) => {
-            if((v === 'finanzas' || v === 'admin') && currentUser.rol !== 'Socio') return;
+            if((v === 'finanzas' || v === 'admin') && currentUser.rol !== 'Socio') {
+                window.showAppMsg("ACCESO RESTRINGIDO", "Solo socios pueden ver finanzas/admin.", true);
+                return;
+            }
             document.querySelectorAll('.view-frame').forEach(f => f.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`v-${v}`).style.display = 'block';
             if(v === 'agenda') loadCalendar();
         };
 
-        // --- AGENDA RE-VIVIDA ---
-        window.changeCalMonth = (dir) => { activeMonth.setMonth(activeMonth.getMonth() + dir); loadCalendar(); };
+        // --- AGENDA 100% FUNCIONAL ---
+        window.changeCalMonth = (dir) => {
+            activeMonth.setMonth(activeMonth.getMonth() + dir);
+            loadCalendar();
+        };
 
-        const loadCalendar = async () => {
+        window.loadCalendar = async () => {
             const grid = document.getElementById('cal-render'); grid.innerHTML = "";
             const title = document.getElementById('cal-month-title');
             title.innerText = activeMonth.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
@@ -237,52 +347,101 @@
             const firstDay = new Date(year, month, 1).getDay();
             const totalDays = new Date(year, month + 1, 0).getDate();
 
+            // Espacios en blanco para el inicio del mes
             for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+
+            // Días del mes
             for(let i=1; i<=totalDays; i++) {
                 const dStr = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
                 const hasEv = evDates.includes(dStr);
                 const isSel = selectedDate === dStr;
-                grid.innerHTML += `<div class="cal-day ${hasEv ? 'has-event' : ''} ${isSel ? 'active-day' : ''}" onclick="window.selectDay('${dStr}')">${i}</div>`;
+                grid.innerHTML += `
+                    <div class="cal-day ${hasEv ? 'has-event' : ''} ${isSel ? 'active-day' : ''}" 
+                         onclick="window.selectDay('${dStr}')">
+                         ${i}
+                    </div>`;
             }
         };
 
-        window.selectDay = (d) => { selectedDate = d; document.getElementById('selected-date-label').innerText = `Día: ${d}`; loadCalendar(); window.showDayTasks(d); };
+        window.selectDay = (d) => {
+            selectedDate = d;
+            document.getElementById('selected-date-label').innerText = `RESERVAS PARA: ${d}`;
+            loadCalendar();
+            window.showDayTasks(d);
+        };
 
         window.saveAg = async () => {
-            if(!selectedDate) return alert("Selecciona un día en el calendario");
-            await addDoc(collection(db, "agenda"), { tit: document.getElementById('ag-tit').value, fecha: selectedDate, hora: document.getElementById('ag-hor').value });
-            window.showMsg("LISTO", "Evento guardado"); loadCalendar();
+            const tit = document.getElementById('ag-tit').value;
+            const hor = document.getElementById('ag-hor').value;
+            if(!selectedDate || !tit) return window.showAppMsg("ERROR", "Selecciona día y escribe título.", true);
+            
+            await addDoc(collection(db, "agenda"), { tit, fecha: selectedDate, hora: hor });
+            window.showAppMsg("GUARDADO", "Evento agendado con éxito.");
+            document.getElementById('ag-tit').value = "";
+            loadCalendar();
+            window.showDayTasks(selectedDate);
         };
 
         window.showDayTasks = async (f) => {
             const snap = await getDocs(query(collection(db, "agenda"), where("fecha", "==", f)));
-            const cont = document.getElementById('ag-day-details'); cont.innerHTML = "<h4>Tareas del día</h4>";
-            snap.forEach(d => cont.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.removeDoc('agenda','${d.id}','loadCalendar')">×</button></div>`);
+            const cont = document.getElementById('ag-day-details');
+            cont.innerHTML = `<h4 style="margin:15px 0 10px 0; color:var(--dorado)">EVENTOS DEL DÍA</h4>`;
+            if(snap.empty) cont.innerHTML += `<p style="opacity:0.4; font-size:0.8rem">No hay eventos.</p>`;
+            snap.forEach(d => {
+                cont.innerHTML += `
+                    <div class="item-row">
+                        <span>${d.data().hora} - ${d.data().tit}</span>
+                        <button class="btn-red" style="width:30px; height:30px; border-radius:50%" onclick="window.removeDoc('agenda','${d.id}','loadCalendar')">×</button>
+                    </div>`;
+            });
         };
 
         // --- FINANZAS ---
         window.saveFin = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
-            if(!m) return;
-            await addDoc(collection(db, "finanzas"), { desc: document.getElementById('f-desc').value, monto: m, tipo: document.getElementById('f-tipo').value, canal: document.getElementById('f-canal').value, fecha: new Date().toISOString() });
+            const d = document.getElementById('f-desc').value;
+            if(!m || !d) return window.showAppMsg("CAMPOS VACÍOS", "Ingresa concepto y monto.", true);
+
+            await addDoc(collection(db, "finanzas"), { 
+                desc: d, monto: m, 
+                tipo: document.getElementById('f-tipo').value, 
+                canal: document.getElementById('f-canal').value, 
+                fecha: new Date().toISOString() 
+            });
+            window.showAppMsg("REGISTRADO", "Operación financiera exitosa.");
+            document.getElementById('f-monto').value = "";
+            document.getElementById('f-desc').value = "";
             loadFinData();
         };
 
         window.loadFinData = async () => {
             const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let v = 0, g = 0; const list = document.getElementById('fin-list'); list.innerHTML = "";
+            let v = 0, g = 0;
+            const list = document.getElementById('fin-list'); list.innerHTML = "";
             snap.forEach(docSnap => {
                 const d = docSnap.data();
                 if(d.tipo === 'GASTO') g += d.monto; else v += d.monto;
-                list.innerHTML += `<div class="item-row"><span>${d.desc}</span> <b class="${d.tipo==='GASTO'?'txt-gasto':'txt-ingreso'}">$${d.monto} <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')">×</button></b></div>`;
+                list.innerHTML += `
+                    <div class="item-row">
+                        <span><b>${d.desc}</b><br><small style="opacity:0.4">${d.canal}</small></span>
+                        <b class="${d.tipo==='GASTO'?'txt-gasto':'txt-ingreso'}">$${d.monto} 
+                        <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')" style="background:none; border:none; color:var(--terracota); margin-left:10px">×</button></b>
+                    </div>`;
             });
             document.getElementById('neto-display').innerText = `$${(v-g).toFixed(2)}`;
             document.getElementById('tot-ventas').innerText = `$${v.toFixed(0)}`;
             document.getElementById('tot-gastos').innerText = `$${g.toFixed(0)}`;
-            const t = v+g; document.getElementById('bar-v').style.width = (v/t*100)+"%"; document.getElementById('bar-g').style.width = (g/t*100)+"%";
+            
+            const t = v + g;
+            if(t > 0) {
+                document.getElementById('bar-v').style.width = (v/t*100) + "%";
+                document.getElementById('bar-g').style.width = (g/t*100) + "%";
+                const ut = v > 0 ? ((v-g)/v*100).toFixed(1) : 0;
+                document.getElementById('perc-rend').innerText = `${ut}% UTILIDAD REAL`;
+            }
         };
 
-        // --- NÓMINA CON CORTE ---
+        // --- NÓMINA CON CORTE Y HORAS ---
         window.loadPayroll = async () => {
             const uS = await getDocs(collection(db, "usuarios"));
             const aS = await getDocs(collection(db, "asistencias"));
@@ -291,7 +450,9 @@
             uS.forEach(uDoc => {
                 const u = uDoc.data();
                 const lastPay = u.ultimoPago ? new Date(u.ultimoPago) : new Date(0);
-                const hits = aS.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) > lastPay).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+                const hits = aS.docs.map(d=>d.data())
+                            .filter(p => p.uid === uDoc.id && new Date(p.fecha) > lastPay)
+                            .sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
                 
                 let hrs = 0;
                 for(let i=0; i<hits.length; i++){
@@ -301,55 +462,117 @@
                     }
                 }
                 const total = hrs * (u.sueldo || 0);
-                render.innerHTML += `<div class="item-row">
-                    <div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} hrs trabajadas</small></div>
-                    <span>$${total.toFixed(0)} <button class="btn-gold" style="padding:5px 10px; border-radius:10px" onclick="window.payPopup('${uDoc.id}','${u.nombre}',${total})">PAGAR</button></span>
-                </div>`;
+                render.innerHTML += `
+                    <div class="item-row">
+                        <div>
+                            <b>${u.nombre}</b><br>
+                            <small style="color:var(--dorado)">${hrs.toFixed(2)} horas acumuladas</small>
+                        </div>
+                        <div style="text-align:right">
+                            <b style="display:block">$${total.toFixed(0)}</b>
+                            <button class="btn-gold" style="padding:4px 8px; font-size:0.6rem; border-radius:8px" 
+                                    onclick="window.payPopup('${uDoc.id}','${u.nombre}',${total})">LIQUIDAR</button>
+                        </div>
+                    </div>`;
             });
         };
 
         window.payPopup = (uid, nom, monto) => {
-            document.getElementById('modal-body').innerHTML = `<h3>Pagar a ${nom}</h3><p>$${monto.toFixed(0)}</p><br><button class="btn-p btn-gold" onclick="window.confirmPay('${uid}','${nom}',${monto},'CAJA')">EFECTIVO</button><br><br><button class="btn-p btn-gold" onclick="window.confirmPay('${uid}','${nom}',${monto},'BANCO')">TRANSFERENCIA</button>`;
+            document.getElementById('modal-body').innerHTML = `
+                <h2 style="color:var(--dorado)">LIQUIDACIÓN</h2>
+                <p style="margin:15px 0">Pagar a <b>${nom}</b> un total de:</p>
+                <h1 style="margin-bottom:25px">$${monto.toFixed(0)}</h1>
+                <button class="btn-p btn-gold" style="margin-bottom:10px" onclick="window.confirmPay('${uid}','${nom}',${monto},'CAJA')">PAGAR EN EFECTIVO</button>
+                <button class="btn-p btn-gold" style="margin-bottom:20px" onclick="window.confirmPay('${uid}','${nom}',${monto},'BANCO')">PAGAR TRANSFERENCIA</button>
+                <button class="btn-p btn-red" onclick="document.getElementById('modal-sys').style.display='none'">CANCELAR</button>
+            `;
             document.getElementById('modal-sys').style.display = 'flex';
         };
 
         window.confirmPay = async (uid, nom, monto, canal) => {
-            await addDoc(collection(db, "finanzas"), { desc: `PAGO: ${nom}`, monto: monto, tipo: 'GASTO', canal: canal, fecha: new Date().toISOString() });
+            // 1. Registrar el gasto en finanzas
+            await addDoc(collection(db, "finanzas"), { 
+                desc: `PAGO NÓMINA: ${nom}`, 
+                monto: monto, 
+                tipo: 'GASTO', 
+                canal: canal, 
+                fecha: new Date().toISOString() 
+            });
+            // 2. Hacer el CORTE de horas (Reiniciar contador)
             await updateDoc(doc(db, "usuarios", uid), { ultimoPago: new Date().toISOString() });
+            
             document.getElementById('modal-sys').style.display = 'none';
-            window.showMsg("PAGADO", "El contador de horas se ha reiniciado.");
+            window.showAppMsg("NÓMINA PAGADA", "El contador de horas de " + nom + " ha regresado a 0.");
             loadPayroll(); loadFinData();
         };
 
-        window.addStaff = async () => {
-            await addDoc(collection(db, "usuarios"), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: 'Staff', ultimoPago: new Date().toISOString() });
-            loadStaffData();
-        };
-
-        window.loadStaffData = async () => {
-            const snap = await getDocs(collection(db, "usuarios"));
-            const render = document.getElementById('staff-render'); render.innerHTML = "";
-            snap.forEach(d => render.innerHTML += `<div class="item-row">${d.data().nombre} <button onclick="window.removeDoc('usuarios','${d.id}','loadStaffData')">×</button></div>`);
-            loadPayroll();
-        };
-
+        // --- ASISTENCIA ---
         window.handlePunch = async (t) => {
-            await addDoc(collection(db, "asistencias"), { uid: currentUser.id, name: currentUser.nombre, tipo: t, fecha: new Date().toISOString() });
-            window.showMsg("RELOJ", `${t} registrada`);
+            await addDoc(collection(db, "asistencias"), { 
+                uid: currentUser.id, 
+                name: currentUser.nombre, 
+                tipo: t, 
+                fecha: new Date().toISOString() 
+            });
+            window.showAppMsg("RELOJ", `Has marcado tu ${t} correctamente.`);
             loadPunchHistory();
         };
 
         window.loadPunchHistory = async () => {
             const snap = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(5)));
-            const list = document.getElementById('last-punches'); list.innerHTML = "<h4>Actividad Reciente</h4>";
-            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().name} (${d.data().tipo}) <button onclick="window.removeDoc('asistencias','${d.id}','loadPunchHistory')">×</button></div>`);
+            const list = document.getElementById('last-punches');
+            list.innerHTML = `<h4 style="margin:20px 0 10px 0; color:var(--dorado)">ÚLTIMOS MOVIMIENTOS</h4>`;
+            snap.forEach(d => {
+                list.innerHTML += `
+                    <div class="item-row">
+                        <small>${d.data().name}</small>
+                        <b style="color:var(--dorado)">${d.data().tipo}</b>
+                    </div>`;
+            });
         };
 
-        window.removeDoc = async (col, id, cb) => { if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, col, id)); window[cb](); } };
+        // --- UTILIDADES ---
+        window.removeDoc = async (col, id, cb) => {
+            if(confirm("¿Estás seguro de eliminar este registro de forma permanente?")) {
+                await deleteDoc(doc(db, col, id));
+                if(cb) window[cb]();
+            }
+        };
+
+        window.addStaff = async () => {
+            const n = document.getElementById('u-nom').value;
+            const p = document.getElementById('u-pin').value;
+            const s = parseFloat(document.getElementById('u-pag').value);
+            if(!n || !p || !s) return window.showAppMsg("ERROR", "Completa todos los datos del staff.", true);
+            
+            await addDoc(collection(db, "usuarios"), { 
+                nombre: n, pin: p, sueldo: s, rol: 'Staff', 
+                ultimoPago: new Date().toISOString() 
+            });
+            window.showAppMsg("ÉXITO", "Nuevo colaborador registrado.");
+            document.getElementById('u-nom').value = "";
+            document.getElementById('u-pin').value = "";
+            document.getElementById('u-pag').value = "";
+            loadStaffData();
+        };
+
+        window.loadStaffData = async () => {
+            const snap = await getDocs(collection(db, "usuarios"));
+            const list = document.getElementById('staff-render'); list.innerHTML = "";
+            snap.forEach(d => {
+                list.innerHTML += `<div class="item-row">${d.data().nombre} (${d.data().rol}) <button onclick="window.removeDoc('usuarios','${d.id}','loadStaffData')">×</button></div>`;
+            });
+            loadPayroll();
+        };
 
         const startApp = () => {
-            window.goTo('reloj'); loadFinData(); loadCalendar();
-            if(currentUser.rol === 'Socio') { loadStaffData(); loadPunchHistory(); }
+            window.goTo('reloj');
+            loadFinData();
+            loadCalendar();
+            if(currentUser.rol === 'Socio') {
+                loadStaffData();
+                loadPunchHistory();
+            }
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('main-clock').innerText = now.toLocaleTimeString();
