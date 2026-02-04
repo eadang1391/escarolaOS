@@ -3,15 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v14.8 - Cross-Platform Enterprise</title>
+    <title>EscarolaOS v15.0 - Enterprise Robust Architecture</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
         /* =========================================
-           CORE DESIGN SYSTEM - ESCAROLA OS
-           ========================================= */
+           SISTEMA DE DISEÑO ESCAROLA OS PREMIUM
+           ========================================= 
+        */
         :root {
             --verde-bosque: #1b3022;
             --verde-oscuro: #0d1a12;
@@ -22,10 +23,11 @@
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(197, 160, 89, 0.3);
             --pill: 50px;
-            --shadow-premium: 0 20px 40px rgba(0,0,0,0.6);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-premium: 0 20px 40px rgba(0,0,0,0.8);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
+        /* RESET SISTÉMICO */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -33,549 +35,683 @@
             color: var(--cantera); 
             height: 100vh; 
             overflow: hidden; 
+            user-select: none;
         }
 
-        /* ANIMACIONES */
+        /* ANIMACIONES DE ALTA FIDELIDAD */
         @keyframes glowPulse {
             0%, 100% { filter: drop-shadow(0 0 5px var(--dorado)); opacity: 0.8; }
-            50% { filter: drop-shadow(0 0 20px var(--dorado)); opacity: 1; }
+            50% { filter: drop-shadow(0 0 25px var(--dorado)); opacity: 1; }
+        }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         /* =========================================
-           LOGIN SCREEN (FIXED FOR PC/MOBILE)
-           ========================================= */
+           SISTEMA DE ACCESO (LOGIN & PINPAD)
+           ========================================= 
+        */
         #login-screen { 
             position: fixed; inset: 0; 
             background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro) 100%); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 999999; 
-            padding: 20px;
+            z-index: 999999; padding: 20px;
         }
 
-        .login-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            max-width: 400px;
-            width: 100%;
+        .login-wrapper {
+            display: flex; flex-direction: column; align-items: center;
+            max-width: 380px; width: 100%;
+            animation: slideUp 0.8s ease;
         }
 
-        .logo-main { 
-            width: 100px; /* Tamaño controlado para PC */
-            height: auto;
-            margin-bottom: 20px; 
+        .logo-box { 
+            width: 110px; height: auto; margin-bottom: 25px; 
             animation: glowPulse 4s infinite ease-in-out; 
         }
 
-        @media (min-width: 768px) {
-            .logo-main { width: 120px; margin-bottom: 30px; }
-        }
-
-        .pin-container { display: flex; margin-bottom: 30px; gap: 15px; }
-        .pin-dot { 
+        .pin-indicator { display: flex; margin-bottom: 40px; gap: 18px; }
+        .dot { 
             width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; 
             transition: var(--transition); 
         }
-        .pin-dot.filled { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); transform: scale(1.2); }
+        .dot.active { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); transform: scale(1.3); }
 
-        .numpad-grid {
-            display: grid; 
-            grid-template-columns: repeat(3, 1fr); 
-            gap: 15px;
+        .numpad-container {
+            display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
             width: 100%;
-            max-width: 300px;
         }
 
-        .key-btn {
-            aspect-ratio: 1;
-            border-radius: 50%;
-            border: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: var(--dorado);
-            background: var(--glass);
-            cursor: pointer;
-            transition: var(--transition);
+        .key {
+            aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; color: var(--dorado); background: var(--glass);
+            cursor: pointer; transition: var(--transition);
         }
-        .key-btn:active { background: var(--dorado); color: var(--negro); }
+        .key:hover { background: rgba(197, 160, 89, 0.1); border-color: var(--dorado); }
+        .key:active { transform: scale(0.85); background: var(--dorado); color: var(--negro); }
 
         /* =========================================
-           APP CONTENT STRUCTURE
-           ========================================= */
-        .view-frame { 
-            display: none; 
-            height: 100vh; 
-            overflow-y: auto; 
-            padding: 30px 20px 180px 20px; 
-            max-width: 800px;
-            margin: 0 auto;
+           CONTENEDOR PRINCIPAL
+           ========================================= 
+        */
+        .main-viewport { 
+            display: none; height: 100vh; overflow-y: auto; 
+            padding: 35px 20px 200px 20px; max-width: 850px; margin: 0 auto;
+            scroll-behavior: smooth;
         }
 
-        .card { 
-            background: var(--verde-oscuro); 
-            border-radius: 30px; 
-            padding: 25px; 
-            margin-bottom: 20px; 
-            border: 1px solid var(--border); 
+        .card-panel { 
+            background: var(--verde-oscuro); border-radius: 35px; 
+            padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); 
             box-shadow: var(--shadow-premium); 
+            animation: slideUp 0.5s ease;
         }
 
-        .header-section { 
-            border-left: 5px solid var(--dorado); 
-            padding-left: 15px; 
-            margin-bottom: 20px; 
-            letter-spacing: 2px; 
-            text-transform: uppercase; 
-            font-size: 0.75rem; 
-            color: var(--dorado); 
-            font-weight: 900;
+        .tag-header { 
+            border-left: 6px solid var(--dorado); padding-left: 18px; 
+            margin-bottom: 25px; letter-spacing: 4px; text-transform: uppercase; 
+            font-size: 0.75rem; color: var(--dorado); font-weight: 900;
         }
 
-        /* ELEMENTOS GLOBALES */
-        .f-input { 
-            width: 100%; 
-            padding: 16px 25px; 
-            border-radius: var(--pill); 
-            background: rgba(0,0,0,0.5); 
-            border: 1px solid var(--border); 
-            color: #fff; 
-            margin-bottom: 12px; 
-            font-size: 1rem; 
-            outline: none;
+        /* ELEMENTOS FORMULARES */
+        .input-premium { 
+            width: 100%; padding: 18px 28px; border-radius: var(--pill); 
+            background: rgba(0,0,0,0.6); border: 1px solid var(--border); 
+            color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none;
+            transition: var(--transition);
         }
+        .input-premium:focus { border-color: var(--dorado); box-shadow: 0 0 15px rgba(197, 160, 89, 0.2); }
 
-        .btn-action { 
-            width: 100%; 
-            padding: 18px; 
-            border-radius: var(--pill); 
-            border: none; 
-            font-weight: 900; 
-            letter-spacing: 1px; 
-            text-transform: uppercase; 
-            cursor: pointer; 
-            transition: var(--transition); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 10px;
-            font-size: 0.8rem;
+        .btn-premium { 
+            width: 100%; padding: 20px; border-radius: var(--pill); border: none; 
+            font-weight: 900; letter-spacing: 2px; text-transform: uppercase; 
+            cursor: pointer; transition: var(--transition); 
+            display: flex; align-items: center; justify-content: center; gap: 12px;
+            font-size: 0.85rem;
         }
-        .btn-gold { background: var(--dorado); color: var(--negro); }
-        .btn-red { background: var(--terracota); color: #fff; }
+        .gold-btn { background: var(--dorado); color: var(--negro); box-shadow: 0 10px 20px rgba(0,0,0,0.3); }
+        .red-btn { background: var(--terracota); color: #fff; }
+        .btn-premium:active { transform: scale(0.96); opacity: 0.9; }
 
-        .item-row { 
-            background: var(--glass); 
-            padding: 15px 22px; 
-            border-radius: var(--pill); 
-            margin-bottom: 10px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border: 1px solid rgba(255,255,255,0.05); 
+        .list-row { 
+            background: var(--glass); padding: 18px 25px; border-radius: var(--pill); 
+            margin-bottom: 12px; display: flex; justify-content: space-between; 
+            align-items: center; border: 1px solid rgba(255,255,255,0.06); 
+            transition: var(--transition);
         }
+        .list-row:hover { background: rgba(255,255,255,0.08); }
 
-        /* CALENDARIO */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
-        .cal-day { 
-            aspect-ratio: 1; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background: rgba(255,255,255,0.03); 
-            border-radius: 12px; 
-            font-size: 0.85rem; 
-            cursor: pointer;
+        /* CALENDARIO PREMIUM */
+        .cal-box { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 20px; }
+        .cal-unit { 
+            aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
+            background: rgba(255,255,255,0.03); border-radius: 15px; font-size: 0.9rem; 
+            cursor: pointer; border: 1px solid transparent; transition: var(--transition);
         }
-        .cal-day.active { background: var(--dorado); color: var(--negro); font-weight: 900; }
-        .cal-day.event { border-bottom: 3px solid var(--terracota); }
+        .cal-unit.active { background: var(--dorado); color: var(--negro); font-weight: 900; transform: scale(1.1); }
+        .cal-unit.marked { border-bottom: 4px solid var(--terracota); }
 
-        /* NAV BAR */
-        #nav-bar { 
-            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
-            width: 94%; max-width: 500px; background: rgba(13, 26, 18, 0.98); 
+        /* BARRA DE COMANDO (BOTTOM NAV) */
+        #command-bar { 
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
+            width: 92%; max-width: 650px; background: rgba(13, 26, 18, 0.98); 
             border-radius: var(--pill); display: none; grid-template-columns: repeat(6, 1fr); 
-            padding: 12px; border: 1px solid var(--dorado); 
-            backdrop-filter: blur(20px); z-index: 9999; 
+            padding: 15px; border: 1px solid var(--dorado); 
+            backdrop-filter: blur(25px); z-index: 9999; box-shadow: var(--shadow-premium);
         }
-        .nav-link { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.55rem; font-weight: 700; cursor: pointer; }
-        .nav-link.active { opacity: 1; color: var(--dorado); }
-        .nav-link i { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+        .cmd-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.6rem; font-weight: 800; cursor: pointer; text-decoration: none; }
+        .cmd-item.active { opacity: 1; color: var(--dorado); }
+        .cmd-item i { font-size: 1.6rem; display: block; margin-bottom: 6px; }
 
-        /* GRÁFICA */
-        .progress-container { height: 16px; background: #000; border-radius: 10px; overflow: hidden; margin: 15px 0; display: flex; border: 1px solid var(--border); }
-        .bar-gain { background: var(--dorado); height: 100%; transition: width 0.8s; }
-        .bar-loss { background: var(--terracota); height: 100%; transition: width 0.8s; }
+        /* GRÁFICA DE ANALÍTICA */
+        .metric-bar { height: 18px; background: #000; border-radius: 10px; overflow: hidden; margin: 20px 0; display: flex; border: 1px solid var(--border); }
+        .chunk-v { background: var(--dorado); height: 100%; transition: width 1s cubic-bezier(0.19, 1, 0.22, 1); }
+        .chunk-g { background: var(--terracota); height: 100%; transition: width 1s cubic-bezier(0.19, 1, 0.22, 1); }
 
-        /* MODALES */
-        .modal-overlay { 
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            z-index: 1000000; align-items: center; justify-content: center; padding: 20px; 
+        /* NOTIFICACIONES */
+        .modal-os { 
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); 
+            z-index: 1000000; align-items: center; justify-content: center; padding: 25px; 
+            backdrop-filter: blur(15px);
         }
-        .modal-box { 
-            background: var(--verde-oscuro); padding: 30px; border-radius: 35px; 
-            width: 100%; max-width: 400px; border: 1px solid var(--dorado); text-align: center; 
+        .modal-os-box { 
+            background: var(--verde-oscuro); padding: 45px; border-radius: 45px; 
+            width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; 
+            box-shadow: 0 0 60px rgba(0,0,0,0.8);
         }
-
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <div class="login-container">
-            <img src="logo.png" class="logo-main" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448636.png'">
-            <h2 style="letter-spacing: 5px; margin-bottom: 25px; font-weight: 200; font-size: 1.2rem;">ESCAROLA<span style="font-weight:900; color:var(--dorado)">OS</span></h2>
+        <div class="login-wrapper">
+            <img src="logo.png" class="logo-box" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448636.png'">
+            <h2 style="letter-spacing: 8px; margin-bottom: 35px; font-weight: 200; font-size: 1.2rem;">ESCAROLA <span style="font-weight:900; color:var(--dorado)">OS</span></h2>
             
-            <div class="pin-container">
-                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            <div class="pin-indicator">
+                <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
             </div>
             
-            <div id="numpad" class="numpad-grid">
+            <div id="numpad-logic" class="numpad-container">
                 </div>
         </div>
     </div>
 
-    <div id="app-shell">
+    <div id="os-shell">
         
-        <div id="view-finanzas" class="view-frame">
-            <div class="card" style="text-align:center">
-                <span style="font-size:0.7rem; letter-spacing:3px; opacity:0.6">PATRIMONIO OPERATIVO</span>
-                <h1 id="display-neto" style="font-size:3.5rem; margin:10px 0">$0.00</h1>
+        <div id="view-finanzas" class="main-viewport">
+            <div class="card-panel" style="text-align:center; padding: 50px 20px;">
+                <span style="font-size:0.8rem; letter-spacing:5px; opacity:0.6; text-transform:uppercase">Capital Disponible</span>
+                <h1 id="neto-val" style="font-size:4rem; margin:15px 0; font-weight: 900;">$0.00</h1>
+                <p id="label-status-fin" style="font-size:0.7rem; color:var(--dorado); letter-spacing:2px"></p>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px">
-                <div class="card" style="margin:0; padding:20px; border-color: var(--dorado);">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px; margin-bottom:25px">
+                <div class="card-panel" style="margin:0; padding:25px; border-color: var(--dorado);">
                     <div style="text-align:center">
-                        <span style="font-size:0.6rem; opacity:0.5">INGRESOS</span>
-                        <h3 id="val-ventas" style="color:var(--dorado)">$0</h3>
+                        <span style="font-size:0.65rem; opacity:0.5">INGRESOS (POS)</span>
+                        <h2 id="total-v" style="color:var(--dorado); margin-top:5px">$0</h2>
                     </div>
                 </div>
-                <div class="card" style="margin:0; padding:20px; border-color: var(--terracota);">
+                <div class="card-panel" style="margin:0; padding:25px; border-color: var(--terracota);">
                     <div style="text-align:center">
-                        <span style="font-size:0.6rem; opacity:0.5">GASTOS</span>
-                        <h3 id="val-gastos" style="color:var(--terracota)">$0</h3>
+                        <span style="font-size:0.65rem; opacity:0.5">EGRESOS (DOCS)</span>
+                        <h2 id="total-g" style="color:var(--terracota); margin-top:5px">$0</h2>
                     </div>
                 </div>
             </div>
 
-            <div class="card">
-                <div class="header-section">Analítica de Rendimiento</div>
-                <div class="progress-container">
-                    <div id="bar-gain" class="bar-gain"></div>
-                    <div id="bar-loss" class="bar-loss"></div>
+            <div class="card-panel">
+                <div class="tag-header">Balance de Operación Mensual</div>
+                <div class="metric-bar">
+                    <div id="bar-v" class="chunk-v"></div>
+                    <div id="bar-g" class="chunk-g"></div>
                 </div>
-                <p id="label-utilidad" style="text-align:center; font-size:0.7rem; color:var(--dorado)"></p>
+                <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:700">
+                    <span id="perc-utilidad" style="color:var(--dorado)">0% UTILIDAD</span>
+                    <span style="opacity:0.4">ANÁLISIS DE FLUJO</span>
+                </div>
             </div>
 
-            <div class="card">
-                <div class="header-section">Nuevo Movimiento</div>
-                <input type="text" id="fin-desc" class="f-input" placeholder="Concepto">
-                <input type="number" id="fin-monto" class="f-input" placeholder="Monto $">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px">
-                    <select id="fin-tipo" class="f-input" style="margin:0"><option value="INGRESO">Venta (+)</option><option value="GASTO">Gasto (-)</option></select>
-                    <select id="fin-canal" class="f-input" style="margin:0"><option value="CAJA">Caja</option><option value="BANCO">Banco</option></select>
+            <div class="card-panel">
+                <div class="tag-header">Asentar Nuevo Movimiento</div>
+                <input type="text" id="f-desc" class="input-premium" placeholder="Descripción del movimiento">
+                <input type="number" id="f-monto" class="input-premium" placeholder="Monto total $">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
+                    <select id="f-tipo" class="input-premium" style="margin:0">
+                        <option value="INGRESO">Entrada (+)</option>
+                        <option value="GASTO">Salida (-)</option>
+                    </select>
+                    <select id="f-canal" class="input-premium" style="margin:0">
+                        <option value="CAJA">Caja Efectivo</option>
+                        <option value="BANCO">Transferencia</option>
+                    </select>
                 </div>
-                <button class="btn-action btn-gold" onclick="window.saveFinance()">REGISTRAR</button>
+                <button class="btn-premium gold-btn" onclick="window.saveFinance()"><i class="fa-solid fa-file-invoice-dollar"></i> CONFIRMAR REGISTRO</button>
             </div>
-            <div id="list-finance"></div>
+            <div id="lista-finanzas"></div>
         </div>
 
-        <div id="view-agenda" class="view-frame">
-            <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                    <button onclick="window.navMonth(-1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-angle-left"></i></button>
-                    <h2 id="cal-title" style="font-size:1rem; letter-spacing:2px; text-transform:uppercase"></h2>
-                    <button onclick="window.navMonth(1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-angle-right"></i></button>
+        <div id="view-agenda" class="main-viewport">
+            <div class="card-panel">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+                    <button onclick="window.navMonth(-1)" class="btn-premium" style="width:60px; background:var(--glass); padding:0"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h2 id="cal-month-display" style="font-size:1.2rem; letter-spacing:4px; text-transform:uppercase; font-weight:900">ENERO 2026</h2>
+                    <button onclick="window.navMonth(1)" class="btn-premium" style="width:60px; background:var(--glass); padding:0"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
-                <div id="cal-box" class="cal-grid"></div>
+                <div id="cal-grid-render" class="cal-box"></div>
             </div>
             
-            <div class="card">
-                <div class="header-section" id="cal-day-label">Selecciona un día</div>
-                <input type="text" id="ev-tit" class="f-input" placeholder="Título del evento">
-                <input type="time" id="ev-hor" class="f-input">
-                <button class="btn-action btn-gold" onclick="window.saveEvent()">GUARDAR EVENTO</button>
+            <div class="card-panel">
+                <div class="tag-header" id="cal-selected-label">Selecciona una fecha</div>
+                <input type="text" id="ev-tit" class="input-premium" placeholder="Asunto / Reservación">
+                <input type="time" id="ev-hor" class="input-premium">
+                <button class="btn-premium gold-btn" onclick="window.saveEvent()"><i class="fa-solid fa-calendar-check"></i> AGENDAR EVENTO</button>
             </div>
-            <div id="list-events"></div>
+            <div id="lista-agenda"></div>
         </div>
 
-        <div id="view-reloj" class="view-frame">
-            <div class="card" style="text-align:center; padding:60px 0; border:2px solid var(--dorado)">
-                <h1 id="live-clock" style="font-size:4rem; font-weight:100">00:00:00</h1>
-                <p id="live-date" style="color:var(--dorado); letter-spacing:4px; font-weight:800; text-transform:uppercase"></p>
+        <div id="view-reloj" class="main-viewport">
+            <div class="card-panel" style="text-align:center; padding:80px 0; border:2px solid var(--dorado); background: radial-gradient(circle, #1a2a1f 0%, #000 100%);">
+                <h1 id="live-time" style="font-size:5rem; font-weight:100; letter-spacing: -3px;">00:00:00</h1>
+                <p id="live-date" style="color:var(--dorado); letter-spacing:6px; font-weight:900; text-transform:uppercase; margin-top:15px"></p>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
-                <button class="btn-action btn-gold" style="height:160px" onclick="window.processPunch('ENTRADA')"><i class="fa-solid fa-fingerprint fa-3x"></i><br><br>ENTRADA</button>
-                <button class="btn-action btn-red" style="height:160px" onclick="window.processPunch('SALIDA')"><i class="fa-solid fa-sign-out-alt fa-3x"></i><br><br>SALIDA</button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:25px; margin-top:25px">
+                <button class="btn-premium gold-btn" style="height:200px; flex-direction:column" onclick="window.handlePunch('ENTRADA')">
+                    <i class="fa-solid fa-fingerprint fa-4x"></i><br>MARCAR ENTRADA
+                </button>
+                <button class="btn-premium red-btn" style="height:200px; flex-direction:column" onclick="window.handlePunch('SALIDA')">
+                    <i class="fa-solid fa-door-open fa-4x"></i><br>MARCAR SALIDA
+                </button>
             </div>
-            <div id="list-recent-punches" style="margin-top:25px"></div>
+            <div id="lista-asistencias" style="margin-top:40px"></div>
         </div>
 
-        <div id="view-bodega" class="view-frame">
-            <div class="card">
-                <div class="header-section">Inventario de Almacén</div>
-                <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px">
-                    <input type="text" id="inv-item" class="f-input" placeholder="Producto">
-                    <input type="number" id="inv-qty" class="f-input" placeholder="Cant.">
+        <div id="view-bodega" class="main-viewport">
+            <div class="card-panel">
+                <div class="tag-header">Gestión de Stock y Almacén</div>
+                <div style="display:grid; grid-template-columns:2fr 1fr; gap:15px">
+                    <input type="text" id="inv-nom" class="input-premium" placeholder="Nombre de insumo">
+                    <input type="number" id="inv-can" class="input-premium" placeholder="Cant.">
                 </div>
-                <button class="btn-action btn-gold" onclick="window.saveInventory()">ACTUALIZAR STOCK</button>
-                <div id="list-inventory" style="margin-top:20px"></div>
+                <button class="btn-premium gold-btn" onclick="window.saveInv()"><i class="fa-solid fa-boxes-stacked"></i> ACTUALIZAR INVENTARIO</button>
+                <div id="lista-inventario" style="margin-top:25px"></div>
             </div>
 
-            <div class="card">
-                <div class="header-section">Recetario y Costeos</div>
-                <input type="text" id="rec-nom" class="f-input" placeholder="Nombre">
-                <input type="number" id="rec-cost" class="f-input" placeholder="Costo $">
-                <textarea id="rec-steps" class="f-input" placeholder="Receta..." style="height:80px; border-radius:20px; padding:15px; color:white; background:rgba(0,0,0,0.3); width:100%; border:1px solid var(--border); margin-bottom:15px"></textarea>
-                <button class="btn-action btn-gold" onclick="window.saveRecipe()">GUARDAR RECETA</button>
-                <div id="list-recipes" style="margin-top:20px"></div>
+            <div class="card-panel">
+                <div class="tag-header">Recetario Estándar y Costeo</div>
+                <input type="text" id="rec-nom" class="input-premium" placeholder="Nombre del Platillo">
+                <input type="number" id="rec-cos" class="input-premium" placeholder="Costo Sugerido de Producción $">
+                <textarea id="rec-det" class="input-premium" placeholder="Ingredientes y pasos de preparación..." style="height:120px; border-radius:25px; padding-top:20px"></textarea>
+                <button class="btn-premium gold-btn" onclick="window.saveRecipe()"><i class="fa-solid fa-mortar-pestle"></i> REGISTRAR RECETA</button>
+                <div id="lista-recetas" style="margin-top:25px"></div>
             </div>
         </div>
 
-        <div id="view-admin" class="view-frame">
-            <div class="card">
-                <div class="header-section">Nómina por Pagar (Horas)</div>
-                <div id="render-payroll"></div>
+        <div id="view-admin" class="main-viewport">
+            <div class="card-panel">
+                <div class="tag-header">Cálculo de Nómina Activa</div>
+                <p style="font-size:0.65rem; opacity:0.5; margin-bottom:20px">Horas calculadas desde la última fecha de pago registrada.</p>
+                <div id="render-nomina"></div>
             </div>
 
-            <div class="card">
-                <div class="header-section">Gestión de Staff</div>
-                <input type="text" id="st-name" class="f-input" placeholder="Nombre">
-                <input type="number" id="st-pin" class="f-input" placeholder="PIN">
-                <input type="number" id="st-wage" class="f-input" placeholder="Pago/Hora $">
-                <button class="btn-action btn-gold" onclick="window.addNewStaff()">AGREGAR</button>
-                <div id="list-staff" style="margin-top:20px"></div>
+            <div class="card-panel">
+                <div class="tag-header">Configuración de Staff</div>
+                <input type="text" id="st-nom" class="input-premium" placeholder="Nombre completo">
+                <input type="number" id="st-pin" class="input-premium" placeholder="PIN (4 dígitos)">
+                <input type="number" id="st-pag" class="input-premium" placeholder="Sueldo base por hora $">
+                <button class="btn-premium gold-btn" onclick="window.addStaffMember()"><i class="fa-solid fa-user-plus"></i> DAR DE ALTA</button>
+                <div id="lista-staff" style="margin-top:25px"></div>
             </div>
 
-            <div class="card">
-                <div class="header-section">Checklist de Limpieza</div>
-                <div style="display:flex; gap:10px; margin-bottom:15px">
-                    <input type="text" id="task-name" class="f-input" placeholder="Nueva tarea..." style="margin:0">
-                    <button class="btn-action btn-gold" style="width:60px" onclick="window.addNewTask()">+</button>
+            <div class="card-panel">
+                <div class="tag-header">Checklist Diario de Operación</div>
+                <div style="display:flex; gap:15px; margin-bottom:20px">
+                    <input type="text" id="task-name" class="input-premium" placeholder="Nueva tarea de limpieza..." style="margin:0">
+                    <button class="btn-premium gold-btn" style="width:75px; padding:0" onclick="window.addNewTask()">+</button>
                 </div>
                 <div id="render-tasks"></div>
             </div>
         </div>
     </div>
 
-    <nav id="nav-bar">
-        <div class="nav-link" onclick="window.switchView('finanzas')"><i class="fa-solid fa-vault"></i>Cap</div>
-        <div class="nav-link" onclick="window.switchView('agenda')"><i class="fa-solid fa-calendar-day"></i>Age</div>
-        <div class="nav-link" onclick="window.switchView('reloj')"><i class="fa-solid fa-stopwatch"></i>Rel</div>
-        <div class="nav-link" onclick="window.switchView('bodega')"><i class="fa-solid fa-utensils"></i>Bod</div>
-        <div class="nav-link" onclick="window.switchView('admin')"><i class="fa-solid fa-user-tie"></i>Adm</div>
-        <div class="nav-link" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>OFF</div>
+    <nav id="command-bar">
+        <div class="cmd-item" onclick="window.nav('finanzas')"><i class="fa-solid fa-vault"></i>Capital</div>
+        <div class="cmd-item" onclick="window.nav('agenda')"><i class="fa-solid fa-calendar-day"></i>Agenda</div>
+        <div class="cmd-item" onclick="window.nav('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
+        <div class="cmd-item" onclick="window.nav('bodega')"><i class="fa-solid fa-utensils"></i>Bodega</div>
+        <div class="cmd-item" onclick="window.nav('admin')"><i class="fa-solid fa-user-shield"></i>Admin</div>
+        <div class="cmd-item" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>Salir</div>
     </nav>
 
-    <div id="sys-modal" class="modal-overlay">
-        <div class="modal-box" id="modal-content"></div>
+    <div id="os-modal" class="modal-os">
+        <div class="modal-os-box" id="os-modal-content"></div>
     </div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
-        // VARIABLES DE ESTADO
-        let pinCode = "";
-        let userAuth = null;
-        let activeDate = new Date();
-        let selectedDay = null;
+        // --- ESTADO MAESTRO ---
+        let globalPin = "";
+        let sessionUser = null;
+        let activeCalDate = new Date();
+        let activeCalDay = null;
 
-        // --- SISTEMA DE POPUPS ---
-        window.alertOS = (tit, msg, err = false) => {
-            document.getElementById('modal-content').innerHTML = `
-                <h2 style="color:${err?'var(--terracota)':'var(--dorado)'}; margin-bottom:15px">${tit}</h2>
-                <p style="margin-bottom:25px; opacity:0.8">${msg}</p>
-                <button class="btn-action btn-gold" onclick="document.getElementById('sys-modal').style.display='none'">OK</button>
+        /**
+         * SISTEMA DE COMUNICACIÓN UNIFICADO
+         * @param {string} t Título de la notificación
+         * @param {string} m Mensaje descriptivo
+         * @param {boolean} e Determina si es un error (estética roja)
+         */
+        window.notifyOS = (t, m, e = false) => {
+            const color = e ? 'var(--terracota)' : 'var(--dorado)';
+            const icon = e ? 'fa-triangle-exclamation' : 'fa-circle-check';
+            document.getElementById('os-modal-content').innerHTML = `
+                <div style="margin-bottom:25px"><i class="fa-solid ${icon} fa-5x" style="color:${color}"></i></div>
+                <h2 style="color:${color}; margin-bottom:15px; letter-spacing:3px; text-transform:uppercase">${t}</h2>
+                <p style="opacity:0.8; margin-bottom:35px; line-height:1.7; font-size:1rem">${m}</p>
+                <button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">CERRAR VENTANA</button>
             `;
-            document.getElementById('sys-modal').style.display = 'flex';
+            document.getElementById('os-modal').style.display = 'flex';
         };
 
-        // --- PINPAD RESPONSIVO ---
-        const setupNumpad = () => {
-            const pad = document.getElementById('numpad');
-            for(let i=1; i<=9; i++) pad.innerHTML += `<div class="key-btn" onclick="window.keyPress(${i})">${i}</div>`;
-            pad.innerHTML += `<div class="key-btn" onclick="window.keyPress('C')" style="color:var(--terracota)"><i class="fa-solid fa-backspace"></i></div>`;
-            pad.innerHTML += `<div class="key-btn" onclick="window.keyPress(0)">0</div>`;
-            pad.innerHTML += `<div class="key-btn" onclick="location.reload()" style="color:var(--terracota)"><i class="fa-solid fa-power-off"></i></div>`;
+        /**
+         * ARQUITECTURA DE PINPAD RESPONSIVO
+         */
+        const renderNumpad = () => {
+            const container = document.getElementById('numpad-logic');
+            for(let i=1; i<=9; i++) {
+                container.innerHTML += `<div class="key" onclick="window.inputKey(${i})">${i}</div>`;
+            }
+            container.innerHTML += `<div class="key" onclick="window.inputKey('DEL')" style="color:var(--terracota)"><i class="fa-solid fa-backspace"></i></div>`;
+            container.innerHTML += `<div class="key" onclick="window.inputKey(0)">0</div>`;
+            container.innerHTML += `<div class="key" onclick="location.reload()" style="color:var(--terracota)"><i class="fa-solid fa-power-off"></i></div>`;
         };
 
-        window.keyPress = async (v) => {
-            if(v === 'C') { pinCode = ""; updateDots(); return; }
-            if(pinCode.length < 4) pinCode += v;
-            updateDots();
+        window.inputKey = async (val) => {
+            if(val === 'DEL') { globalPin = ""; updatePinDots(); return; }
+            if(globalPin.length < 4) globalPin += val;
+            updatePinDots();
             
-            if(pinCode.length === 4) {
-                const q = query(collection(db, "usuarios"), where("pin", "==", pinCode));
-                const snap = await getDocs(q);
-                if(!snap.empty) {
-                    userAuth = { id: snap.docs[0].id, ...snap.docs[0].data() };
-                    document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('nav-bar').style.display = 'grid';
-                    initApp();
-                } else {
-                    pinCode = ""; updateDots();
-                    window.alertOS("ERROR", "PIN Incorrecto", true);
+            if(globalPin.length === 4) {
+                try {
+                    const q = query(collection(db, "usuarios"), where("pin", "==", globalPin));
+                    const snap = await getDocs(q);
+                    if(!snap.empty) {
+                        sessionUser = { id: snap.docs[0].id, ...snap.docs[0].data() };
+                        document.getElementById('login-screen').style.display = 'none';
+                        document.getElementById('command-bar').style.display = 'grid';
+                        initAppSequence();
+                    } else {
+                        globalPin = ""; updatePinDots();
+                        window.notifyOS("ERROR DE ACCESO", "El código PIN ingresado no corresponde a ningún usuario activo.", true);
+                    }
+                } catch(err) {
+                    window.notifyOS("ERROR DE RED", "No se pudo conectar con la base de datos de EscarolaOS.", true);
                 }
             }
         };
 
-        const updateDots = () => {
-            document.querySelectorAll('.pin-dot').forEach((dot, i) => dot.classList.toggle('filled', i < pinCode.length));
+        const updatePinDots = () => {
+            const dots = document.querySelectorAll('.dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i < globalPin.length));
         };
 
-        // --- NAVEGACIÓN ---
-        window.switchView = (v) => {
-            if((v === 'finanzas' || v === 'admin') && userAuth.rol !== 'Socio') return;
-            document.querySelectorAll('.view-frame').forEach(f => f.style.display = 'none');
-            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(`view-${v}`).style.display = 'block';
-            if(v === 'agenda') loadCalendar();
-            if(vID === 'bodega') loadBodega();
-            if(v === 'admin') loadAdminData();
+        /**
+         * SISTEMA DE NAVEGACIÓN Y PERMISOS
+         */
+        window.nav = (view) => {
+            const socioViews = ['finanzas', 'admin'];
+            if(socioViews.includes(view) && sessionUser.rol !== 'Socio') {
+                window.notifyOS("ACCESO RESTRINGIDO", "Esta área está reservada exclusivamente para la gerencia (Socio).", true);
+                return;
+            }
+            document.querySelectorAll('.main-viewport').forEach(v => v.style.display = 'none');
+            document.querySelectorAll('.cmd-item').forEach(i => i.classList.remove('active'));
+            document.getElementById(`view-${view}`).style.display = 'block';
+            
+            // Cargas específicas por módulo
+            if(view === 'finanzas') loadFinanceData();
+            if(view === 'agenda') renderCalendar();
+            if(view === 'bodega') loadWarehouseData();
+            if(view === 'admin') loadAdminData();
         };
 
-        // --- FINANZAS ---
+        /**
+         * MÓDULO: FINANZAS Y CAJA (RECONSTRUIDO)
+         */
         window.saveFinance = async () => {
-            const m = parseFloat(document.getElementById('fin-monto').value);
-            const d = document.getElementById('fin-desc').value;
-            if(!m || !d) return;
-            await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('fin-tipo').value, canal: document.getElementById('fin-canal').value, fecha: new Date().toISOString() });
-            document.getElementById('fin-monto').value = ""; document.getElementById('fin-desc').value = "";
-            loadFinances();
+            const monto = parseFloat(document.getElementById('f-monto').value);
+            const desc = document.getElementById('f-desc').value;
+            if(!monto || !desc) return window.notifyOS("DATOS INCOMPLETOS", "Es obligatorio ingresar el concepto y el monto total.", true);
+
+            await addDoc(collection(db, "finanzas"), {
+                desc, monto,
+                tipo: document.getElementById('f-tipo').value,
+                canal: document.getElementById('f-canal').value,
+                fecha: new Date().toISOString()
+            });
+            document.getElementById('f-monto').value = ""; document.getElementById('f-desc').value = "";
+            loadFinanceData();
+            window.notifyOS("REGISTRO EXITOSO", "El movimiento ha sido asentado en los libros contables.");
         };
 
-        window.loadFinances = async () => {
+        window.loadFinanceData = async () => {
             const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let v = 0, g = 0;
-            const list = document.getElementById('list-finance'); list.innerHTML = "";
-            snap.forEach(s => {
-                const data = s.data();
-                if(data.tipo === 'GASTO') g += data.monto; else v += data.monto;
-                list.innerHTML += `<div class="item-row"><span>${data.desc}</span> <b>$${data.monto} <button onclick="window.delDoc('finanzas','${s.id}','loadFinances')">×</button></b></div>`;
+            let ingresos = 0, gastos = 0;
+            const container = document.getElementById('lista-finanzas');
+            container.innerHTML = "";
+            
+            snap.forEach(docSnap => {
+                const data = docSnap.data();
+                const isGasto = data.tipo === 'GASTO';
+                if(isGasto) gastos += data.monto; else ingresos += data.monto;
+                
+                container.innerHTML += `
+                    <div class="list-row">
+                        <div><b>${data.desc}</b><br><small style="opacity:0.4">${data.canal}</small></div>
+                        <div style="text-align:right">
+                            <b class="${isGasto?'color-red':'color-gold'}" style="color:${isGasto?'var(--terracota)':'var(--dorado)'}">
+                                ${isGasto?'-':'+'} $${data.monto.toFixed(2)}
+                            </b>
+                            <button onclick="window.secureDelete('finanzas','${docSnap.id}','loadFinanceData')" style="background:none; border:none; color:var(--terracota); margin-left:15px; cursor:pointer">×</button>
+                        </div>
+                    </div>`;
             });
-            document.getElementById('display-neto').innerText = `$${(v-g).toFixed(2)}`;
-            document.getElementById('val-ventas').innerText = `$${v.toFixed(0)}`;
-            document.getElementById('val-gastos').innerText = `$${g.toFixed(0)}`;
-            const total = v + g;
-            if(total > 0) {
-                document.getElementById('bar-gain').style.width = (v/total*100) + "%";
-                document.getElementById('bar-loss').style.width = (g/total*100) + "%";
-                document.getElementById('label-utilidad').innerText = `${((v-g)/v*100).toFixed(1)}% UTILIDAD`;
+
+            const neto = ingresos - gastos;
+            document.getElementById('neto-val').innerText = `$${neto.toFixed(2)}`;
+            document.getElementById('total-v').innerText = `$${ingresos.toFixed(0)}`;
+            document.getElementById('total-g').innerText = `$${gastos.toFixed(0)}`;
+            
+            const totalFlujo = ingresos + gastos;
+            if(totalFlujo > 0) {
+                const util = ingresos > 0 ? ((neto / ingresos) * 100) : 0;
+                document.getElementById('bar-v').style.width = (ingresos / totalFlujo * 100) + "%";
+                document.getElementById('bar-g').style.width = (gastos / totalFlujo * 100) + "%";
+                document.getElementById('perc-utilidad').innerText = `${util.toFixed(1)}% MARGEN DE UTILIDAD`;
+                document.getElementById('label-status-fin').innerText = util > 25 ? "RENDIMIENTO ÓPTIMO" : "REVISIÓN DE COSTOS RECOMENDADA";
             }
         };
 
-        // --- AGENDA ---
-        window.navMonth = (d) => { activeDate.setMonth(activeDate.getMonth() + d); loadCalendar(); };
-        window.loadCalendar = async () => {
-            const box = document.getElementById('cal-box'); box.innerHTML = "";
-            document.getElementById('cal-title').innerText = activeDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+        /**
+         * MÓDULO: AGENDA Y RESERVACIONES (ESTABLE)
+         */
+        window.navMonth = (dir) => { activeCalDate.setMonth(activeCalDate.getMonth() + dir); renderCalendar(); };
+
+        window.renderCalendar = async () => {
+            const grid = document.getElementById('cal-grid-render');
+            grid.innerHTML = "";
+            document.getElementById('cal-month-display').innerText = activeCalDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+
             const snap = await getDocs(collection(db, "agenda"));
-            const evs = snap.docs.map(d => d.data().fecha);
-            const y = activeDate.getFullYear(), m = activeDate.getMonth();
-            const start = new Date(y, m, 1).getDay();
-            const days = new Date(y, m + 1, 0).getDate();
-            for(let i=0; i<start; i++) box.innerHTML += `<div></div>`;
-            for(let i=1; i<=days; i++) {
-                const k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                box.innerHTML += `<div class="cal-day ${evs.includes(k)?'event':''} ${selectedDay===k?'active':''}" onclick="window.pickDay('${k}')">${i}</div>`;
+            const registeredDates = snap.docs.map(d => d.data().fecha);
+
+            const year = activeCalDate.getFullYear();
+            const month = activeCalDate.getMonth();
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            for(let i=0; i<firstDay; i++) grid.innerHTML += `<div></div>`;
+            for(let i=1; i<=daysInMonth; i++) {
+                const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                const hasEvent = registeredDates.includes(dateKey);
+                const isSelected = activeCalDay === dateKey;
+                grid.innerHTML += `<div class="cal-unit ${hasEvent?'marked':''} ${isSelected?'active':''}" onclick="window.selectDay('${dateKey}')">${i}</div>`;
             }
         };
-        window.pickDay = (d) => { selectedDay = d; document.getElementById('cal-day-label').innerText = `Día: ${d}`; loadCalendar(); refreshDayEvents(d); };
+
+        window.selectDay = (date) => {
+            activeCalDay = date;
+            document.getElementById('cal-selected-label').innerText = `DÍA SELECCIONADO: ${date}`;
+            renderCalendar();
+            loadDayEvents(date);
+        };
+
         window.saveEvent = async () => {
-            if(!selectedDay) return;
-            await addDoc(collection(db, "agenda"), { tit: document.getElementById('ev-tit').value, hora: document.getElementById('ev-hor').value, fecha: selectedDay });
-            loadCalendar(); refreshDayEvents(selectedDay);
-        };
-        window.refreshDayEvents = async (f) => {
-            const snap = await getDocs(query(collection(db, "agenda"), where("fecha", "==", f)));
-            const list = document.getElementById('list-events'); list.innerHTML = "";
-            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.delDoc('agenda','${d.id}','loadCalendar')">×</button></div>`);
+            if(!activeCalDay) return window.notifyOS("SIN FECHA", "Debes seleccionar un día en el calendario.", true);
+            const tit = document.getElementById('ev-tit').value;
+            if(!tit) return;
+            await addDoc(collection(db, "agenda"), { tit, hora: document.getElementById('ev-hor').value, fecha: activeCalDay });
+            document.getElementById('ev-tit').value = "";
+            renderCalendar(); loadDayEvents(activeCalDay);
         };
 
-        // --- BODEGA ---
-        window.saveInventory = async () => {
-            await addDoc(collection(db, "inventario"), { item: document.getElementById('inv-item').value, qty: document.getElementById('inv-qty').value });
-            loadBodega();
-        };
-        window.saveRecipe = async () => {
-            await addDoc(collection(db, "recetas"), { nom: document.getElementById('rec-nom').value, cost: document.getElementById('rec-cost').value, steps: document.getElementById('rec-steps').value });
-            loadBodega();
-        };
-        window.loadBodega = async () => {
-            const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas"));
-            const iL = document.getElementById('list-inventory'), rL = document.getElementById('list-recipes');
-            iL.innerHTML = ""; rL.innerHTML = "";
-            iS.forEach(d => iL.innerHTML += `<div class="item-row">${d.data().item} <b>${d.data().qty} <button onclick="window.delDoc('inventario','${d.id}','loadBodega')">×</button></b></div>`);
-            rS.forEach(d => rL.innerHTML += `<div class="item-row">${d.data().nom} <b>$${d.data().cost} <button onclick="window.delDoc('recetas','${d.id}','loadBodega')">×</button></b></div>`);
-        };
-
-        // --- ADMIN / NÓMINA ---
-        window.loadAdminData = async () => { loadPayroll(); loadTasks(); loadStaff(); };
-        window.loadPayroll = async () => {
-            const uS = await getDocs(collection(db, "usuarios")), aS = await getDocs(collection(db, "asistencias"));
-            const render = document.getElementById('render-payroll'); render.innerHTML = "";
-            uS.forEach(uDoc => {
-                const u = uDoc.data(); const lP = u.ultimoPago ? new Date(u.ultimoPago) : new Date(0);
-                const hits = aS.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) > lP).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
-                let hrs = 0;
-                for(let i=0; i<hits.length; i++){
-                    if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA') { hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; }
-                }
-                const pag = hrs * (u.sueldo || 0);
-                render.innerHTML += `<div class="item-row"><div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} hrs</small></div><b>$${pag.toFixed(0)} <button onclick="window.payStaff('${uDoc.id}','${u.nombre}',${pag})">PAGAR</button></b></div>`;
+        window.loadDayEvents = async (fecha) => {
+            const q = query(collection(db, "agenda"), where("fecha", "==", fecha));
+            const snap = await getDocs(q);
+            const list = document.getElementById('lista-agenda');
+            list.innerHTML = "";
+            snap.forEach(d => {
+                list.innerHTML += `<div class="list-row"><span>${d.data().hora} - ${d.data().tit}</span> <button onclick="window.secureDelete('agenda','${d.id}','renderCalendar')">×</button></div>`;
             });
         };
-        window.payStaff = async (uid, nom, mon) => {
-            await addDoc(collection(db, "finanzas"), { desc: `PAGO: ${nom}`, monto: mon, tipo: 'GASTO', canal: 'CAJA', fecha: new Date().toISOString() });
+
+        /**
+         * MÓDULO: ALMACÉN Y RECETARIO (ROBUSTO)
+         */
+        window.saveInv = async () => {
+            const item = document.getElementById('inv-nom').value;
+            const qty = parseFloat(document.getElementById('inv-can').value);
+            if(!item || isNaN(qty)) return;
+            await addDoc(collection(db, "inventario"), { item, qty, fecha: new Date().toISOString() });
+            document.getElementById('inv-nom').value = ""; document.getElementById('inv-can').value = "";
+            loadWarehouseData();
+        };
+
+        window.saveRecipe = async () => {
+            const nom = document.getElementById('rec-nom').value;
+            if(!nom) return;
+            await addDoc(collection(db, "recetas"), { nom, cost: document.getElementById('rec-cos').value, detail: document.getElementById('rec-det').value });
+            document.getElementById('rec-nom').value = ""; document.getElementById('rec-cos').value = ""; document.getElementById('rec-det').value = "";
+            loadWarehouseData();
+        };
+
+        window.loadWarehouseData = async () => {
+            const invSnap = await getDocs(collection(db, "inventario"));
+            const recSnap = await getDocs(collection(db, "recetas"));
+            const iList = document.getElementById('lista-inventario');
+            const rList = document.getElementById('lista-recetas');
+            iList.innerHTML = ""; rList.innerHTML = "";
+
+            invSnap.forEach(d => iList.innerHTML += `<div class="list-row"><span>${d.data().item}</span> <b>${d.data().qty} un. <button onclick="window.secureDelete('inventario','${d.id}','loadWarehouseData')">×</button></b></div>`);
+            recSnap.forEach(d => rList.innerHTML += `<div class="list-row"><span>${d.data().nom}</span> <b>$${d.data().cost} <button onclick="window.secureDelete('recetas','${d.id}','loadWarehouseData')">×</button></b></div>`);
+        };
+
+        /**
+         * MÓDULO: ADMINISTRACIÓN, NÓMINA Y STAFF
+         */
+        window.loadAdminData = async () => {
+            loadPayrollCalculation();
+            loadStaffManagement();
+            loadOperationalChecklist();
+        };
+
+        window.loadPayrollCalculation = async () => {
+            const users = await getDocs(collection(db, "usuarios"));
+            const punches = await getDocs(collection(db, "asistencias"));
+            const render = document.getElementById('render-nomina');
+            render.innerHTML = "";
+
+            users.forEach(uDoc => {
+                const u = uDoc.data();
+                const lastPayDate = u.ultimoPago ? new Date(u.ultimoPago) : new Date(0);
+                const userPunches = punches.docs.map(p=>p.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) > lastPayDate).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+                
+                let totalHours = 0;
+                for(let i=0; i<userPunches.length; i++){
+                    if(userPunches[i].tipo==='ENTRADA' && userPunches[i+1]?.tipo==='SALIDA'){
+                        totalHours += (new Date(userPunches[i+1].fecha) - new Date(userPunches[i].fecha)) / 3600000;
+                        i++;
+                    }
+                }
+                const amountToPay = totalHours * (u.sueldo || 0);
+                render.innerHTML += `
+                    <div class="list-row">
+                        <div><b>${u.nombre}</b><br><small>${totalHours.toFixed(2)} horas trabajadas</small></div>
+                        <div style="text-align:right">
+                            <b style="display:block">$${amountToPay.toFixed(0)}</b>
+                            <button class="gold-btn" style="padding:6px 12px; border-radius:10px; font-size:0.6rem; font-weight:900" onclick="window.executePayment('${uDoc.id}','${u.nombre}',${amountToPay})">LIQUIDAR</button>
+                        </div>
+                    </div>`;
+            });
+        };
+
+        window.executePayment = async (uid, nom, total) => {
+            if(total <= 0) return window.notifyOS("SIN SALDO", "Este colaborador no tiene horas acumuladas para liquidar.", true);
+            if(!confirm(`¿Confirmas el pago de $${total} a ${nom}? Las horas volverán a cero.`)) return;
+            
+            await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: total, tipo: 'GASTO', canal: 'CAJA', fecha: new Date().toISOString() });
             await updateDoc(doc(db, "usuarios", uid), { ultimoPago: new Date().toISOString() });
-            window.alertOS("PAGADO", "Horas reiniciadas."); loadAdminData(); loadFinances();
+            window.notifyOS("PAGO REGISTRADO", `Se ha generado el egreso por $${total}. El contador de horas para ${nom} se ha reiniciado.`);
+            loadAdminData();
         };
 
-        // --- CHECKLIST ---
         window.addNewTask = async () => {
-            await addDoc(collection(db, "tareas"), { tarea: document.getElementById('task-name').value, status: false });
-            document.getElementById('task-name').value = ""; loadTasks();
+            const t = document.getElementById('task-name').value;
+            if(!t) return;
+            await addDoc(collection(db, "tareas"), { tarea: t, status: false });
+            document.getElementById('task-name').value = "";
+            loadOperationalChecklist();
         };
-        window.loadTasks = async () => {
+
+        window.loadOperationalChecklist = async () => {
             const snap = await getDocs(collection(db, "tareas"));
-            const render = document.getElementById('render-tasks'); render.innerHTML = "";
-            snap.forEach(d => render.innerHTML += `<div class="item-row"><input type="checkbox" ${d.data().status?'checked':''} onchange="window.checkT('${d.id}',this.checked)"> ${d.data().tarea} <button onclick="window.delDoc('tareas','${d.id}','loadTasks')">×</button></div>`);
-        };
-        window.checkT = async (id, s) => await updateDoc(doc(db, "tareas", id), { status: s });
-
-        // --- ASISTENCIA ---
-        window.processPunch = async (t) => {
-            await addDoc(collection(db, "asistencias"), { uid: userAuth.id, name: userAuth.nombre, tipo: t, fecha: new Date().toISOString() });
-            window.alertOS("LISTO", `${t} registrada.`); loadRecent();
-        };
-        window.loadRecent = async () => {
-            const snap = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(5)));
-            const list = document.getElementById('list-recent-punches'); list.innerHTML = "<h4>RECIENTE</h4>";
-            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().name} - ${d.data().tipo}</div>`);
+            const render = document.getElementById('render-tasks');
+            render.innerHTML = "";
+            snap.forEach(d => {
+                render.innerHTML += `
+                    <div class="list-row">
+                        <input type="checkbox" style="width:22px; height:22px" ${d.data().status?'checked':''} onchange="window.toggleTaskStatus('${d.id}', this.checked)">
+                        <span style="flex:1; margin-left:15px">${d.data().tarea}</span>
+                        <button onclick="window.secureDelete('tareas','${d.id}','loadOperationalChecklist')" style="color:var(--terracota); background:none; border:none">×</button>
+                    </div>`;
+            });
         };
 
-        window.delDoc = async (c, i, cb) => { if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, c, i)); window[cb](); } };
-        window.addNewStaff = async () => {
-            await addDoc(collection(db, "usuarios"), { nombre: document.getElementById('st-name').value, pin: document.getElementById('st-pin').value, sueldo: parseFloat(document.getElementById('st-wage').value), rol: 'Staff', ultimoPago: new Date().toISOString() });
-            loadStaff();
+        window.toggleTaskStatus = async (id, s) => { await updateDoc(doc(db, "tareas", id), { status: s }); };
+
+        window.addStaffMember = async () => {
+            const n = document.getElementById('st-nom').value;
+            const p = document.getElementById('st-pin').value;
+            const s = parseFloat(document.getElementById('st-pag').value);
+            if(!n || !p) return;
+            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, sueldo: s, rol: 'Staff', ultimoPago: new Date().toISOString() });
+            document.getElementById('st-nom').value = ""; document.getElementById('st-pin').value = "";
+            loadStaffManagement();
         };
-        window.loadStaff = async () => {
+
+        window.loadStaffManagement = async () => {
             const snap = await getDocs(collection(db, "usuarios"));
-            const list = document.getElementById('list-staff'); list.innerHTML = "";
-            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().nombre} <button onclick="window.delDoc('usuarios','${d.id}','loadStaff')">×</button></div>`);
+            const list = document.getElementById('lista-staff');
+            list.innerHTML = "";
+            snap.forEach(d => list.innerHTML += `<div class="list-row">${d.data().nombre} (${d.data().rol}) <button onclick="window.secureDelete('usuarios','${d.id}','loadStaffManagement')">×</button></div>`);
         };
 
-        const initApp = () => {
-            window.switchView('reloj'); loadFinances(); loadRecent();
+        /**
+         * MÓDULO: CONTROL DE ASISTENCIA (RELOJ CHECADOR)
+         */
+        window.handlePunch = async (tipo) => {
+            await addDoc(collection(db, "asistencias"), { uid: sessionUser.id, name: sessionUser.nombre, tipo, fecha: new Date().toISOString() });
+            window.notifyOS("REGISTRO EXITOSO", `Se ha marcado tu ${tipo} el ${new Date().toLocaleTimeString()}.`);
+            loadRecentPunches();
+        };
+
+        window.loadRecentPunches = async () => {
+            const q = query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(6));
+            const snap = await getDocs(q);
+            const list = document.getElementById('lista-asistencias');
+            list.innerHTML = "<h4 style='margin-bottom:20px; color:var(--dorado); letter-spacing:2px'>ÚLTIMOS MOVIMIENTOS</h4>";
+            snap.forEach(d => list.innerHTML += `<div class="list-row"><span>${d.data().name}</span> <b style="color:var(--dorado)">${d.data().tipo}</b></div>`);
+        };
+
+        /**
+         * UTILIDADES GLOBALES DE SISTEMA
+         */
+        window.secureDelete = async (col, id, callback) => {
+            if(confirm("¿Estás seguro de eliminar permanentemente este registro del sistema? Esta acción no se puede deshacer.")) {
+                await deleteDoc(doc(db, col, id));
+                if(callback) window[callback]();
+            }
+        };
+
+        const initAppSequence = () => {
+            window.nav('reloj');
+            loadFinanceData();
+            loadRecentPunches();
+            
+            // RELOJ DE ALTA PRECISIÓN (REPARADO)
             setInterval(() => {
-                const n = new Date();
-                document.getElementById('live-clock').innerText = n.toLocaleTimeString();
-                document.getElementById('live-date').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+                const now = new Date();
+                const clockElem = document.getElementById('live-time');
+                const dateElem = document.getElementById('live-date');
+                if(clockElem) clockElem.innerText = now.toLocaleTimeString('es-MX', { hour12: false });
+                if(dateElem) dateElem.innerText = now.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' });
             }, 1000);
         };
 
-        setupNumpad();
+        renderNumpad();
     </script>
 </body>
 </html>
