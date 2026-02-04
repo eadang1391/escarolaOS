@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v14.2</title>
+    <title>EscarolaOS v14.3</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -104,7 +104,6 @@
             width: 100%; max-width: 450px; border: 2px solid var(--dorado); text-align: center; 
         }
 
-        /* ESTILOS REPORTES */
         .report-bar { height: 12px; background: #333; border-radius: 6px; overflow: hidden; margin: 10px 0; display: flex; }
         .bar-fill-v { background: var(--dorado); height: 100%; }
         .bar-fill-g { background: var(--terracota); height: 100%; }
@@ -128,20 +127,24 @@
                 <h1 id="neto-display" style="font-size:3.5rem; margin:10px 0">$0.00</h1>
             </div>
 
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:20px">
+                <div class="card" style="margin:0; padding:15px; text-align:center">
+                    <span style="font-size:0.6rem">CAJA EFECTIVO</span>
+                    <h3 id="caja-efectivo" class="txt-ingreso">$0</h3>
+                </div>
+                <div class="card" style="margin:0; padding:15px; text-align:center">
+                    <span style="font-size:0.6rem">BANCO/TRANSF</span>
+                    <h3 id="caja-banco" class="txt-ingreso">$0</h3>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="header-s">Reporte de Rendimiento</div>
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.8rem">
-                    <span>Balance de Flujo</span>
-                    <span id="perc-rend">0% Utilidad</span>
-                </div>
                 <div class="report-bar">
                     <div id="bar-v" class="bar-fill-v" style="width: 50%"></div>
                     <div id="bar-g" class="bar-fill-g" style="width: 50%"></div>
                 </div>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px">
-                    <div style="font-size:0.7rem"><i class="fa-solid fa-circle" style="color:var(--dorado)"></i> VENTAS: <span id="tot-ventas">0</span></div>
-                    <div style="font-size:0.7rem"><i class="fa-solid fa-circle" style="color:var(--terracota)"></i> GASTOS: <span id="tot-gastos">0</span></div>
-                </div>
+                <div id="perc-rend" style="font-size:0.7rem; text-align:center; color:var(--dorado)">0% Utilidad</div>
             </div>
 
             <div class="card">
@@ -152,7 +155,7 @@
                     <select id="f-tipo" class="f-input" style="margin:0"><option value="INGRESO">Venta (+)</option><option value="GASTO">Gasto (-)</option></select>
                     <select id="f-canal" class="f-input" style="margin:0"><option value="CAJA">Caja</option><option value="BANCO">Banco</option></select>
                 </div>
-                <button class="btn-p btn-gold" onclick="window.saveFin()">Registrar en Libros</button>
+                <button class="btn-p btn-gold" onclick="window.saveFin()">Registrar</button>
             </div>
             <div id="fin-list"></div>
         </div>
@@ -161,7 +164,7 @@
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
                     <button onclick="window.moveMonth(-1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-circle-chevron-left"></i></button>
-                    <h2 id="cal-month-title" style="font-size:1rem; letter-spacing:2px">CARGANDO...</h2>
+                    <h2 id="cal-month-title" style="font-size:1rem; letter-spacing:2px">ENERO 2026</h2>
                     <button onclick="window.moveMonth(1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-circle-chevron-right"></i></button>
                 </div>
                 <div id="cal-render" class="cal-grid"></div>
@@ -193,16 +196,16 @@
                 <input type="text" id="r-nom" class="f-input" placeholder="Nombre del Platillo">
                 <input type="number" id="r-cos" class="f-input" placeholder="Costo de Producción $">
                 <textarea id="r-det" class="f-input" placeholder="Detalle de Ingredientes..." style="border-radius:20px; height:80px"></textarea>
-                <button class="btn-p btn-gold" onclick="window.saveReceta()">Guardar en Recetario</button>
+                <button class="btn-p btn-gold" onclick="window.saveReceta()">Guardar Receta</button>
                 <div id="recetas-list" style="margin-top:20px"></div>
             </div>
             <div class="card">
-                <div class="header-s">Control de Stock (Toca para editar)</div>
+                <div class="header-s">Control de Stock</div>
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">
                     <input type="text" id="i-nom" class="f-input" placeholder="Insumo">
                     <input type="number" id="i-can" class="f-input" placeholder="Cant.">
                 </div>
-                <button class="btn-p btn-gold" onclick="window.saveStock()">Agregar al Inventario</button>
+                <button class="btn-p btn-gold" onclick="window.saveStock()">Agregar Insumo</button>
                 <div id="stock-list" style="margin-top:20px"></div>
             </div>
         </div>
@@ -261,6 +264,17 @@
         let activeMonth = new Date();
         let editingStaffId = null;
 
+        // --- SISTEMA DE POPUPS ---
+        window.showMsg = (tit, txt, tipo = 'gold') => {
+            const btnClass = tipo === 'gold' ? 'btn-gold' : 'btn-red';
+            document.getElementById('modal-body').innerHTML = `
+                <h2 style="color:var(--dorado); margin-bottom:15px">${tit}</h2>
+                <p style="margin-bottom:25px; opacity:0.8">${txt}</p>
+                <button class="btn-p ${btnClass}" onclick="document.getElementById('modal-sys').style.display='none'">ENTENDIDO</button>
+            `;
+            document.getElementById('modal-sys').style.display = 'flex';
+        };
+
         const initNumpad = () => {
             const grid = document.getElementById('numpad-grid');
             for(let i=1; i<=9; i++) grid.innerHTML += `<div class="key-btn" style="width:80px; height:80px; border-radius:50%; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--dorado); background:var(--glass)" onclick="window.pressKey(${i})">${i}</div>`;
@@ -296,43 +310,53 @@
             document.getElementById(`v-${view}`).style.display = 'block';
         };
 
+        // --- FINANZAS REINTEGRADO ---
         window.saveFin = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
             const d = document.getElementById('f-desc').value;
             if(!m || !d) return;
-            await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('f-tipo').value, canal: document.getElementById('f-canal').value, fecha: new Date().toISOString() });
+            await addDoc(collection(db, "finanzas"), { 
+                desc: d, monto: m, 
+                tipo: document.getElementById('f-tipo').value, 
+                canal: document.getElementById('f-canal').value, 
+                fecha: new Date().toISOString() 
+            });
+            window.showMsg("ÉXITO", "Operación guardada correctamente");
             loadFinData();
         };
 
         window.loadFinData = async () => {
             const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let total = 0, v = 0, g = 0;
+            let total = 0, v = 0, g = 0, cEf = 0, cBa = 0;
             const list = document.getElementById('fin-list'); list.innerHTML = "";
             snap.forEach(docSnap => {
                 const data = docSnap.data();
                 const isGasto = data.tipo === 'GASTO';
+                const val = isGasto ? -data.monto : data.monto;
+                
                 if(isGasto) g += data.monto; else v += data.monto;
-                total += isGasto ? -data.monto : data.monto;
-                list.innerHTML += `<div class="item-row"><span>${data.desc}</span> <b class="${isGasto ? 'txt-gasto' : 'txt-ingreso'}">$${data.monto} <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')">×</button></b></div>`;
+                if(data.canal === 'CAJA') cEf += val; else cBa += val;
+                total += val;
+
+                list.innerHTML += `<div class="item-row">
+                    <span>${data.desc} <small>(${data.canal})</small></span> 
+                    <b class="${isGasto ? 'txt-gasto' : 'txt-ingreso'}">$${data.monto} 
+                    <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')">×</button></b>
+                </div>`;
             });
-            
-            // UI Update
             document.getElementById('neto-display').innerText = `$${total.toFixed(2)}`;
-            document.getElementById('tot-ventas').innerText = `$${v.toFixed(2)}`;
-            document.getElementById('tot-gastos').innerText = `$${g.toFixed(2)}`;
+            document.getElementById('caja-efectivo').innerText = `$${cEf.toFixed(2)}`;
+            document.getElementById('caja-banco').innerText = `$${cBa.toFixed(2)}`;
             
-            // Report Bar Logic
             const totalFlujo = v + g;
             if(totalFlujo > 0) {
-                const pV = (v / totalFlujo) * 100;
-                const pG = (g / totalFlujo) * 100;
-                document.getElementById('bar-v').style.width = pV + "%";
-                document.getElementById('bar-g').style.width = pG + "%";
-                const utilidad = v > 0 ? ((v - g) / v * 100).toFixed(1) : 0;
-                document.getElementById('perc-rend').innerText = `${utilidad}% Utilidad`;
+                document.getElementById('bar-v').style.width = (v/totalFlujo*100) + "%";
+                document.getElementById('bar-g').style.width = (g/totalFlujo*100) + "%";
+                document.getElementById('perc-rend').innerText = `${((v-g)/v*100).toFixed(1)}% Rendimiento Real`;
             }
         };
 
+        // --- AGENDA ---
         window.moveMonth = (dir) => { activeMonth.setMonth(activeMonth.getMonth() + dir); loadAgenda(); };
         window.loadAgenda = async () => {
             const grid = document.getElementById('cal-render');
@@ -349,6 +373,7 @@
 
         window.saveAg = async () => {
             await addDoc(collection(db, "agenda"), { tit: document.getElementById('ag-tit').value, fecha: document.getElementById('ag-fec').value, hora: document.getElementById('ag-hor').value });
+            window.showMsg("AGENDA", "Evento reservado");
             loadAgenda();
         };
 
@@ -359,18 +384,19 @@
             snap.forEach(d => container.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.removeDoc('agenda','${d.id}','loadAgenda')">×</button></div>`);
         };
 
+        // --- RELOJ ---
         window.handlePunch = async (tipo) => {
             if(tipo === 'SALIDA') {
                 const tasks = await getDocs(collection(db, "tareas"));
                 let html = `<h3>CHECKLIST SALIDA</h3>`;
                 tasks.forEach(t => html += `<label style="display:block; margin:10px 0; text-align:left"><input type="checkbox" class="exit-chk"> ${t.data().tarea}</label>`);
-                html += `<button class="btn-p btn-gold" onclick="window.confirmExit()">FINALIZAR</button>`;
+                html += `<button class="btn-p btn-gold" onclick="window.confirmExit()">FINALIZAR TURNO</button>`;
                 document.getElementById('modal-body').innerHTML = html;
                 document.getElementById('modal-sys').style.display = 'flex';
-            } else { recordPunch('ENTRADA'); }
+            } else { recordPunch('ENTRADA'); window.showMsg("RELOJ", "Entrada registrada"); }
         };
 
-        window.confirmExit = () => { recordPunch('SALIDA'); setTimeout(() => location.reload(), 1000); };
+        window.confirmExit = () => { recordPunch('SALIDA'); window.showMsg("RELOJ", "Turno finalizado. Hasta mañana"); setTimeout(() => location.reload(), 2000); };
         const recordPunch = async (t) => {
             await addDoc(collection(db, "asistencias"), { uid: currentUser.id, name: currentUser.nombre, tipo: t, fecha: new Date().toISOString() });
             if(currentUser.rol === 'Socio') loadPunchHistory();
@@ -382,8 +408,10 @@
             snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().name} (${d.data().tipo})</span> <button onclick="window.removeDoc('asistencias','${d.id}','loadPunchHistory')">×</button></div>`);
         };
 
+        // --- BODEGA ---
         window.saveReceta = async () => {
             await addDoc(collection(db, "recetas"), { platillo: document.getElementById('r-nom').value, costo: document.getElementById('r-cos').value, detalles: document.getElementById('r-det').value });
+            window.showMsg("RECETARIO", "Platillo costeado y guardado");
             loadBodegaData();
         };
 
@@ -401,8 +429,9 @@
             invS.forEach(d => document.getElementById('stock-list').innerHTML += `<div class="item-row" onclick="window.editInsumo('${d.id}','${d.data().insumo}',${d.data().cant})">${d.data().insumo}: ${d.data().cant} <button onclick="window.removeDoc('inventario','${d.id}','loadBodegaData')">×</button></div>`);
         };
 
-        window.editInsumo = (id, n, c) => { const nc = prompt(`Stock ${n}:`, c); if(nc !== null) updateDoc(doc(db, "inventario", id), { cant: parseFloat(nc) }).then(() => loadBodegaData()); };
+        window.editInsumo = (id, n, c) => { const nc = prompt(`Nuevo stock para ${n}:`, c); if(nc !== null) updateDoc(doc(db, "inventario", id), { cant: parseFloat(nc) }).then(() => loadBodegaData()); };
 
+        // --- ADMIN & STAFF ---
         window.addStaff = async () => {
             await addDoc(collection(db, "usuarios"), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: document.getElementById('u-rol').value });
             loadStaffData();
@@ -415,21 +444,6 @@
             loadPayroll();
         };
 
-        window.prepEditStaff = async (id) => {
-            const snap = await getDocs(collection(db, "usuarios"));
-            const u = snap.docs.find(x => x.id === id).data();
-            editingStaffId = id;
-            document.getElementById('u-nom').value = u.nombre; document.getElementById('u-pin').value = u.pin; document.getElementById('u-pag').value = u.sueldo; document.getElementById('u-rol').value = u.rol;
-            document.getElementById('u-add-btn').style.display = 'none'; document.getElementById('u-edit-btns').style.display = 'flex';
-        };
-
-        window.updateStaff = async () => {
-            await updateDoc(doc(db, "usuarios", editingStaffId), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: document.getElementById('u-rol').value });
-            window.cancelStaffEdit(); loadStaffData();
-        };
-
-        window.cancelStaffEdit = () => { editingStaffId = null; document.getElementById('u-add-btn').style.display = 'block'; document.getElementById('u-edit-btns').style.display = 'none'; };
-
         window.loadPayroll = async () => {
             const uS = await getDocs(collection(db, "usuarios"));
             const aS = await getDocs(collection(db, "asistencias"));
@@ -439,11 +453,28 @@
                 const hits = aS.docs.map(d=>d.data()).filter(p=>p.uid === uDoc.id).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
                 let hrs = 0;
                 for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs+=(new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
-                render.innerHTML += `<div class="item-row"><b>${u.nombre}</b> <span>$${(hrs * (u.sueldo || 0)).toFixed(0)} <button class="btn-gold" style="width:auto; padding:5px 10px; border-radius:10px" onclick="window.payStaff('${u.nombre}',${hrs * (u.sueldo || 0)})">Pagar</button></span></div>`;
+                const monto = hrs * (u.sueldo || 0);
+                render.innerHTML += `<div class="item-row"><b>${u.nombre}</b> <span>$${monto.toFixed(0)} <button class="btn-gold" style="width:auto; padding:5px 10px; border-radius:10px" onclick="window.payPopup('${u.nombre}',${monto})">Pagar</button></span></div>`;
             });
         };
 
-        window.payStaff = (nom, monto) => { if(confirm(`Pagar $${monto} a ${nom}?`)) { addDoc(collection(db, "finanzas"), { desc: `PAGO STAFF: ${nom}`, monto: monto, tipo: 'GASTO', canal: 'CAJA', fecha: new Date().toISOString() }).then(() => loadFinData()); } };
+        window.payPopup = (nom, monto) => {
+            document.getElementById('modal-body').innerHTML = `
+                <h3>Pagar a ${nom}</h3>
+                <p>Monto: $${monto.toFixed(0)}</p><br>
+                <button class="btn-p btn-gold" onclick="window.confirmPay('${nom}',${monto},'CAJA')">EFECTIVO (CAJA)</button><br><br>
+                <button class="btn-p btn-gold" onclick="window.confirmPay('${nom}',${monto},'BANCO')">TRANSFERENCIA</button><br><br>
+                <button class="btn-p btn-red" onclick="document.getElementById('modal-sys').style.display='none'">CANCELAR</button>
+            `;
+            document.getElementById('modal-sys').style.display = 'flex';
+        };
+
+        window.confirmPay = async (nom, monto, canal) => {
+            await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: monto, tipo: 'GASTO', canal: canal, fecha: new Date().toISOString() });
+            document.getElementById('modal-sys').style.display = 'none';
+            window.showMsg("NÓMINA", "Pago registrado en libros");
+            loadFinData();
+        };
 
         window.addTask = async () => { await addDoc(collection(db, "tareas"), { tarea: document.getElementById('t-nom').value }); document.getElementById('t-nom').value = ""; loadTasks(); };
         window.loadTasks = async () => {
@@ -456,7 +487,7 @@
 
         const startApp = () => {
             window.goTo('reloj'); loadFinData(); loadAgenda(); loadBodegaData();
-            if(currentUser.rol === 'Socio') { loadStaffData(); loadPunchHistory(); loadTasks(); }
+            if(currentUser.rol === 'Socio') { loadStaffData(); loadTasks(); }
             setInterval(() => {
                 const now = new Date();
                 document.getElementById('main-clock').innerText = now.toLocaleTimeString();
