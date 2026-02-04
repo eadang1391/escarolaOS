@@ -2,650 +2,1078 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>EscarolaOS v9.0 - Enterprise Suite</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EscarolaOS v12.0 - Enterprise Management System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://unpkg.com/tesseract.js@v2.1.0/dist/tesseract.min.js"></script>
 
     <style>
+        /* --- VARIABLES DE DISEÑO ESCAROLA --- */
         :root {
-            --verde-bosque: #1b3022; --verde-oscuro: #14241a; --terracota: #b0413e;
-            --cantera: #d9d4c7; --dorado: #c5a059; --negro: #0a0a0a;
-            --azul-banco: #4a90e2; --blanco-trans: rgba(217, 212, 199, 0.12); 
-            --shadow: 0 20px 60px rgba(0,0,0,0.9); --radius-lg: 40px; --radius-md: 25px;
+            --verde-bosque: #1b3022;
+            --verde-oscuro: #14241a;
+            --terracota: #b0413e;
+            --cantera: #d9d4c7;
+            --dorado: #c5a059;
+            --negro: #0a0a0a;
+            --azul-banco: #4a90e2;
+            --blanco-trans: rgba(217, 212, 199, 0.12); 
+            --shadow-strong: 0 25px 50px -12px rgba(0, 0, 0, 0.8);
+            --radius-xl: 40px;
+            --transition-soft: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* --- BASE RESPONSIVA --- */
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; font-family: 'Inter', 'Segoe UI', sans-serif; }
-        body { background: var(--verde-bosque); color: var(--cantera); margin: 0; height: 100vh; overflow: hidden; }
+        /* --- RESET GENERAL --- */
+        * { 
+            box-sizing: border-box; 
+            -webkit-tap-highlight-color: transparent; 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
+        }
 
-        /* --- SISTEMA DE ACCESO --- */
-        #login-screen { position: fixed; inset: 0; background: var(--verde-bosque); display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 30000; transition: transform 0.8s cubic-bezier(0.77, 0, 0.175, 1); }
-        .grid-pin { display: grid; grid-template-columns: repeat(3, 100px); gap: 25px; }
-        .btn-pin { width: 100px; height: 100px; border-radius: 50%; border: 2px solid var(--dorado); background: var(--verde-oscuro); color: var(--dorado); font-size: 2.5rem; font-weight: 900; cursor: pointer; transition: 0.1s; display: flex; align-items: center; justify-content: center; }
-        .btn-pin:active { background: var(--dorado); color: var(--verde-oscuro); transform: scale(0.9); }
-        .dot-box { display: flex; margin-bottom: 60px; gap: 30px; }
-        .dot { width: 28px; height: 28px; border: 3px solid var(--dorado); border-radius: 50%; transition: 0.4s; }
-        .dot.active { background: var(--dorado); box-shadow: 0 0 35px var(--dorado); }
+        body { 
+            background: var(--verde-bosque); 
+            color: var(--cantera); 
+            margin: 0; 
+            height: 100vh; 
+            overflow: hidden; 
+            -webkit-font-smoothing: antialiased;
+        }
 
-        /* --- CONTENEDORES ADAPTATIVOS --- */
-        .container { 
+        /* --- PANTALLA DE LOGIN (PINPAD) --- */
+        #login-screen { 
+            position: fixed; 
+            inset: 0; 
+            background: radial-gradient(circle at center, var(--verde-bosque), var(--negro)); 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            z-index: 100000; 
+            padding: 40px; 
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .login-logo h1 {
+            letter-spacing: 12px; 
+            font-size: 2.8rem; 
+            margin: 0; 
+            font-weight: 900;
+            text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+        }
+
+        .login-logo p {
+            color: var(--dorado); 
+            letter-spacing: 5px; 
+            font-size: 0.7rem; 
+            font-weight: 800;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+
+        .dot-container { 
+            display: flex; 
+            gap: 25px; 
+            margin-bottom: 50px; 
+        }
+
+        .pin-dot { 
+            width: 22px; 
+            height: 22px; 
+            border: 2px solid var(--dorado); 
+            border-radius: 50%; 
+            transition: var(--transition-soft); 
+        }
+
+        .pin-dot.filled { 
+            background: var(--dorado); 
+            box-shadow: 0 0 25px var(--dorado); 
+            transform: scale(1.3); 
+        }
+
+        .pin-grid { 
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 20px; 
             width: 100%; 
-            max-width: 1400px; 
+            max-width: 320px; 
+        }
+
+        .pin-key { 
+            aspect-ratio: 1; 
+            border-radius: 50%; 
+            border: 2px solid var(--blanco-trans); 
+            background: rgba(255,255,255,0.03); 
+            color: var(--dorado); 
+            font-size: 2rem; 
+            font-weight: 300; 
+            cursor: pointer; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            transition: all 0.15s ease;
+        }
+
+        .pin-key:active { 
+            background: var(--dorado); 
+            color: var(--verde-oscuro); 
+            transform: scale(0.9);
+            border-color: var(--dorado);
+        }
+
+        /* --- LAYOUT DE LA APP --- */
+        .main-wrapper { 
+            width: 100%; 
+            max-width: 1200px; 
             margin: 0 auto; 
             padding: 20px; 
             display: none; 
             height: 100vh; 
             overflow-y: auto; 
             padding-bottom: 180px; 
-            scrollbar-width: none; 
         }
-        .container::-webkit-scrollbar { display: none; }
 
-        /* --- GRID DE CAPITAL OPTIMIZADO --- */
-        .main-dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
+        .main-wrapper::-webkit-scrollbar { display: none; }
+
+        .glass-card { 
+            background: var(--verde-oscuro); 
+            border-radius: var(--radius-xl); 
+            padding: 30px; 
+            margin-bottom: 25px; 
+            border: 1px solid var(--blanco-trans); 
+            box-shadow: var(--shadow-strong); 
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 25px;
+            color: var(--dorado);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 800;
+        }
+
+        /* --- DASHBOARD DE CAPITAL --- */
+        .capital-hero {
+            text-align: center;
+            padding: 40px 20px;
+            background: linear-gradient(180deg, rgba(20,36,26,1) 0%, rgba(10,10,10,1) 100%);
+            border-bottom: 4px solid var(--dorado);
+            border-radius: var(--radius-xl);
             margin-bottom: 30px;
         }
 
-        .card { 
-            background: var(--verde-oscuro); 
-            border-radius: var(--radius-md); 
-            padding: 30px; 
-            border: 1px solid var(--blanco-trans); 
-            box-shadow: var(--shadow); 
-            position: relative; 
-            animation: fadeIn 0.6s ease;
+        .net-value {
+            font-size: 4rem;
+            font-weight: 900;
+            margin: 10px 0;
+            letter-spacing: -2px;
+            color: #fff;
         }
 
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .stats-grid { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); 
+            gap: 15px; 
+            margin-bottom: 30px; 
+        }
 
-        /* --- CAJAS DE TOTALES --- */
-        .stat-card {
-            padding: 25px;
-            border-radius: var(--radius-md);
+        @media (min-width: 1024px) { 
+            .stats-grid { grid-template-columns: repeat(4, 1fr); } 
+        }
+
+        .mini-stat { 
+            padding: 25px; 
+            border-radius: 25px; 
+            background: rgba(255,255,255,0.02); 
+            border: 1px solid var(--blanco-trans); 
+            text-align: center;
+            transition: var(--transition-soft);
+        }
+
+        .mini-stat:hover {
+            background: rgba(255,255,255,0.05);
+            transform: translateY(-5px);
+        }
+
+        .mini-stat h4 { margin: 5px 0; font-size: 1.6rem; color: #fff; }
+        .mini-label { font-size: 0.7rem; font-weight: 900; opacity: 0.5; text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- CALENDARIO TRADICIONAL --- */
+        .calendar-box {
+            background: #0d1510;
+            border-radius: 30px;
+            padding: 20px;
+            border: 1px solid var(--blanco-trans);
+        }
+
+        .cal-ctrls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .cal-month-name {
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: var(--dorado);
+        }
+
+        .cal-grid-system {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+        }
+
+        .cal-day-label {
+            text-align: center;
+            font-size: 0.65rem;
+            font-weight: 900;
+            color: var(--dorado);
+            padding-bottom: 10px;
+        }
+
+        .cal-date-cell {
+            aspect-ratio: 1;
+            background: rgba(255,255,255,0.02);
+            border-radius: 12px;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: center;
-            border: 1px solid rgba(255,255,255,0.05);
-            transition: 0.3s;
+            font-size: 0.9rem;
+            position: relative;
+            cursor: pointer;
+            border: 1px solid transparent;
+            transition: 0.2s;
         }
-        .stat-card:hover { transform: translateY(-5px); background: rgba(255,255,255,0.03); }
-        .stat-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.7; font-weight: 800; }
-        .stat-value { font-size: 2.2rem; font-weight: 900; margin: 10px 0; }
 
-        /* --- INPUTS Y BOTONES --- */
-        .btn-pill { 
-            border-radius: 100px; 
-            border: none; 
-            padding: 24px; 
-            font-weight: 900; 
-            cursor: pointer; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 15px; 
-            text-transform: uppercase; 
-            font-size: 1rem; 
-            width: 100%; 
-            transition: all 0.4s; 
-            letter-spacing: 2px; 
+        .cal-date-cell.active-today {
+            border-color: var(--dorado);
+            background: rgba(197,160,89,0.1);
+            color: var(--dorado);
+            font-weight: 900;
         }
+
+        .cal-date-cell.has-event::after {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--dorado);
+            border-radius: 50%;
+            position: absolute;
+            bottom: 8px;
+            box-shadow: 0 0 10px var(--dorado);
+        }
+
+        .cal-date-cell.not-current { opacity: 0.2; }
+
+        /* --- RELOJ CHECADOR --- */
+        .clock-container {
+            text-align: center;
+            padding: 50px 20px;
+            background: radial-gradient(circle, #1a2e21 0%, #050505 100%);
+            border-radius: 40px;
+            border: 2px solid var(--dorado);
+            margin-bottom: 30px;
+            box-shadow: 0 0 40px rgba(0,0,0,0.5);
+        }
+
+        #clock-time { 
+            font-size: 18vw; 
+            line-height: 1; 
+            font-weight: 900; 
+            margin: 0; 
+            color: #fff;
+            text-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        
+        @media (min-width: 768px) { #clock-time { font-size: 7rem; } }
+
+        #clock-date {
+            color: var(--dorado);
+            font-weight: 800;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        /* --- COMPONENTES DE FORMULARIO --- */
+        .btn-action {
+            width: 100%;
+            padding: 22px;
+            border-radius: 50px;
+            border: none;
+            font-weight: 900;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            transition: var(--transition-soft);
+        }
+
         .btn-gold { background: var(--dorado); color: var(--verde-oscuro); }
-        .btn-red { background: var(--terracota); color: white; }
+        .btn-red { background: var(--terracota); color: #fff; }
         .btn-outline { background: transparent; border: 2px solid var(--dorado); color: var(--dorado); }
         
-        input, select, textarea { 
-            width: 100%; 
-            padding: 22px; 
-            margin: 12px 0; 
-            background: var(--negro); 
-            border: 1px solid var(--blanco-trans); 
-            border-radius: 20px; 
-            color: white; 
-            font-size: 1.1rem; 
-            outline: none; 
+        .btn-action:active { transform: scale(0.96); opacity: 0.8; }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 20px;
+            margin: 10px 0;
+            background: var(--negro);
+            border: 1px solid var(--blanco-trans);
+            border-radius: 18px;
+            color: #fff;
+            font-size: 1rem;
+            transition: 0.3s;
         }
 
-        /* --- NAVBAR RESPONSIVA --- */
-        #main-nav { 
+        input:focus { border-color: var(--dorado); outline: none; background: #000; }
+
+        label {
+            font-size: 0.7rem;
+            color: var(--dorado);
+            text-transform: uppercase;
+            font-weight: 900;
+            margin-left: 10px;
+            letter-spacing: 1.5px;
+        }
+
+        /* --- NAVEGACIÓN PRINCIPAL --- */
+        #navbar-bottom { 
             position: fixed; 
             bottom: 30px; 
             left: 50%; 
             transform: translateX(-50%); 
-            width: 95%; 
-            max-width: 900px; 
-            background: rgba(10, 10, 10, 0.98); 
-            border-radius: 100px; 
+            width: 94%; 
+            max-width: 600px; 
+            background: rgba(10, 10, 10, 0.96); 
+            border-radius: 50px; 
             border: 1px solid var(--dorado); 
             display: none; 
             grid-template-columns: repeat(5, 1fr); 
             padding: 15px 10px; 
-            z-index: 25000; 
+            z-index: 9999; 
             backdrop-filter: blur(20px); 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
         }
-        .tab-item { text-align: center; color: var(--cantera); opacity: 0.4; cursor: pointer; transition: 0.3s; }
-        .tab-item.active { opacity: 1; color: var(--dorado); transform: translateY(-10px); }
-        .tab-item i { font-size: 1.8rem; display: block; margin-bottom: 5px; }
-        .tab-item span { font-size: 0.65rem; font-weight: 900; text-transform: uppercase; }
 
-        /* --- MEDIA QUERIES PARA PC/TABLET --- */
-        @media (min-width: 1024px) {
-            .container { padding: 50px; }
-            .main-dashboard-grid { grid-template-columns: repeat(4, 1fr); }
-            .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-            #main-nav { width: 60%; padding: 20px; }
+        .nav-item { 
+            text-align: center; 
+            color: var(--cantera); 
+            opacity: 0.4; 
+            transition: 0.3s; 
+            cursor: pointer;
+        }
+
+        .nav-item.active { 
+            opacity: 1; 
+            color: var(--dorado); 
+            transform: translateY(-8px); 
+        }
+
+        .nav-item i { font-size: 1.6rem; display: block; margin-bottom: 5px; }
+        .nav-item span { font-size: 0.6rem; font-weight: 900; text-transform: uppercase; }
+
+        /* --- LISTAS Y ELEMENTOS DINÁMICOS --- */
+        .dynamic-row {
+            background: rgba(255,255,255,0.03);
+            padding: 20px;
+            border-radius: 20px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 5px solid transparent;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-10px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .row-info b { font-size: 1.1rem; color: #fff; display: block; }
+        .row-info small { opacity: 0.5; font-size: 0.75rem; text-transform: uppercase; }
+
+        .btn-round-del {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: rgba(176,65,62,0.1);
+            color: var(--terracota);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        /* --- NOTIFICACIONES (TOAST) --- */
+        #notification-toast { 
+            position: fixed; 
+            top: 50px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            padding: 20px 45px; 
+            border-radius: 60px; 
+            font-weight: 900; 
+            display: none; 
+            z-index: 200000; 
+            text-align: center; 
+            font-size: 0.9rem;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
         }
 
         /* --- MODALES --- */
-        .full-modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 40000; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(15px); }
-        .modal-content { width: 100%; max-width: 650px; background: var(--verde-oscuro); border-radius: var(--radius-md); padding: 40px; border: 1px solid var(--dorado); }
+        .modal-overlay { 
+            display: none; 
+            position: fixed; 
+            inset: 0; 
+            background: rgba(0,0,0,0.98); 
+            z-index: 150000; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 25px; 
+        }
 
-        #toast { position: fixed; top: 40px; left: 50%; transform: translateX(-50%); padding: 20px 60px; border-radius: 100px; font-weight: 900; display: none; z-index: 50000; box-shadow: var(--shadow); letter-spacing: 2px; text-align: center; }
+        .modal-body { 
+            width: 100%; 
+            max-width: 500px; 
+            background: var(--verde-oscuro); 
+            border-radius: 40px; 
+            padding: 40px; 
+            border: 2px solid var(--dorado); 
+            box-shadow: var(--shadow-strong);
+        }
+
+        /* --- ALERTAS DE INVENTARIO --- */
+        .alert-low-stock {
+            border-left-color: var(--terracota) !important;
+            background: linear-gradient(90deg, rgba(176,65,62,0.15), transparent) !important;
+        }
     </style>
 </head>
 <body>
 
-    <div id="toast"></div>
+    <div id="notification-toast"></div>
 
     <div id="login-screen">
-        <h1 style="letter-spacing:15px; font-size:3.5rem; margin-bottom:10px; font-weight:900">ESCAROLA<span style="color:var(--dorado)">OS</span></h1>
-        <p style="color:var(--dorado); letter-spacing:8px; font-size:0.8rem; margin-bottom:60px; font-weight:bold; opacity:0.7">SISTEMA INTEGRADO DE GESTIÓN v9.0</p>
-        <div class="dot-box">
-            <div id="p0" class="dot"></div><div id="p1" class="dot"></div><div id="p2" class="dot"></div><div id="p3" class="dot"></div>
+        <div class="login-logo">
+            <h1>ESCAROLA<span>OS</span></h1>
+            <p>SISTEMA DE GESTIÓN GASTRONÓMICA</p>
         </div>
-        <div class="grid-pin">
-            <button class="btn-pin" onclick="window.pinWrite('1')">1</button><button class="btn-pin" onclick="window.pinWrite('2')">2</button><button class="btn-pin" onclick="window.pinWrite('3')">3</button>
-            <button class="btn-pin" onclick="window.pinWrite('4')">4</button><button class="btn-pin" onclick="window.pinWrite('5')">5</button><button class="btn-pin" onclick="window.pinWrite('6')">6</button>
-            <button class="btn-pin" onclick="window.pinWrite('7')">7</button><button class="btn-pin" onclick="window.pinWrite('8')">8</button><button class="btn-pin" onclick="window.pinWrite('9')">9</button>
-            <button class="btn-pin" onclick="window.pinClear()" style="color:var(--terracota)">C</button><button class="btn-pin" onclick="window.pinWrite('0')">0</button><button class="btn-pin" onclick="location.reload()"><i class="fa-solid fa-sync"></i></button>
+        <div class="dot-container">
+            <div id="dot-1" class="pin-dot"></div>
+            <div id="dot-2" class="pin-dot"></div>
+            <div id="dot-3" class="pin-dot"></div>
+            <div id="dot-4" class="pin-dot"></div>
         </div>
-    </div>
-
-    <div id="finanzas" class="container">
-        <div class="card" style="border-bottom: 8px solid var(--dorado); margin-bottom: 25px;">
-            <label class="stat-label">Liquidez Total Neta (Efectivo + Banco)</label>
-            <h1 id="f-total-neto" style="font-size:4.5rem; margin:10px 0; font-weight:900; color:#fff">$0.00</h1>
-        </div>
-
-        <div class="main-dashboard-grid">
-            <div class="stat-card" style="background: rgba(197,160,89,0.1); border-left: 5px solid var(--dorado);">
-                <span class="stat-label">Caja Chica</span>
-                <h2 id="f-caja" class="stat-value" style="color:var(--dorado)">$0.00</h2>
-            </div>
-            <div class="stat-card" style="background: rgba(74,144,226,0.1); border-left: 5px solid var(--azul-banco);">
-                <span class="stat-label">Cuentas Bancarias</span>
-                <h2 id="f-banco" class="stat-value" style="color:var(--azul-banco)">$0.00</h2>
-            </div>
-            <div class="stat-card" style="background: rgba(176,65,62,0.1); border-left: 5px solid var(--terracota);">
-                <span class="stat-label">Gastos del Mes</span>
-                <h2 id="f-gastos" class="stat-value" style="color:var(--terracota)">$0.00</h2>
-            </div>
-            <div class="stat-card" style="background: rgba(255,255,255,0.05); border-left: 5px solid #fff;">
-                <span class="stat-label">Entradas Totales</span>
-                <h2 id="f-ingresos-total" class="stat-value" style="color:#fff">$0.00</h2>
-            </div>
-        </div>
-
-        <div class="form-grid-2">
-            <div class="card">
-                <h3><i class="fa-solid fa-plus-circle"></i> Nuevo Movimiento</h3>
-                <label>Descripción del concepto</label>
-                <input type="text" id="fn-desc" placeholder="Ej. Venta matutina, Compra insumos...">
-                <label>Importe ($)</label>
-                <input type="number" id="fn-monto" step="0.01" placeholder="0.00">
-                <label>Método / Ubicación del dinero</label>
-                <select id="fn-metodo">
-                    <option value="CAJA">Caja Física (Efectivo)</option>
-                    <option value="BANCO">Banco (Digital / Terminal)</option>
-                </select>
-                <div style="display:flex; gap:15px; margin-top:20px">
-                    <button class="btn-pill btn-gold" onclick="window.registrarFinanza('INGRESO')">INGRESO</button>
-                    <button class="btn-pill btn-red" onclick="window.registrarFinanza('GASTO')">GASTO</button>
-                </div>
-            </div>
-
-            <div class="card">
-                <h3><i class="fa-solid fa-barcode"></i> OCR Scanner IA</h3>
-                <p style="opacity:0.6; font-size:0.9rem">Digitaliza tus tickets y facturas automáticamente.</p>
-                <input type="file" id="ocr-input" accept="image/*" hidden onchange="window.scanIA(this)">
-                <button class="btn-pill btn-outline" onclick="document.getElementById('ocr-input').click()">
-                    <i class="fa-solid fa-camera"></i> ESCANEAR DOCUMENTO
-                </button>
-                <div id="ocr-load" style="display:none; text-align:center; margin-top:30px">
-                    <i class="fa-solid fa-circle-notch fa-spin" style="font-size:2.5rem; color:var(--dorado)"></i>
-                    <p style="font-weight:900; color:var(--dorado); margin-top:10px">PROCESANDO IMAGEN...</p>
-                </div>
-            </div>
-        </div>
-
-        <div id="fn-historial" style="margin-top:30px"></div>
-    </div>
-
-    <div id="agenda" class="container">
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
-                <button onclick="window.calMover(-1)" class="btn-pill btn-outline" style="width:60px; padding:10px"><i class="fa-solid fa-chevron-left"></i></button>
-                <h2 id="cal-mes-txt" style="letter-spacing:5px; margin:0">ENERO 2026</h2>
-                <button onclick="window.calMover(1)" class="btn-pill btn-outline" style="width:60px; padding:10px"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-            <div class="cal-grid" id="cal-render"></div>
-        </div>
-        <div class="form-grid-2">
-            <div class="card">
-                <h3><i class="fa-solid fa-calendar-check"></i> Nueva Reservación</h3>
-                <label>Cliente</label><input type="text" id="ag-cliente">
-                <label>Fecha y Hora</label><input type="datetime-local" id="ag-hora">
-                <label>Comentarios</label><textarea id="ag-notas" rows="3"></textarea>
-                <button class="btn-pill btn-gold" onclick="window.guardarEvento()">CONFIRMAR AGENDA</button>
-            </div>
-            <div id="ag-lista-dia"></div>
+        <div class="pin-grid">
+            <button class="pin-key" onclick="window.handlePinInput('1')">1</button>
+            <button class="pin-key" onclick="window.handlePinInput('2')">2</button>
+            <button class="pin-key" onclick="window.handlePinInput('3')">3</button>
+            <button class="pin-key" onclick="window.handlePinInput('4')">4</button>
+            <button class="pin-key" onclick="window.handlePinInput('5')">5</button>
+            <button class="pin-key" onclick="window.handlePinInput('6')">6</button>
+            <button class="pin-key" onclick="window.handlePinInput('7')">7</button>
+            <button class="pin-key" onclick="window.handlePinInput('8')">8</button>
+            <button class="pin-key" onclick="window.handlePinInput('9')">9</button>
+            <button class="pin-key" onclick="window.resetPin()" style="color:var(--terracota); border-color:var(--terracota)">C</button>
+            <button class="pin-key" onclick="window.handlePinInput('0')">0</button>
+            <button class="pin-key" onclick="location.reload()"><i class="fa-solid fa-redo-alt"></i></button>
         </div>
     </div>
 
-    <div id="reloj" class="container">
-        <div class="card" style="text-align:center; border: 4px solid var(--dorado);">
-            <h1 id="live-h" style="font-size:7rem; margin:0; font-weight:900; letter-spacing:-3px">00:00:00</h1>
-            <p id="live-d" style="font-size:1.8rem; color:var(--dorado); font-weight:bold; text-transform:uppercase"></p>
+    <div id="view-finanzas" class="main-wrapper">
+        <div class="capital-hero">
+            <span class="mini-label">Balance Total Consolidado</span>
+            <h1 id="net-total-display" class="net-value">$0.00</h1>
         </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:30px; margin-top:40px">
-            <button class="btn-pill btn-gold" style="height:220px; font-size:2.5rem; flex-direction:column" onclick="window.actionReloj('ENTRADA')">
-                <i class="fa-solid fa-id-badge" style="font-size:4rem"></i> ENTRADA
-            </button>
-            <button class="btn-pill btn-red" style="height:220px; font-size:2.5rem; flex-direction:column" onclick="window.actionReloj('SALIDA')">
-                <i class="fa-solid fa-sign-out-alt" style="font-size:4rem"></i> SALIDA
-            </button>
-        </div>
-        <div class="card" style="margin-top:40px">
-            <h3><i class="fa-solid fa-history"></i> Registros Recientes</h3>
-            <div id="staff-turno"></div>
-        </div>
-    </div>
-
-    <div id="cocina" class="container">
-        <div class="form-grid-2">
-            <div class="card">
-                <h3><i class="fa-solid fa-mortar-pestle"></i> Costeo de Recetas</h3>
-                <label>Nombre del Platillo</label><input type="text" id="rc-nombre">
-                <div id="rc-ingredientes-area"></div>
-                <button class="btn-pill btn-outline" style="margin:20px 0" onclick="window.addIngredienteUI()">+ AGREGAR INSUMO</button>
-                <div class="stat-card" style="background:#000; border: 1px solid var(--dorado)">
-                    <span class="stat-label">Costo total de producción:</span>
-                    <h2 id="rc-costo-total" style="font-size:3rem; margin:10px 0">$0.00</h2>
-                </div>
-                <button class="btn-pill btn-gold" style="margin-top:20px" onclick="window.guardarReceta()">GUARDAR EN RECETARIO</button>
+        <div class="stats-grid">
+            <div class="mini-stat">
+                <span class="mini-label">Efectivo Caja</span>
+                <h4 id="stat-caja">$0.00</h4>
             </div>
-            <div class="card">
-                <h3><i class="fa-solid fa-boxes-stacked"></i> Inventario e Insumos</h3>
-                <input type="file" id="xl-input" accept=".xlsx, .xls" hidden onchange="window.importXL(this)">
-                <button class="btn-pill btn-outline" onclick="document.getElementById('xl-input').click()">IMPORTAR EXCEL (.XLSX)</button>
-                <div id="recetas-render" style="margin-top:20px"></div>
+            <div class="mini-stat">
+                <span class="mini-label">Bancos / Terminal</span>
+                <h4 id="stat-banco">$0.00</h4>
+            </div>
+            <div class="mini-stat">
+                <span class="mini-label">Total Egresos</span>
+                <h4 id="stat-gastos" style="color:var(--terracota)">$0.00</h4>
+            </div>
+            <div class="mini-stat">
+                <span class="mini-label">Ventas Netas</span>
+                <h4 id="stat-ventas" style="color:var(--dorado)">$0.00</h4>
             </div>
         </div>
-    </div>
-
-    <div id="admin" class="container">
-        <div class="main-dashboard-grid">
-            <div class="card">
-                <h3>Nómina Pendiente</h3>
-                <div id="adm-nomina-view"></div>
-            </div>
-            <div class="card">
-                <h3>Control de Usuarios</h3>
-                <label>Nombre</label><input type="text" id="u-nombre">
-                <label>PIN Acceso</label><input type="number" id="u-pin">
-                <label>Sueldo/Hora</label><input type="number" id="u-sueldo">
-                <label>Rol</label>
-                <select id="u-rol"><option value="Staff">Staff</option><option value="Socio">Socio</option></select>
-                <button class="btn-pill btn-gold" onclick="window.crearUsuario()">AÑADIR PERSONAL</button>
-                <div id="adm-users-list" style="margin-top:20px"></div>
-            </div>
-            <div class="card">
-                <h3>Tareas de Limpieza</h3>
-                <div id="adm-checklist-view"></div>
-                <div style="display:flex; gap:10px; margin-top:15px">
-                    <input type="text" id="task-new" placeholder="Nueva tarea...">
-                    <button class="btn-pill btn-gold" style="width:80px" onclick="window.crearTarea()">+</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="modal-edit-fin" class="full-modal">
-        <div class="modal-content">
-            <h2 style="color:var(--dorado)"><i class="fa-solid fa-pen-to-square"></i> Editar Movimiento</h2>
-            <input type="hidden" id="edit-fn-id">
-            <label>Concepto</label><input type="text" id="edit-fn-desc">
-            <label>Importe</label><input type="number" id="edit-fn-monto" step="0.01">
-            <label>Canal</label>
-            <select id="edit-fn-metodo"><option value="CAJA">Caja</option><option value="BANCO">Banco</option></select>
+        <div class="glass-card">
+            <div class="section-title"><i class="fa-solid fa-file-invoice-dollar"></i> Registrar Flujo</div>
+            <label>Concepto de Operación</label>
+            <input type="text" id="flow-desc" placeholder="Ej: Venta de Cena o Pago de Proveedor">
+            <label>Monto</label>
+            <input type="number" id="flow-amount" step="0.01" placeholder="0.00">
+            <label>Canal de Dinero</label>
+            <select id="flow-method">
+                <option value="CAJA">Caja Física (Efectivo)</option>
+                <option value="BANCO">Banco (Transferencia/Terminal)</option>
+            </select>
+            <label>Vincular a Receta (Opcional para descontar stock)</label>
+            <select id="flow-recipe-link"><option value="">-- Sin receta vinculada --</option></select>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px">
-                <button class="btn-pill btn-gold" onclick="window.updateFinanza()">ACTUALIZAR</button>
-                <button class="btn-pill btn-outline" onclick="window.closeModals()">CANCELAR</button>
+                <button class="btn-action btn-gold" onclick="window.processFinance('INGRESO')"><i class="fa-solid fa-arrow-down"></i> INGRESO</button>
+                <button class="btn-action btn-red" onclick="window.processFinance('GASTO')"><i class="fa-solid fa-arrow-up"></i> GASTO</button>
+            </div>
+        </div>
+        <div id="finance-history-list"></div>
+    </div>
+
+    <div id="view-agenda" class="main-wrapper">
+        <div class="calendar-box">
+            <div class="cal-ctrls">
+                <button onclick="window.changeCalMonth(-1)" class="btn-round-del" style="background:var(--blanco-trans); color:white"><i class="fa-solid fa-chevron-left"></i></button>
+                <h3 id="cal-month-title" class="cal-month-name">MES AÑO</h3>
+                <button onclick="window.changeCalMonth(1)" class="btn-round-del" style="background:var(--blanco-trans); color:white"><i class="fa-solid fa-chevron-right"></i></button>
+            </div>
+            <div class="cal-grid-system" id="cal-grid-main"></div>
+        </div>
+        <div class="glass-card" style="margin-top:25px">
+            <div class="section-title"><i class="fa-solid fa-calendar-plus"></i> Nueva Reservación</div>
+            <label>Nombre del Cliente</label>
+            <input type="text" id="res-name" placeholder="Ej: Familia Martínez">
+            <label>Fecha y Hora</label>
+            <input type="datetime-local" id="res-date">
+            <label>Observaciones Especiales</label>
+            <textarea id="res-notes" rows="2" placeholder="Ej: Alergias o mesa específica..."></textarea>
+            <button class="btn-action btn-gold" onclick="window.saveReservation()"><i class="fa-solid fa-check"></i> AGENDAR SERVICIO</button>
+        </div>
+        <div id="day-detail-agenda"></div>
+    </div>
+
+    <div id="view-reloj" class="main-wrapper">
+        <div class="clock-container">
+            <h1 id="clock-time">00:00:00</h1>
+            <p id="clock-date">CARGANDO...</p>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px">
+            <button class="btn-action btn-gold" style="height:150px; flex-direction:column; border-radius:40px" onclick="window.handleClockAction('ENTRADA')">
+                <i class="fa-solid fa-user-check" style="font-size:2.5rem"></i>
+                <span>REGISTRAR ENTRADA</span>
+            </button>
+            <button class="btn-action btn-red" style="height:150px; flex-direction:column; border-radius:40px" onclick="window.handleClockAction('SALIDA')">
+                <i class="fa-solid fa-user-clock" style="font-size:2.5rem"></i>
+                <span>REGISTRAR SALIDA</span>
+            </button>
+        </div>
+        <div id="clock-recent-logs" style="margin-top:30px"></div>
+    </div>
+
+    <div id="view-insumos" class="main-wrapper">
+        <div class="glass-card">
+            <div class="section-title"><i class="fa-solid fa-boxes-stacked"></i> Entrada de Insumos</div>
+            <div style="display:grid; grid-template-columns: 2fr 1fr 1fr; gap:10px">
+                <div><label>Insumo</label><input type="text" id="inv-item-name" placeholder="Nombre"></div>
+                <div><label>Cant.</label><input type="number" id="inv-item-qty" placeholder="0"></div>
+                <div><label>Unidad</label><input type="text" id="inv-item-unit" placeholder="Kg/L/Pz"></div>
+            </div>
+            <label>Stock Mínimo (Alerta Crítica)</label>
+            <input type="number" id="inv-item-min" placeholder="Avisar cuando quede menos de...">
+            <button class="btn-action btn-gold" style="margin-top:10px" onclick="window.updateInventory()"><i class="fa-solid fa-save"></i> GUARDAR EN BODEGA</button>
+        </div>
+        <div id="inventory-full-list"></div>
+
+        <div class="glass-card" style="margin-top:30px">
+            <div class="section-title"><i class="fa-solid fa-mortar-pestle"></i> Gestión de Recetas</div>
+            <label>Nombre del Platillo / Preparación</label>
+            <input type="text" id="rec-platillo-name" placeholder="Ej: Pizza Margarita">
+            <div id="rec-ingredients-container"></div>
+            <button class="btn-action btn-outline" style="margin:15px 0" onclick="window.addNewIngredientField()"><i class="fa-solid fa-plus"></i> AGREGAR INGREDIENTE</button>
+            <button class="btn-action btn-gold" onclick="window.saveMasterRecipe()"><i class="fa-solid fa-receipt"></i> GUARDAR RECETA MAESTRA</button>
+        </div>
+        <div id="recetario-full-list"></div>
+    </div>
+
+    <div id="view-admin" class="main-wrapper">
+        <div class="glass-card">
+            <div class="section-title"><i class="fa-solid fa-users-cog"></i> Gestión de Equipo</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
+                <div><label>Nombre</label><input type="text" id="user-name-add"></div>
+                <div><label>PIN (4 dígitos)</label><input type="number" id="user-pin-add"></div>
+            </div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
+                <div><label>Sueldo por Hora</label><input type="number" id="user-pay-add"></div>
+                <div><label>Rango / Rol</label>
+                    <select id="user-role-add">
+                        <option value="Staff">Operativo (Staff)</option>
+                        <option value="Socio">Administrador (Socio)</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn-action btn-gold" onclick="window.createNewUser()"><i class="fa-solid fa-user-plus"></i> REGISTRAR COLABORADOR</button>
+        </div>
+        <div id="admin-user-list-render"></div>
+
+        <div class="glass-card">
+            <div class="section-title"><i class="fa-solid fa-tasks"></i> Tareas de Cierre</div>
+            <div id="admin-checklist-render"></div>
+            <div style="display:flex; gap:10px; margin-top:15px">
+                <input type="text" id="task-desc-add" placeholder="Nueva tarea de limpieza o cierre...">
+                <button class="btn-action btn-gold" style="width:70px" onclick="window.addChecklistTask()"><i class="fa-solid fa-plus"></i></button>
             </div>
         </div>
     </div>
 
-    <div id="modal-edit-user" class="full-modal">
-        <div class="modal-content">
-            <h2 style="color:var(--dorado)">Perfil del Colaborador</h2>
-            <input type="hidden" id="edit-u-id">
-            <label>Nombre</label><input type="text" id="edit-u-nom">
-            <label>PIN</label><input type="number" id="edit-u-pin-val">
-            <label>Sueldo</label><input type="number" id="edit-u-sueldo-val">
-            <label>Rol</label>
-            <select id="edit-u-rol-val"><option value="Staff">Staff</option><option value="Socio">Socio</option></select>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; margin-top:20px">
-                <button class="btn-pill btn-gold" onclick="window.updateUsuario()">GUARDAR</button>
-                <button class="btn-pill btn-outline" onclick="window.closeModals()">SALIR</button>
-            </div>
+    <div id="modal-checklist" class="modal-overlay">
+        <div class="modal-body">
+            <h2 style="text-align:center; color:var(--dorado); margin-bottom:10px">PROTOCOLO DE CIERRE</h2>
+            <p style="text-align:center; opacity:0.6; font-size:0.8rem; margin-bottom:30px">Por seguridad y orden, marca las tareas completadas.</p>
+            <div id="modal-checklist-items" style="max-height:300px; overflow-y:auto; margin-bottom:30px"></div>
+            <button class="btn-action btn-gold" style="height:80px" onclick="window.confirmClockOut()">
+                <i class="fa-solid fa-clipboard-check"></i> FINALIZAR TURNO
+            </button>
         </div>
     </div>
 
-    <div id="modal-c" class="full-modal">
-        <div class="modal-content" style="text-align:center">
-            <h2 style="color:var(--dorado); letter-spacing:5px">PROTOCOLO DE CIERRE</h2>
-            <div id="modal-tasks-list" style="margin:30px 0; text-align:left"></div>
-            <button class="btn-pill btn-gold" style="height:100px; font-size:1.8rem" onclick="window.finalizarSalida()">CONFIRMAR SALIDA</button>
-        </div>
-    </div>
-
-    <nav id="main-nav">
-        <div class="tab-item" id="tab-finanzas" onclick="window.nav('finanzas')"><i class="fa-solid fa-sack-dollar"></i><span>Capital</span></div>
-        <div class="tab-item" id="tab-agenda" onclick="window.nav('agenda')"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></div>
-        <div class="tab-item" id="tab-reloj" onclick="window.nav('reloj')"><i class="fa-solid fa-clock"></i><span>Reloj</span></div>
-        <div class="tab-item" id="tab-cocina" onclick="window.nav('cocina')"><i class="fa-solid fa-utensils"></i><span>Cocina</span></div>
-        <div class="tab-item" id="tab-admin" onclick="window.nav('admin')"><i class="fa-solid fa-user-shield"></i><span>Admin</span></div>
+    <nav id="navbar-bottom">
+        <div class="nav-item" id="nav-finanzas" onclick="window.switchView('finanzas')"><i class="fa-solid fa-wallet"></i><span>Capital</span></div>
+        <div class="nav-item" id="nav-agenda" onclick="window.switchView('agenda')"><i class="fa-solid fa-calendar-alt"></i><span>Agenda</span></div>
+        <div class="nav-item" id="nav-reloj" onclick="window.switchView('reloj')"><i class="fa-solid fa-clock"></i><span>Reloj</span></div>
+        <div class="nav-item" id="nav-insumos" onclick="window.switchView('insumos')"><i class="fa-solid fa-utensils"></i><span>Cocina</span></div>
+        <div class="nav-item" id="nav-admin" onclick="window.switchView('admin')"><i class="fa-solid fa-shield-halved"></i><span>Admin</span></div>
     </nav>
 
     <script type="module">
-        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
+        /* ==========================================================================
+           ESCAROLA OS - NÚCLEO OPERATIVO (FIREBASE INTEGRATION)
+           ========================================================================== */
+        import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit, onSnapshot } from './firebase-config.js';
 
-        // --- GLOBAL STATE ---
-        window.pinIn = ""; window.me = null; window.curCal = new Date();
+        // Variables de sesión
+        window.activePin = ""; 
+        window.currentUser = null; 
+        window.calendarReference = new Date();
 
-        // --- SISTEMA DE PIN ---
-        window.pinWrite = (n) => {
-            if(window.pinIn.length < 4) {
-                window.pinIn += n; window.upDots();
-                if(window.pinIn.length === 4) window.login();
+        /* --- CONTROL DE ACCESO --- */
+        window.handlePinInput = (digit) => {
+            if(window.activePin.length < 4) {
+                window.activePin += digit;
+                window.syncPinDots();
+                if(window.activePin.length === 4) window.executeLogin();
             }
         };
-        window.pinClear = () => { window.pinIn = ""; window.upDots(); };
-        window.upDots = () => {
-            for(let i=0; i<4; i++) document.getElementById(`p${i}`).classList.toggle('active', i < window.pinIn.length);
+
+        window.resetPin = () => { 
+            window.activePin = ""; 
+            window.syncPinDots(); 
         };
 
-        window.login = async () => {
-            const q = query(collection(db, "usuarios"), where("pin", "==", window.pinIn));
-            const snap = await getDocs(q);
-            if(!snap.empty) {
-                window.me = { id: snap.docs[0].id, ...snap.docs[0].data() };
-                document.getElementById('login-screen').style.transform = 'translateY(-100%)';
-                setTimeout(() => {
+        window.syncPinDots = () => {
+            for(let i=1; i<=4; i++) {
+                document.getElementById(`dot-${i}`).classList.toggle('filled', i <= window.activePin.length);
+            }
+        };
+
+        window.executeLogin = async () => {
+            try {
+                const q = query(collection(db, "usuarios"), where("pin", "==", window.activePin));
+                const snap = await getDocs(q);
+                if(!snap.empty) {
+                    window.currentUser = { id: snap.docs[0].id, ...snap.docs[0].data() };
                     document.getElementById('login-screen').style.display = 'none';
-                    document.getElementById('main-nav').style.display = 'grid';
-                    window.initApp();
-                }, 800);
-            } else { window.toast("PIN INVÁLIDO", true); window.pinClear(); }
-        };
-
-        // --- NAVEGACIÓN ---
-        window.nav = (id) => {
-            if((id === 'finanzas' || id === 'admin') && window.me.rol !== 'Socio') return window.toast("ACCESO RESTRINGIDO", true);
-            document.querySelectorAll('.container').forEach(c => c.style.display = 'none');
-            document.querySelectorAll('.tab-item').forEach(t => t.classList.remove('active'));
-            document.getElementById(id).style.display = 'block';
-            document.getElementById(`tab-${id}`).classList.add('active');
-        };
-
-        // --- CAPITAL (LÓGICA CORREGIDA) ---
-        window.registrarFinanza = async (tipo) => {
-            const m = parseFloat(document.getElementById('fn-monto').value);
-            const d = document.getElementById('fn-desc').value;
-            const mt = document.getElementById('fn-metodo').value;
-            if(!m || !d) return window.toast("FALTAN DATOS", true);
-            
-            await addDoc(collection(db, "finanzas"), {
-                monto: m, desc: d, metodo: mt, tipo, fecha: new Date().toISOString()
-            });
-            
-            document.getElementById('fn-monto').value = "";
-            document.getElementById('fn-desc').value = "";
-            window.toast("REGISTRO EXITOSO");
-            await window.loadFinanzas(); // Recarga inmediata para mover los cuadros
-        };
-
-        window.loadFinanzas = async () => {
-            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let totalCaja = 0, totalBanco = 0, totalGastos = 0, totalIngresos = 0;
-            const h = document.getElementById('fn-historial'); 
-            h.innerHTML = "<h3>Historial de Movimientos</h3>";
-            
-            snap.forEach(d => {
-                const f = d.data();
-                const monto = parseFloat(f.monto);
-                
-                if(f.tipo === 'INGRESO') {
-                    totalIngresos += monto;
-                    if(f.metodo === 'CAJA') totalCaja += monto; else totalBanco += monto;
+                    document.getElementById('navbar-bottom').style.display = 'grid';
+                    window.bootApp();
                 } else {
-                    totalGastos += monto;
-                    if(f.metodo === 'CAJA') totalCaja -= monto; else totalBanco -= monto;
+                    window.showToast("PIN INCORRECTO", true);
+                    window.resetPin();
+                }
+            } catch(e) { console.error(e); }
+        };
+
+        /* --- GESTIÓN DE VISTAS --- */
+        window.switchView = (viewId) => {
+            // Protección de rutas para No-Administradores
+            if((viewId === 'finanzas' || viewId === 'admin') && window.currentUser.rol !== 'Socio') {
+                return window.showToast("SOLO ADMINISTRADORES", true);
+            }
+            document.querySelectorAll('.main-wrapper').forEach(v => v.style.display = 'none');
+            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).style.display = 'block';
+            document.getElementById(`nav-${viewId}`).classList.add('active');
+        };
+
+        /* --- MÓDULO FINANCIERO CON DEDUCCIÓN --- */
+        window.processFinance = async (type) => {
+            const amt = parseFloat(document.getElementById('flow-amount').value);
+            const dsc = document.getElementById('flow-desc').value;
+            const met = document.getElementById('flow-method').value;
+            const recId = document.getElementById('flow-recipe-link').value;
+
+            if(!amt || !dsc) return window.showToast("DATOS INCOMPLETOS", true);
+
+            try {
+                await addDoc(collection(db, "finanzas"), {
+                    monto: amt, desc: dsc, metodo: met, tipo: type,
+                    recipeId: recId || null,
+                    fecha: new Date().toISOString(),
+                    autor: window.currentUser.nombre
+                });
+
+                // Si hay una receta vinculada y es un ingreso, descontamos stock
+                if(type === 'INGRESO' && recId) {
+                    await window.deductStockFromRecipe(recId);
                 }
 
-                h.innerHTML += `<div class="card" style="padding:15px; margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid ${f.tipo==='INGRESO'?'var(--dorado)':'var(--terracota)'}">
-                    <div><b>${f.desc}</b><br><small>${f.metodo} • ${f.fecha.split('T')[0]}</small></div>
-                    <div style="text-align:right">
-                        <b style="color:${f.tipo==='GASTO'?'var(--terracota)':'var(--dorado)'}">${f.tipo==='GASTO'?'-':'+'}$${monto.toFixed(2)}</b><br>
-                        <button class="btn-action btn-edit" onclick="window.openEditFin('${d.id}','${f.desc}',${monto},'${f.metodo}')"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn-action btn-del" onclick="window.delDoc('finanzas','${d.id}','loadFinanzas')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            });
-
-            // Actualización de UI en tiempo real
-            document.getElementById('f-caja').innerText = `$${totalCaja.toFixed(2)}`;
-            document.getElementById('f-banco').innerText = `$${totalBanco.toFixed(2)}`;
-            document.getElementById('f-gastos').innerText = `$${totalGastos.toFixed(2)}`;
-            document.getElementById('f-ingresos-total').innerText = `$${totalIngresos.toFixed(2)}`;
-            document.getElementById('f-total-neto').innerText = `$${(totalCaja + totalBanco).toFixed(2)}`;
+                window.showToast("OPERACIÓN EXITOSA");
+                document.getElementById('flow-amount').value = "";
+                document.getElementById('flow-desc').value = "";
+                window.refreshFinanceUI();
+            } catch(e) { window.showToast("ERROR AL GUARDAR", true); }
         };
 
-        window.openEditFin = (id, d, m, mt) => {
-            document.getElementById('edit-fn-id').value = id;
-            document.getElementById('edit-fn-desc').value = d;
-            document.getElementById('edit-fn-monto').value = m;
-            document.getElementById('edit-fn-metodo').value = mt;
-            document.getElementById('modal-edit-fin').style.display = 'flex';
-        };
+        window.refreshFinanceUI = async () => {
+            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
+            let totalCaja = 0, totalBanco = 0, totalGastos = 0, totalVentas = 0;
+            const list = document.getElementById('finance-history-list');
+            list.innerHTML = "<h4 style='margin:20px 0 10px 10px; opacity:0.5'>Últimos Movimientos</h4>";
 
-        window.updateFinanza = async () => {
-            await updateDoc(doc(db, "finanzas", document.getElementById('edit-fn-id').value), {
-                desc: document.getElementById('edit-fn-desc').value,
-                monto: parseFloat(document.getElementById('edit-fn-monto').value),
-                metodo: document.getElementById('edit-fn-metodo').value
-            });
-            window.closeModals(); window.loadFinanzas(); window.toast("REGISTRO ACTUALIZADO");
-        };
-
-        // --- RELOJ Y ASISTENCIAS ---
-        window.actionReloj = async (tipo) => {
-            if(tipo === 'SALIDA') {
-                const snap = await getDocs(collection(db, "checklist"));
-                let h = ""; snap.forEach(d => h += `<div style="padding:15px; border-bottom:1px solid #333; display:flex; align-items:center; gap:20px"><input type="checkbox" style="width:30px; height:30px" class="t-chk"> <span style="font-weight:bold">${d.data().tarea}</span></div>`);
-                document.getElementById('modal-tasks-list').innerHTML = h || "<p>No hay tareas pendientes.</p>";
-                document.getElementById('modal-c').style.display = 'flex';
-            } else { await window.saveAsistencia('ENTRADA'); }
-        };
-
-        window.finalizarSalida = async () => {
-            const checks = document.querySelectorAll('.t-chk');
-            if(checks.length > 0 && !Array.from(checks).every(c => c.checked)) return window.toast("DEBE COMPLETAR LIMPIEZA", true);
-            document.getElementById('modal-c').style.display = 'none';
-            await window.saveAsistencia('SALIDA');
-        };
-
-        window.saveAsistencia = async (tipo) => {
-            await addDoc(collection(db, "asistencias"), {
-                uid: window.me.id, nombre: window.me.nombre, tipo, sueldo: window.me.sueldo,
-                time: new Date().toISOString(), pagado: false
-            });
-            window.toast("REGISTRO DE " + tipo); window.loadStaffActivo();
-        };
-
-        window.loadStaffActivo = async () => {
-            const snap = await getDocs(query(collection(db, "asistencias"), orderBy("time", "desc"), limit(12)));
-            const div = document.getElementById('staff-turno'); div.innerHTML = "";
             snap.forEach(d => {
-                const a = d.data();
-                div.innerHTML += `<div style="display:flex; justify-content:space-between; padding:15px; border-bottom:1px solid #222; align-items:center">
-                    <span style="font-weight:bold">${a.nombre}</span> 
-                    <div><b style="color:var(--dorado)">${a.tipo}</b> <small style="opacity:0.5; margin-left:10px">${new Date(a.time).toLocaleTimeString()}</small></div>
-                </div>`;
+                const f = d.data();
+                if(f.tipo === 'INGRESO') {
+                    totalVentas += f.monto;
+                    if(f.metodo === 'CAJA') totalCaja += f.monto; else totalBanco += f.monto;
+                } else {
+                    totalGastos += f.monto;
+                    if(f.metodo === 'CAJA') totalCaja -= f.monto; else totalBanco -= f.monto;
+                }
+
+                list.innerHTML += `
+                    <div class="dynamic-row" style="border-left-color:${f.tipo==='INGRESO'?'var(--dorado)':'var(--terracota)'}">
+                        <div class="row-info">
+                            <b>${f.desc}</b>
+                            <small>${f.metodo} • ${new Date(f.fecha).toLocaleDateString()}</small>
+                        </div>
+                        <div style="text-align:right">
+                            <b style="color:${f.tipo==='INGRESO'?'var(--dorado)':'var(--terracota)'}">$${f.monto.toFixed(2)}</b><br>
+                            <button class="btn-round-del" onclick="window.deleteEntry('finanzas','${d.id}','refreshFinanceUI')"><i class="fa-solid fa-trash-can"></i></button>
+                        </div>
+                    </div>`;
             });
+
+            document.getElementById('stat-caja').innerText = `$${totalCaja.toFixed(2)}`;
+            document.getElementById('stat-banco').innerText = `$${totalBanco.toFixed(2)}`;
+            document.getElementById('stat-gastos').innerText = `$${totalGastos.toFixed(2)}`;
+            document.getElementById('stat-ventas').innerText = `$${totalVentas.toFixed(2)}`;
+            document.getElementById('net-total-display').innerText = `$${(totalCaja + totalBanco).toFixed(2)}`;
         };
 
-        // --- AGENDA ---
-        window.guardarEvento = async () => {
-            const c = document.getElementById('ag-cliente').value;
-            const f = document.getElementById('ag-hora').value;
-            if(!c || !f) return window.toast("DATOS INCOMPLETOS", true);
-            await addDoc(collection(db, "agenda"), { cliente: c, fecha: f, notas: document.getElementById('ag-notas').value });
-            window.toast("RESERVA AGENDADA"); window.renderCal();
-            document.getElementById('ag-cliente').value = ""; document.getElementById('ag-notas').value = "";
-        };
+        /* --- CALENDARIO TRADICIONAL 7x6 --- */
+        window.renderMasterCalendar = async () => {
+            const grid = document.getElementById('cal-grid-main');
+            grid.innerHTML = "";
+            const month = window.calendarReference.getMonth();
+            const year = window.calendarReference.getFullYear();
+            
+            document.getElementById('cal-month-title').innerText = window.calendarReference.toLocaleDateString('es-MX', {month:'long', year:'numeric'});
 
-        window.renderCal = async () => {
-            const g = document.getElementById('cal-render'); g.innerHTML = "";
-            const m = window.curCal.getMonth(); const a = window.curCal.getFullYear();
-            document.getElementById('cal-mes-txt').innerText = window.curCal.toLocaleDateString('es-MX', {month:'long', year:'numeric'}).toUpperCase();
-            const snap = await getDocs(collection(db, "agenda"));
-            let evs = []; snap.forEach(d => evs.push(d.data().fecha.split('T')[0]));
-            for(let i=0; i<new Date(a, m, 1).getDay(); i++) g.innerHTML += `<div></div>`;
-            for(let d=1; d<=new Date(a, m+1, 0).getDate(); d++) {
-                const ds = `${a}-${(m+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
-                const has = evs.includes(ds);
-                g.innerHTML += `<div class="cal-day ${has?'has-ev':''}" onclick="window.verDia('${ds}')">${d}${has?'<div class="cal-dot"></div>':''}</div>`;
+            const weekdays = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
+            weekdays.forEach(wd => grid.innerHTML += `<div class="cal-day-label">${wd}</div>`);
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const prevMonthTotal = new Date(year, month, 0).getDate();
+
+            // Cargar eventos para marcar puntos
+            const evSnap = await getDocs(collection(db, "agenda"));
+            let busyDates = [];
+            evSnap.forEach(e => busyDates.push(e.data().fecha.split('T')[0]));
+
+            // Días mes anterior
+            for(let i = firstDay; i > 0; i--) {
+                grid.innerHTML += `<div class="cal-date-cell not-current">${prevMonthTotal - i + 1}</div>`;
+            }
+
+            // Días mes actual
+            for(let d = 1; d <= totalDays; d++) {
+                const dateString = `${year}-${(month+1).toString().padStart(2,'0')}-${d.toString().padStart(2,'0')}`;
+                const isToday = new Date().toDateString() === new Date(year, month, d).toDateString();
+                const hasEvent = busyDates.includes(dateString);
+
+                grid.innerHTML += `
+                    <div class="cal-date-cell ${isToday?'active-today':''} ${hasEvent?'has-event':''}" onclick="window.viewDayEvents('${dateString}')">
+                        ${d}
+                    </div>`;
             }
         };
 
-        window.verDia = async (f) => {
-            const snap = await getDocs(query(collection(db, "agenda"), where("fecha", ">=", f), where("fecha", "<=", f+"T23:59")));
-            const div = document.getElementById('ag-lista-dia'); div.innerHTML = `<h3>Eventos: ${f}</h3>`;
-            if(snap.empty) div.innerHTML += "<p>Sin reservaciones.</p>";
-            snap.forEach(d => {
-                const ev = d.data();
-                div.innerHTML += `<div class="card" style="margin-bottom:10px">
-                    <b>${ev.cliente}</b> - ${ev.fecha.split('T')[1]}h<br><small>${ev.notas || ''}</small>
-                    <div style="text-align:right"><button class="btn-action btn-del" onclick="window.delDoc('agenda','${d.id}','renderCal')"><i class="fa-solid fa-trash"></i></button></div>
-                </div>`;
+        window.viewDayEvents = async (dateStr) => {
+            const q = query(collection(db, "agenda"), where("fecha", ">=", dateStr), where("fecha", "<=", dateStr + "T23:59"));
+            const s = await getDocs(q);
+            const container = document.getElementById('day-detail-agenda');
+            container.innerHTML = `<h4 style="margin:20px 0 10px">Reservas para: ${dateStr}</h4>`;
+            
+            if(s.empty) container.innerHTML += "<p style='opacity:0.4'>Sin actividades programadas.</p>";
+            
+            s.forEach(doc => {
+                const r = doc.data();
+                container.innerHTML += `
+                    <div class="dynamic-row">
+                        <div class="row-info"><b>${r.cliente}</b><small>${r.fecha.split('T')[1]}h</small></div>
+                        <button class="btn-round-del" onclick="window.deleteEntry('agenda','${doc.id}','renderMasterCalendar')">✕</button>
+                    </div>`;
             });
         };
 
-        // --- ADMINISTRACIÓN ---
-        window.crearUsuario = async () => {
-            const n = document.getElementById('u-nombre').value;
-            const p = document.getElementById('u-pin').value;
-            const s = document.getElementById('u-sueldo').value;
-            const r = document.getElementById('u-rol').value;
-            if(!n || !p || !s) return window.toast("DATOS REQUERIDOS", true);
+        window.saveReservation = async () => {
+            const name = document.getElementById('res-name').value;
+            const date = document.getElementById('res-date').value;
+            const notes = document.getElementById('res-notes').value;
+            if(!name || !date) return window.showToast("FALTAN DATOS", true);
+            
+            await addDoc(collection(db, "agenda"), { cliente: name, fecha: date, notas: notes });
+            window.showToast("RESERVA GUARDADA");
+            window.renderMasterCalendar();
+        };
+
+        /* --- BODEGA E INVENTARIO --- */
+        window.updateInventory = async () => {
+            const nom = document.getElementById('inv-item-name').value;
+            const qty = parseFloat(document.getElementById('inv-item-qty').value);
+            const uni = document.getElementById('inv-item-unit').value;
+            const min = parseFloat(document.getElementById('inv-item-min').value || 0);
+
+            if(!nom || isNaN(qty)) return;
+
+            await addDoc(collection(db, "inventario"), { 
+                nombre: nom, stock: qty, unidad: uni, min: min 
+            });
+            window.showToast("STOCK ACTUALIZADO");
+            window.refreshInventoryUI();
+        };
+
+        window.refreshInventoryUI = async () => {
+            const snap = await getDocs(collection(db, "inventario"));
+            const list = document.getElementById('inventory-full-list');
+            list.innerHTML = "<h4 style='margin:20px 0 10px 10px; opacity:0.5'>Stock en Almacén</h4>";
+
+            snap.forEach(d => {
+                const i = d.data();
+                const isLow = i.stock <= i.min;
+                list.innerHTML += `
+                    <div class="dynamic-row ${isLow?'alert-low-stock':''}">
+                        <div class="row-info">
+                            <b>${i.nombre}</b>
+                            <small>${isLow?'¡PEDIR URGENTE!':'Suficiente'} • Mín: ${i.min}</small>
+                        </div>
+                        <div style="text-align:right">
+                            <b style="font-size:1.3rem">${i.stock} <small>${i.unidad}</small></b><br>
+                            <button class="btn-round-del" onclick="window.deleteEntry('inventario','${d.id}','refreshInventoryUI')"><i class="fa-solid fa-times"></i></button>
+                        </div>
+                    </div>`;
+            });
+        };
+
+        /* --- RECETARIO Y AUTO-DEDUCCIÓN --- */
+        window.addNewIngredientField = () => {
+            const div = document.createElement('div');
+            div.style.display = "grid";
+            div.style.gridTemplateColumns = "2fr 1fr";
+            div.style.gap = "10px";
+            div.innerHTML = `<input type="text" class="rec-ing-name" placeholder="Insumo"><input type="number" class="rec-ing-qty" placeholder="Cant.">`;
+            document.getElementById('rec-ingredients-container').appendChild(div);
+        };
+
+        window.saveMasterRecipe = async () => {
+            const name = document.getElementById('rec-platillo-name').value;
+            const ings = [];
+            const names = document.querySelectorAll('.rec-ing-name');
+            const qtys = document.querySelectorAll('.rec-ing-qty');
+
+            names.forEach((n, i) => {
+                if(n.value) ings.push({ nombre: n.value, cantidad: parseFloat(qtys[i].value) });
+            });
+
+            await addDoc(collection(db, "recetas"), { platillo: name, ingredientes: ings });
+            window.showToast("RECETA REGISTRADA");
+            window.refreshRecipesUI();
+        };
+
+        window.deductStockFromRecipe = async (recipeId) => {
+            const recSnap = await getDocs(collection(db, "recetas"));
+            const receta = recSnap.docs.find(r => r.id === recipeId).data();
+
+            for(const ing of receta.ingredientes) {
+                const invQ = query(collection(db, "inventario"), where("nombre", "==", ing.nombre));
+                const invS = await getDocs(invQ);
+                if(!invS.empty) {
+                    const item = invS.docs[0];
+                    const newStock = item.data().stock - ing.cantidad;
+                    await updateDoc(doc(db, "inventario", item.id), { stock: newStock });
+                }
+            }
+            window.refreshInventoryUI();
+        };
+
+        window.refreshRecipesUI = async () => {
+            const snap = await getDocs(collection(db, "recetas"));
+            const list = document.getElementById('recetario-full-list');
+            const select = document.getElementById('flow-recipe-link');
+            
+            list.innerHTML = "<h4 style='margin:20px 0 10px 10px; opacity:0.5'>Recetario</h4>";
+            select.innerHTML = "<option value=''>-- Sin receta vinculada --</option>";
+
+            snap.forEach(d => {
+                const r = d.data();
+                list.innerHTML += `<div class="dynamic-row"><b>${r.platillo}</b><button class="btn-round-del" onclick="window.deleteEntry('recetas','${d.id}','refreshRecipesUI')">✕</button></div>`;
+                select.innerHTML += `<option value="${d.id}">${r.platillo}</option>`;
+            });
+        };
+
+        /* --- RELOJ Y ASISTENCIA --- */
+        window.handleClockAction = async (actionType) => {
+            if(actionType === 'SALIDA') {
+                const snap = await getDocs(collection(db, "tareas"));
+                let html = "";
+                snap.forEach(d => {
+                    html += `<div style="padding:15px; border-bottom:1px solid #333; display:flex; align-items:center; gap:15px">
+                        <input type="checkbox" class="modal-chk" style="width:25px; height:25px">
+                        <span>${d.data().tarea}</span>
+                    </div>`;
+                });
+                document.getElementById('modal-checklist-items').innerHTML = html || "No hay tareas configuradas.";
+                document.getElementById('modal-checklist').style.display = 'flex';
+            } else {
+                await window.saveTimeLog('ENTRADA');
+            }
+        };
+
+        window.confirmClockOut = async () => {
+            const checks = document.querySelectorAll('.modal-chk');
+            const allDone = Array.from(checks).every(c => c.checked);
+            
+            if(checks.length > 0 && !allDone) {
+                return window.showToast("LIMPIEZA PENDIENTE", true);
+            }
+
+            document.getElementById('modal-checklist').style.display = 'none';
+            await window.saveTimeLog('SALIDA');
+            location.reload(); // Logout automático al salir
+        };
+
+        window.saveTimeLog = async (type) => {
+            await addDoc(collection(db, "asistencias"), {
+                uid: window.currentUser.id,
+                nombre: window.currentUser.nombre,
+                tipo: type,
+                fecha: new Date().toISOString()
+            });
+            window.showToast("REGISTRO " + type + " OK");
+            window.refreshClockLogs();
+        };
+
+        window.refreshClockLogs = async () => {
+            const q = query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(10));
+            const s = await getDocs(q);
+            const l = document.getElementById('clock-recent-logs');
+            l.innerHTML = "<h4 style='opacity:0.5; margin-bottom:10px'>Actividad Reciente</h4>";
+            s.forEach(d => {
+                const a = d.data();
+                l.innerHTML += `<div class="dynamic-row"><span>${a.nombre}</span> <b style="color:var(--dorado)">${a.tipo}</b></div>`;
+            });
+        };
+
+        /* --- PANEL DE ADMINISTRACIÓN --- */
+        window.createNewUser = async () => {
+            const n = document.getElementById('user-name-add').value;
+            const p = document.getElementById('user-pin-add').value;
+            const s = document.getElementById('user-pay-add').value;
+            const r = document.getElementById('user-role-add').value;
+
+            if(!n || p.length !== 4) return window.showToast("PIN DEBE SER DE 4 DÍGITOS", true);
+
             await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, sueldo: parseFloat(s), rol: r });
-            window.loadUsers(); window.toast("USUARIO CREADO");
+            window.showToast("USUARIO CREADO");
+            window.refreshAdminUI();
         };
 
-        window.loadUsers = async () => {
-            const snap = await getDocs(collection(db, "usuarios"));
-            const div = document.getElementById('adm-users-list'); div.innerHTML = "";
-            snap.forEach(d => {
-                const u = d.data();
-                div.innerHTML += `<div class="card" style="display:flex; justify-content:space-between; margin-bottom:10px; padding:15px">
-                    <span><b>${u.nombre}</b><br><small>${u.rol} • $${u.sueldo}/h</small></span>
-                    <button class="btn-action btn-edit" onclick="window.openEditUser('${d.id}','${u.nombre}',${u.sueldo},'${u.rol}','${u.pin}')"><i class="fa-solid fa-user-gear"></i></button>
-                </div>`;
-            });
-        };
-
-        window.openEditUser = (id, n, s, r, p) => {
-            document.getElementById('edit-u-id').value = id;
-            document.getElementById('edit-u-nom').value = n;
-            document.getElementById('edit-u-sueldo-val').value = s;
-            document.getElementById('edit-u-rol-val').value = r;
-            document.getElementById('edit-u-pin-val').value = p;
-            document.getElementById('modal-edit-user').style.display = 'flex';
-        };
-
-        window.updateUsuario = async () => {
-            await updateDoc(doc(db, "usuarios", document.getElementById('edit-u-id').value), {
-                nombre: document.getElementById('edit-u-nom').value,
-                sueldo: parseFloat(document.getElementById('edit-u-sueldo-val').value),
-                rol: document.getElementById('edit-u-rol-val').value,
-                pin: document.getElementById('edit-u-pin-val').value
-            });
-            window.closeModals(); window.loadUsers();
-        };
-
-        window.crearTarea = async () => { 
-            const t = document.getElementById('task-new').value;
+        window.addChecklistTask = async () => {
+            const t = document.getElementById('task-desc-add').value;
             if(!t) return;
-            await addDoc(collection(db, "checklist"), { tarea: t }); 
-            document.getElementById('task-new').value = "";
-            window.loadTasks(); 
+            await addDoc(collection(db, "tareas"), { tarea: t });
+            document.getElementById('task-desc-add').value = "";
+            window.refreshAdminUI();
         };
 
-        window.loadTasks = async () => {
-            const snap = await getDocs(collection(db, "checklist"));
-            const div = document.getElementById('adm-checklist-view'); div.innerHTML = "";
-            snap.forEach(d => div.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #333"><span>${d.data().tarea}</span><button class="btn-del" onclick="window.delDoc('checklist','${d.id}','loadTasks')">✕</button></div>`);
+        window.refreshAdminUI = async () => {
+            const uSnap = await getDocs(collection(db, "usuarios"));
+            const tSnap = await getDocs(collection(db, "tareas"));
+            
+            const uList = document.getElementById('admin-user-list-render');
+            const tList = document.getElementById('admin-checklist-render');
+
+            uList.innerHTML = "<h4>Colaboradores</h4>";
+            uSnap.forEach(d => uList.innerHTML += `<div class="dynamic-row"><span>${d.data().nombre} (${d.data().rol})</span><button class="btn-round-del" onclick="window.deleteEntry('usuarios','${d.id}','refreshAdminUI')">✕</button></div>`);
+
+            tList.innerHTML = "";
+            tSnap.forEach(d => tList.innerHTML += `<div class="dynamic-row"><span>${d.data().tarea}</span><button class="btn-round-del" onclick="window.deleteEntry('tareas','${d.id}','refreshAdminUI')">✕</button></div>`);
         };
 
-        // --- UTILIDADES ---
-        window.toast = (m, e=false) => {
-            const t = document.getElementById('toast'); t.innerText = m; t.style.display = 'block';
-            t.style.background = e ? 'var(--terracota)' : 'var(--dorado)';
-            t.style.color = e ? '#fff' : 'var(--verde-oscuro)';
-            setTimeout(() => t.style.display='none', 3000);
-        };
-        window.delDoc = async (c, id, cb) => { if(confirm("¿CONFIRMAR ELIMINACIÓN?")) { await deleteDoc(doc(db, c, id)); if(window[cb]) window[cb](); } };
-        window.closeModals = () => { document.querySelectorAll('.full-modal').forEach(m => m.style.display = 'none'); };
-        window.calMover = (n) => { window.curCal.setMonth(window.curCal.getMonth() + n); window.renderCal(); };
-        window.addIngredienteUI = () => {
-            const d = document.createElement('div'); d.className = 'form-grid-2';
-            d.innerHTML = `<input type="text" class="r-i-n" placeholder="Insumo"><input type="number" class="r-i-c" oninput="window.calcR()" placeholder="Costo">`;
-            document.getElementById('rc-ingredientes-area').appendChild(d);
-        };
-        window.calcR = () => {
-            let t = 0; document.querySelectorAll('.r-i-c').forEach(i => t += parseFloat(i.value || 0));
-            document.getElementById('rc-costo-total').innerText = `$${t.toFixed(2)}`;
-        };
-        window.guardarReceta = async () => {
-            const ings = []; document.querySelectorAll('.r-i-n').forEach((el, i) => ings.push({ n: el.value, c: document.querySelectorAll('.r-i-c')[i].value }));
-            await addDoc(collection(db, "recetas"), { nombre: document.getElementById('rc-nombre').value, ingredientes: ings, total: document.getElementById('rc-costo-total').innerText });
-            window.toast("RECETA GUARDADA");
+        /* --- UTILIDADES GLOBALES --- */
+        window.showToast = (msg, isErr = false) => {
+            const t = document.getElementById('notification-toast');
+            t.innerText = msg;
+            t.style.display = 'block';
+            t.style.background = isErr ? 'var(--terracota)' : 'var(--dorado)';
+            t.style.color = isErr ? '#fff' : 'var(--verde-oscuro)';
+            setTimeout(() => t.style.display = 'none', 3000);
         };
 
-        window.scanIA = async (i) => {
-            document.getElementById('ocr-load').style.display='block';
-            try {
-                const { data: { text } } = await Tesseract.recognize(i.files[0], 'spa');
-                const m = text.match(/(\d+[\.,]\d{2})/);
-                if(m) { document.getElementById('fn-monto').value = m[0].replace(',','.'); window.toast("VALOR DETECTADO"); }
-            } catch (e) { window.toast("ERROR SCAN", true); }
-            document.getElementById('ocr-load').style.display='none';
+        window.deleteEntry = async (col, id, callback) => {
+            if(confirm("¿Seguro que deseas eliminar este registro permanente?")) {
+                await deleteDoc(doc(db, col, id));
+                if(window[callback]) window[callback]();
+            }
         };
 
-        window.initApp = () => {
-            window.nav(window.me.rol === 'Socio' ? 'finanzas' : 'reloj');
-            window.loadStaffActivo(); window.renderCal();
-            if(window.me.rol === 'Socio') { window.loadFinanzas(); window.loadUsers(); window.loadTasks(); }
+        window.changeCalMonth = (offset) => {
+            window.calendarReference.setMonth(window.calendarReference.getMonth() + offset);
+            window.renderMasterCalendar();
+        };
+
+        window.bootApp = () => {
+            window.switchView(window.currentUser.rol === 'Socio' ? 'finanzas' : 'reloj');
+            window.renderMasterCalendar();
+            window.refreshClockLogs();
+            window.refreshInventoryUI();
+            window.refreshRecipesUI();
+            if(window.currentUser.rol === 'Socio') {
+                window.refreshFinanceUI();
+                window.refreshAdminUI();
+            }
+            
+            // Iniciar Reloj en Vivo
             setInterval(() => {
                 const n = new Date();
-                document.getElementById('live-h').innerText = n.toLocaleTimeString('es-MX', {hour12:false});
-                document.getElementById('live-d').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
+                document.getElementById('clock-time').innerText = n.toLocaleTimeString('es-MX', {hour12:false});
+                document.getElementById('clock-date').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
             }, 1000);
         };
     </script>
