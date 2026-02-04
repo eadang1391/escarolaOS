@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v14.1</title>
+    <title>EscarolaOS v14.2</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -23,7 +23,6 @@
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--verde-bosque); color: var(--cantera); height: 100vh; overflow: hidden; }
 
-        /* ANIMACIONES Y LOGO */
         @keyframes glow {
             0%, 100% { filter: drop-shadow(0 0 5px var(--dorado)); opacity: 0.8; }
             50% { filter: drop-shadow(0 0 20px var(--dorado)); opacity: 1; }
@@ -43,7 +42,6 @@
         }
         .pin-dot.filled { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); transform: scale(1.3); }
 
-        /* UI MODERNA */
         .view-frame { display: none; height: 100vh; overflow-y: auto; padding: 25px 20px 180px 20px; }
         .card { 
             background: var(--verde-oscuro); border-radius: 30px; padding: 25px; 
@@ -72,7 +70,6 @@
             align-items: center; border: 1px solid rgba(255,255,255,0.05); 
         }
 
-        /* CALENDARIO RECONSTRUIDO */
         .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; margin-top: 15px; }
         .cal-day { 
             aspect-ratio: 1; display: flex; align-items: center; justify-content: center; 
@@ -84,7 +81,6 @@
             border-radius: 50%; position: absolute; bottom: 6px; 
         }
 
-        /* NAVEGACIÓN */
         #main-nav { 
             position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
             width: 94%; max-width: 500px; background: rgba(13, 26, 18, 0.96); 
@@ -107,6 +103,11 @@
             background: var(--verde-oscuro); padding: 35px; border-radius: 40px; 
             width: 100%; max-width: 450px; border: 2px solid var(--dorado); text-align: center; 
         }
+
+        /* ESTILOS REPORTES */
+        .report-bar { height: 12px; background: #333; border-radius: 6px; overflow: hidden; margin: 10px 0; display: flex; }
+        .bar-fill-v { background: var(--dorado); height: 100%; }
+        .bar-fill-g { background: var(--terracota); height: 100%; }
     </style>
 </head>
 <body>
@@ -126,10 +127,23 @@
                 <span style="font-size:0.7rem; letter-spacing:3px; opacity:0.6">PATRIMONIO NETO</span>
                 <h1 id="neto-display" style="font-size:3.5rem; margin:10px 0">$0.00</h1>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:20px">
-                <div class="card" style="margin:0; padding:15px; text-align:center"><span>Ventas</span><h3 id="tot-ventas" class="txt-ingreso">$0</h3></div>
-                <div class="card" style="margin:0; padding:15px; text-align:center"><span>Gastos</span><h3 id="tot-gastos" class="txt-gasto">$0</h3></div>
+
+            <div class="card">
+                <div class="header-s">Reporte de Rendimiento</div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px; font-size:0.8rem">
+                    <span>Balance de Flujo</span>
+                    <span id="perc-rend">0% Utilidad</span>
+                </div>
+                <div class="report-bar">
+                    <div id="bar-v" class="bar-fill-v" style="width: 50%"></div>
+                    <div id="bar-g" class="bar-fill-g" style="width: 50%"></div>
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:10px">
+                    <div style="font-size:0.7rem"><i class="fa-solid fa-circle" style="color:var(--dorado)"></i> VENTAS: <span id="tot-ventas">0</span></div>
+                    <div style="font-size:0.7rem"><i class="fa-solid fa-circle" style="color:var(--terracota)"></i> GASTOS: <span id="tot-gastos">0</span></div>
+                </div>
             </div>
+
             <div class="card">
                 <div class="header-s">Registrar Operación</div>
                 <input type="text" id="f-desc" class="f-input" placeholder="Concepto">
@@ -147,7 +161,7 @@
             <div class="card">
                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px">
                     <button onclick="window.moveMonth(-1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-circle-chevron-left"></i></button>
-                    <h2 id="cal-month-title" style="font-size:1rem; letter-spacing:2px">ENERO 2026</h2>
+                    <h2 id="cal-month-title" style="font-size:1rem; letter-spacing:2px">CARGANDO...</h2>
                     <button onclick="window.moveMonth(1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-circle-chevron-right"></i></button>
                 </div>
                 <div id="cal-render" class="cal-grid"></div>
@@ -301,9 +315,22 @@
                 total += isGasto ? -data.monto : data.monto;
                 list.innerHTML += `<div class="item-row"><span>${data.desc}</span> <b class="${isGasto ? 'txt-gasto' : 'txt-ingreso'}">$${data.monto} <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')">×</button></b></div>`;
             });
+            
+            // UI Update
             document.getElementById('neto-display').innerText = `$${total.toFixed(2)}`;
             document.getElementById('tot-ventas').innerText = `$${v.toFixed(2)}`;
             document.getElementById('tot-gastos').innerText = `$${g.toFixed(2)}`;
+            
+            // Report Bar Logic
+            const totalFlujo = v + g;
+            if(totalFlujo > 0) {
+                const pV = (v / totalFlujo) * 100;
+                const pG = (g / totalFlujo) * 100;
+                document.getElementById('bar-v').style.width = pV + "%";
+                document.getElementById('bar-g').style.width = pG + "%";
+                const utilidad = v > 0 ? ((v - g) / v * 100).toFixed(1) : 0;
+                document.getElementById('perc-rend').innerText = `${utilidad}% Utilidad`;
+            }
         };
 
         window.moveMonth = (dir) => { activeMonth.setMonth(activeMonth.getMonth() + dir); loadAgenda(); };
@@ -336,7 +363,7 @@
             if(tipo === 'SALIDA') {
                 const tasks = await getDocs(collection(db, "tareas"));
                 let html = `<h3>CHECKLIST SALIDA</h3>`;
-                tasks.forEach(t => html += `<label style="display:block; margin:10px 0"><input type="checkbox" class="exit-chk"> ${t.data().tarea}</label>`);
+                tasks.forEach(t => html += `<label style="display:block; margin:10px 0; text-align:left"><input type="checkbox" class="exit-chk"> ${t.data().tarea}</label>`);
                 html += `<button class="btn-p btn-gold" onclick="window.confirmExit()">FINALIZAR</button>`;
                 document.getElementById('modal-body').innerHTML = html;
                 document.getElementById('modal-sys').style.display = 'flex';
