@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v14.7 - Enterprise Robust System</title>
+    <title>EscarolaOS v14.8 - Cross-Platform Enterprise</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
         /* =========================================
-           SISTEMA DE DISEÑO ESCAROLA OS
+           CORE DESIGN SYSTEM - ESCAROLA OS
            ========================================= */
         :root {
             --verde-bosque: #1b3022;
@@ -26,7 +26,6 @@
             --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* RESET GENERAL */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         
         body { 
@@ -34,309 +33,326 @@
             color: var(--cantera); 
             height: 100vh; 
             overflow: hidden; 
-            user-select: none;
         }
 
-        /* ANIMACIONES DE INTERFAZ */
+        /* ANIMACIONES */
         @keyframes glowPulse {
             0%, 100% { filter: drop-shadow(0 0 5px var(--dorado)); opacity: 0.8; }
             50% { filter: drop-shadow(0 0 20px var(--dorado)); opacity: 1; }
         }
-        @keyframes fadeInView {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
 
-        /* PANTALLA DE ACCESO (PIN) */
+        /* =========================================
+           LOGIN SCREEN (FIXED FOR PC/MOBILE)
+           ========================================= */
         #login-screen { 
             position: fixed; inset: 0; 
             background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro) 100%); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; 
             z-index: 999999; 
+            padding: 20px;
         }
 
-        .logo-main { width: 120px; margin-bottom: 30px; animation: glowPulse 4s infinite ease-in-out; }
+        .login-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 400px;
+            width: 100%;
+        }
 
-        .pin-container { display: flex; margin-bottom: 50px; gap: 20px; }
+        .logo-main { 
+            width: 100px; /* Tamaño controlado para PC */
+            height: auto;
+            margin-bottom: 20px; 
+            animation: glowPulse 4s infinite ease-in-out; 
+        }
+
+        @media (min-width: 768px) {
+            .logo-main { width: 120px; margin-bottom: 30px; }
+        }
+
+        .pin-container { display: flex; margin-bottom: 30px; gap: 15px; }
         .pin-dot { 
-            width: 20px; height: 20px; border: 2px solid var(--dorado); border-radius: 50%; 
+            width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; 
             transition: var(--transition); 
         }
-        .pin-dot.filled { background: var(--dorado); box-shadow: 0 0 20px var(--dorado); transform: scale(1.2); }
+        .pin-dot.filled { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); transform: scale(1.2); }
 
-        /* CONTENEDORES PRINCIPALES */
+        .numpad-grid {
+            display: grid; 
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .key-btn {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: var(--dorado);
+            background: var(--glass);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .key-btn:active { background: var(--dorado); color: var(--negro); }
+
+        /* =========================================
+           APP CONTENT STRUCTURE
+           ========================================= */
         .view-frame { 
             display: none; 
             height: 100vh; 
             overflow-y: auto; 
-            padding: 30px 25px 180px 25px; 
-            animation: fadeInView 0.5s ease-out;
+            padding: 30px 20px 180px 20px; 
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .card { 
             background: var(--verde-oscuro); 
-            border-radius: 35px; 
-            padding: 28px; 
-            margin-bottom: 25px; 
+            border-radius: 30px; 
+            padding: 25px; 
+            margin-bottom: 20px; 
             border: 1px solid var(--border); 
             box-shadow: var(--shadow-premium); 
         }
 
         .header-section { 
             border-left: 5px solid var(--dorado); 
-            padding-left: 18px; 
-            margin-bottom: 25px; 
-            letter-spacing: 3px; 
+            padding-left: 15px; 
+            margin-bottom: 20px; 
+            letter-spacing: 2px; 
             text-transform: uppercase; 
-            font-size: 0.8rem; 
+            font-size: 0.75rem; 
             color: var(--dorado); 
             font-weight: 900;
         }
 
-        /* ELEMENTOS DE FORMULARIO */
+        /* ELEMENTOS GLOBALES */
         .f-input { 
             width: 100%; 
-            padding: 18px 28px; 
+            padding: 16px 25px; 
             border-radius: var(--pill); 
             background: rgba(0,0,0,0.5); 
             border: 1px solid var(--border); 
             color: #fff; 
-            margin-bottom: 15px; 
+            margin-bottom: 12px; 
             font-size: 1rem; 
             outline: none;
-            transition: var(--transition);
         }
-        .f-input:focus { border-color: var(--dorado); background: rgba(0,0,0,0.7); }
 
         .btn-action { 
             width: 100%; 
-            padding: 20px; 
+            padding: 18px; 
             border-radius: var(--pill); 
             border: none; 
             font-weight: 900; 
-            letter-spacing: 2px; 
+            letter-spacing: 1px; 
             text-transform: uppercase; 
             cursor: pointer; 
             transition: var(--transition); 
             display: flex; 
             align-items: center; 
             justify-content: center; 
-            gap: 12px;
-            font-size: 0.85rem;
+            gap: 10px;
+            font-size: 0.8rem;
         }
         .btn-gold { background: var(--dorado); color: var(--negro); }
         .btn-red { background: var(--terracota); color: #fff; }
-        .btn-action:active { transform: scale(0.95); opacity: 0.8; }
 
-        /* LISTAS Y FILAS */
         .item-row { 
             background: var(--glass); 
-            padding: 18px 25px; 
+            padding: 15px 22px; 
             border-radius: var(--pill); 
-            margin-bottom: 12px; 
+            margin-bottom: 10px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
-            border: 1px solid rgba(255,255,255,0.08); 
+            border: 1px solid rgba(255,255,255,0.05); 
         }
 
-        /* CALENDARIO ROBUSTO */
-        .cal-wrapper { margin-top: 15px; }
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        /* CALENDARIO */
+        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; margin-top: 15px; }
         .cal-day { 
             aspect-ratio: 1; 
             display: flex; 
             align-items: center; 
             justify-content: center; 
             background: rgba(255,255,255,0.03); 
-            border-radius: 15px; 
-            font-size: 0.9rem; 
-            border: 1px solid transparent; 
-            transition: var(--transition);
+            border-radius: 12px; 
+            font-size: 0.85rem; 
+            cursor: pointer;
         }
-        .cal-day.active { background: var(--dorado); color: var(--negro); font-weight: 900; transform: scale(1.1); box-shadow: 0 0 15px var(--dorado); }
-        .cal-day.event { border-bottom: 4px solid var(--terracota); }
-
-        /* CHECKLIST */
-        .check-item { 
-            display: flex; 
-            align-items: center; 
-            gap: 15px; 
-            padding: 15px; 
-            border-bottom: 1px solid rgba(255,255,255,0.05);
-        }
-        .check-item input[type="checkbox"] {
-            width: 24px; height: 24px; accent-color: var(--dorado);
-        }
+        .cal-day.active { background: var(--dorado); color: var(--negro); font-weight: 900; }
+        .cal-day.event { border-bottom: 3px solid var(--terracota); }
 
         /* NAV BAR */
         #nav-bar { 
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); 
-            width: 92%; max-width: 600px; background: rgba(13, 26, 18, 0.98); 
+            position: fixed; bottom: 25px; left: 50%; transform: translateX(-50%); 
+            width: 94%; max-width: 500px; background: rgba(13, 26, 18, 0.98); 
             border-radius: var(--pill); display: none; grid-template-columns: repeat(6, 1fr); 
-            padding: 15px; border: 1px solid var(--dorado); 
-            backdrop-filter: blur(25px); z-index: 9999; 
+            padding: 12px; border: 1px solid var(--dorado); 
+            backdrop-filter: blur(20px); z-index: 9999; 
         }
-        .nav-link { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.6rem; font-weight: 700; text-decoration: none; }
+        .nav-link { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.55rem; font-weight: 700; cursor: pointer; }
         .nav-link.active { opacity: 1; color: var(--dorado); }
-        .nav-link i { font-size: 1.6rem; display: block; margin-bottom: 5px; }
+        .nav-link i { font-size: 1.4rem; display: block; margin-bottom: 4px; }
+
+        /* GRÁFICA */
+        .progress-container { height: 16px; background: #000; border-radius: 10px; overflow: hidden; margin: 15px 0; display: flex; border: 1px solid var(--border); }
+        .bar-gain { background: var(--dorado); height: 100%; transition: width 0.8s; }
+        .bar-loss { background: var(--terracota); height: 100%; transition: width 0.8s; }
 
         /* MODALES */
         .modal-overlay { 
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); 
-            z-index: 1000000; align-items: center; justify-content: center; padding: 25px; 
-            backdrop-filter: blur(15px); 
+            z-index: 1000000; align-items: center; justify-content: center; padding: 20px; 
         }
         .modal-box { 
-            background: var(--verde-oscuro); padding: 40px; border-radius: 45px; 
-            width: 100%; max-width: 480px; border: 1px solid var(--dorado); text-align: center; 
-            box-shadow: 0 0 60px rgba(0,0,0,0.8);
+            background: var(--verde-oscuro); padding: 30px; border-radius: 35px; 
+            width: 100%; max-width: 400px; border: 1px solid var(--dorado); text-align: center; 
         }
-
-        /* MÉTRICAS / GRÁFICA */
-        .txt-loss { color: var(--terracota) !important; font-weight: 800; }
-        .txt-gain { color: var(--dorado) !important; font-weight: 800; }
-        .progress-container { height: 20px; background: #000; border-radius: 10px; overflow: hidden; margin: 20px 0; display: flex; border: 1px solid var(--border); }
-        .bar-gain { background: var(--dorado); height: 100%; transition: width 0.8s ease; }
-        .bar-loss { background: var(--terracota); height: 100%; transition: width 0.8s ease; }
 
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <img src="logo.png" class="logo-main" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448636.png'">
-        <h2 style="letter-spacing: 8px; margin-bottom: 40px; font-weight: 200;">ESCAROLA<span style="font-weight:900; color:var(--dorado)">OS</span></h2>
-        <div class="pin-container">
-            <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+        <div class="login-container">
+            <img src="logo.png" class="logo-main" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448636.png'">
+            <h2 style="letter-spacing: 5px; margin-bottom: 25px; font-weight: 200; font-size: 1.2rem;">ESCAROLA<span style="font-weight:900; color:var(--dorado)">OS</span></h2>
+            
+            <div class="pin-container">
+                <div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div><div class="pin-dot"></div>
+            </div>
+            
+            <div id="numpad" class="numpad-grid">
+                </div>
         </div>
-        <div id="numpad" style="display:grid; grid-template-columns:repeat(3, 1fr); gap:25px"></div>
     </div>
 
-    <div id="main-shell">
+    <div id="app-shell">
         
         <div id="view-finanzas" class="view-frame">
             <div class="card" style="text-align:center">
-                <span style="font-size:0.75rem; letter-spacing:4px; opacity:0.6">FLUJO NETO DISPONIBLE</span>
-                <h1 id="display-neto" style="font-size:3.8rem; margin:15px 0">$0.00</h1>
+                <span style="font-size:0.7rem; letter-spacing:3px; opacity:0.6">PATRIMONIO OPERATIVO</span>
+                <h1 id="display-neto" style="font-size:3.5rem; margin:10px 0">$0.00</h1>
             </div>
 
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:25px">
-                <div class="card" style="margin:0; padding:25px; border-color: var(--dorado);">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:20px">
+                <div class="card" style="margin:0; padding:20px; border-color: var(--dorado);">
                     <div style="text-align:center">
-                        <span style="font-size:0.65rem; opacity:0.6">VENTAS (POS)</span>
-                        <h2 id="val-ventas" class="txt-gain">$0</h2>
+                        <span style="font-size:0.6rem; opacity:0.5">INGRESOS</span>
+                        <h3 id="val-ventas" style="color:var(--dorado)">$0</h3>
                     </div>
                 </div>
-                <div class="card" style="margin:0; padding:25px; border-color: var(--terracota);">
+                <div class="card" style="margin:0; padding:20px; border-color: var(--terracota);">
                     <div style="text-align:center">
-                        <span style="font-size:0.65rem; opacity:0.6">GASTOS (DOCS)</span>
-                        <h2 id="val-gastos" class="txt-loss">$0</h2>
+                        <span style="font-size:0.6rem; opacity:0.5">GASTOS</span>
+                        <h3 id="val-gastos" style="color:var(--terracota)">$0</h3>
                     </div>
                 </div>
             </div>
 
             <div class="card">
-                <div class="header-section">Balance de Rendimiento</div>
+                <div class="header-section">Analítica de Rendimiento</div>
                 <div class="progress-container">
                     <div id="bar-gain" class="bar-gain"></div>
                     <div id="bar-loss" class="bar-loss"></div>
                 </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.75rem">
-                    <span id="label-utilidad" class="txt-gain">0% UTILIDAD</span>
-                    <span style="opacity:0.5" id="label-status">ANALIZANDO...</span>
-                </div>
+                <p id="label-utilidad" style="text-align:center; font-size:0.7rem; color:var(--dorado)"></p>
             </div>
 
             <div class="card">
-                <div class="header-section">Registro Contable</div>
-                <input type="text" id="fin-desc" class="f-input" placeholder="Referencia / Concepto">
-                <input type="number" id="fin-monto" class="f-input" placeholder="Monto Total $">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:15px">
-                    <select id="fin-tipo" class="f-input" style="margin:0"><option value="INGRESO">Ingreso (+)</option><option value="GASTO">Egreso (-)</option></select>
+                <div class="header-section">Nuevo Movimiento</div>
+                <input type="text" id="fin-desc" class="f-input" placeholder="Concepto">
+                <input type="number" id="fin-monto" class="f-input" placeholder="Monto $">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:12px">
+                    <select id="fin-tipo" class="f-input" style="margin:0"><option value="INGRESO">Venta (+)</option><option value="GASTO">Gasto (-)</option></select>
                     <select id="fin-canal" class="f-input" style="margin:0"><option value="CAJA">Caja</option><option value="BANCO">Banco</option></select>
                 </div>
-                <button class="btn-action btn-gold" onclick="window.saveFinance()"><i class="fa-solid fa-file-invoice-dollar"></i> ASENTAR EN LIBROS</button>
+                <button class="btn-action btn-gold" onclick="window.saveFinance()">REGISTRAR</button>
             </div>
             <div id="list-finance"></div>
         </div>
 
         <div id="view-agenda" class="view-frame">
             <div class="card">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:25px">
-                    <button onclick="window.navMonth(-1)" class="btn-action" style="width:50px; padding:0; background:var(--glass)"><i class="fa-solid fa-chevron-left"></i></button>
-                    <h2 id="cal-title" style="font-size:1.2rem; letter-spacing:3px; text-transform:uppercase">ENERO 2026</h2>
-                    <button onclick="window.navMonth(1)" class="btn-action" style="width:50px; padding:0; background:var(--glass)"><i class="fa-solid fa-chevron-right"></i></button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px">
+                    <button onclick="window.navMonth(-1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-angle-left"></i></button>
+                    <h2 id="cal-title" style="font-size:1rem; letter-spacing:2px; text-transform:uppercase"></h2>
+                    <button onclick="window.navMonth(1)" style="background:none; border:none; color:var(--dorado); font-size:1.5rem"><i class="fa-solid fa-angle-right"></i></button>
                 </div>
                 <div id="cal-box" class="cal-grid"></div>
             </div>
             
             <div class="card">
-                <div class="header-section" id="cal-day-label">Agenda para hoy</div>
-                <input type="text" id="ev-tit" class="f-input" placeholder="Asunto / Reserva">
+                <div class="header-section" id="cal-day-label">Selecciona un día</div>
+                <input type="text" id="ev-tit" class="f-input" placeholder="Título del evento">
                 <input type="time" id="ev-hor" class="f-input">
-                <button class="btn-action btn-gold" onclick="window.saveEvent()">AGENDAR FECHA</button>
+                <button class="btn-action btn-gold" onclick="window.saveEvent()">GUARDAR EVENTO</button>
             </div>
             <div id="list-events"></div>
         </div>
 
         <div id="view-reloj" class="view-frame">
-            <div class="card" style="text-align:center; padding:70px 0; border:2px solid var(--dorado); background: radial-gradient(circle, var(--verde-oscuro) 0%, #000 100%);">
-                <h1 id="live-clock" style="font-size:4.5rem; font-weight:100; letter-spacing: -2px;">00:00:00</h1>
-                <p id="live-date" style="color:var(--dorado); letter-spacing:5px; font-weight:800; text-transform:uppercase; margin-top:10px"></p>
+            <div class="card" style="text-align:center; padding:60px 0; border:2px solid var(--dorado)">
+                <h1 id="live-clock" style="font-size:4rem; font-weight:100">00:00:00</h1>
+                <p id="live-date" style="color:var(--dorado); letter-spacing:4px; font-weight:800; text-transform:uppercase"></p>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:25px; margin-top:20px">
-                <button class="btn-action btn-gold" style="height:180px; flex-direction:column;" onclick="window.processPunch('ENTRADA')">
-                    <i class="fa-solid fa-fingerprint fa-4x"></i><br>MARCAR ENTRADA
-                </button>
-                <button class="btn-action btn-red" style="height:180px; flex-direction:column;" onclick="window.processPunch('SALIDA')">
-                    <i class="fa-solid fa-door-open fa-4x"></i><br>MARCAR SALIDA
-                </button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px">
+                <button class="btn-action btn-gold" style="height:160px" onclick="window.processPunch('ENTRADA')"><i class="fa-solid fa-fingerprint fa-3x"></i><br><br>ENTRADA</button>
+                <button class="btn-action btn-red" style="height:160px" onclick="window.processPunch('SALIDA')"><i class="fa-solid fa-sign-out-alt fa-3x"></i><br><br>SALIDA</button>
             </div>
-            <div id="list-recent-punches" style="margin-top:30px"></div>
+            <div id="list-recent-punches" style="margin-top:25px"></div>
         </div>
 
         <div id="view-bodega" class="view-frame">
             <div class="card">
-                <div class="header-section">Gestión de Inventario (Almacén)</div>
+                <div class="header-section">Inventario de Almacén</div>
                 <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px">
-                    <input type="text" id="inv-item" class="f-input" placeholder="Insumo / Producto">
+                    <input type="text" id="inv-item" class="f-input" placeholder="Producto">
                     <input type="number" id="inv-qty" class="f-input" placeholder="Cant.">
                 </div>
-                <button class="btn-action btn-gold" onclick="window.saveInventory()"><i class="fa-solid fa-boxes-stacked"></i> ACTUALIZAR STOCK</button>
+                <button class="btn-action btn-gold" onclick="window.saveInventory()">ACTUALIZAR STOCK</button>
                 <div id="list-inventory" style="margin-top:20px"></div>
             </div>
 
             <div class="card">
-                <div class="header-section">Recetario y Costeo</div>
-                <input type="text" id="rec-nom" class="f-input" placeholder="Nombre del Platillo">
-                <input type="number" id="rec-cost" class="f-input" placeholder="Costo Sugerido $">
-                <textarea id="rec-steps" class="f-input" placeholder="Ingredientes y preparación..." style="height:100px; border-radius:25px; padding-top:15px"></textarea>
-                <button class="btn-action btn-gold" onclick="window.saveRecipe()"><i class="fa-solid fa-book-open"></i> GUARDAR RECETA</button>
+                <div class="header-section">Recetario y Costeos</div>
+                <input type="text" id="rec-nom" class="f-input" placeholder="Nombre">
+                <input type="number" id="rec-cost" class="f-input" placeholder="Costo $">
+                <textarea id="rec-steps" class="f-input" placeholder="Receta..." style="height:80px; border-radius:20px; padding:15px; color:white; background:rgba(0,0,0,0.3); width:100%; border:1px solid var(--border); margin-bottom:15px"></textarea>
+                <button class="btn-action btn-gold" onclick="window.saveRecipe()">GUARDAR RECETA</button>
                 <div id="list-recipes" style="margin-top:20px"></div>
             </div>
         </div>
 
         <div id="view-admin" class="view-frame">
             <div class="card">
-                <div class="header-section">Nómina y Liquidación de Horas</div>
+                <div class="header-section">Nómina por Pagar (Horas)</div>
                 <div id="render-payroll"></div>
             </div>
 
             <div class="card">
-                <div class="header-section">Configuración de Staff</div>
-                <input type="text" id="st-name" class="f-input" placeholder="Nombre Completo">
-                <input type="number" id="st-pin" class="f-input" placeholder="PIN de 4 dígitos">
-                <input type="number" id="st-wage" class="f-input" placeholder="Sueldo por Hora $">
-                <button class="btn-action btn-gold" onclick="window.addNewStaff()">REGISTRAR COLABORADOR</button>
+                <div class="header-section">Gestión de Staff</div>
+                <input type="text" id="st-name" class="f-input" placeholder="Nombre">
+                <input type="number" id="st-pin" class="f-input" placeholder="PIN">
+                <input type="number" id="st-wage" class="f-input" placeholder="Pago/Hora $">
+                <button class="btn-action btn-gold" onclick="window.addNewStaff()">AGREGAR</button>
                 <div id="list-staff" style="margin-top:20px"></div>
             </div>
 
             <div class="card">
-                <div class="header-section">Checklist de Operaciones / Limpieza</div>
+                <div class="header-section">Checklist de Limpieza</div>
                 <div style="display:flex; gap:10px; margin-bottom:15px">
-                    <input type="text" id="task-name" class="f-input" placeholder="Nueva tarea de limpieza..." style="margin:0">
-                    <button class="btn-action btn-gold" style="width:70px; padding:0" onclick="window.addNewTask()"><i class="fa-solid fa-plus"></i></button>
+                    <input type="text" id="task-name" class="f-input" placeholder="Nueva tarea..." style="margin:0">
+                    <button class="btn-action btn-gold" style="width:60px" onclick="window.addNewTask()">+</button>
                 </div>
                 <div id="render-tasks"></div>
             </div>
@@ -345,10 +361,10 @@
 
     <nav id="nav-bar">
         <div class="nav-link" onclick="window.switchView('finanzas')"><i class="fa-solid fa-vault"></i>Cap</div>
-        <div class="nav-link" onclick="window.switchView('agenda')"><i class="fa-solid fa-calendar-check"></i>Age</div>
+        <div class="nav-link" onclick="window.switchView('agenda')"><i class="fa-solid fa-calendar-day"></i>Age</div>
         <div class="nav-link" onclick="window.switchView('reloj')"><i class="fa-solid fa-stopwatch"></i>Rel</div>
         <div class="nav-link" onclick="window.switchView('bodega')"><i class="fa-solid fa-utensils"></i>Bod</div>
-        <div class="nav-link" onclick="window.switchView('admin')"><i class="fa-solid fa-user-shield"></i>Adm</div>
+        <div class="nav-link" onclick="window.switchView('admin')"><i class="fa-solid fa-user-tie"></i>Adm</div>
         <div class="nav-link" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>OFF</div>
     </nav>
 
@@ -359,314 +375,207 @@
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
-        // ESTADO GLOBAL DE LA APP
-        let pinInput = "";
-        let authUser = null;
-        let calDate = new Date();
-        let selDay = null;
+        // VARIABLES DE ESTADO
+        let pinCode = "";
+        let userAuth = null;
+        let activeDate = new Date();
+        let selectedDay = null;
 
-        /**
-         * SISTEMA DE MENSAJERÍA UNIFICADO
-         */
-        window.alertOS = (title, text, isCritical = false) => {
-            const accent = isCritical ? 'var(--terracota)' : 'var(--dorado)';
+        // --- SISTEMA DE POPUPS ---
+        window.alertOS = (tit, msg, err = false) => {
             document.getElementById('modal-content').innerHTML = `
-                <div style="margin-bottom:25px"><i class="fa-solid ${isCritical ? 'fa-circle-exclamation' : 'fa-circle-check'} fa-4x" style="color:${accent}"></i></div>
-                <h2 style="margin-bottom:15px; color:${accent}; letter-spacing:2px">${title}</h2>
-                <p style="opacity:0.8; margin-bottom:35px; line-height:1.6">${text}</p>
-                <button class="btn-action btn-gold" onclick="document.getElementById('sys-modal').style.display='none'">ENTENDIDO</button>
+                <h2 style="color:${err?'var(--terracota)':'var(--dorado)'}; margin-bottom:15px">${tit}</h2>
+                <p style="margin-bottom:25px; opacity:0.8">${msg}</p>
+                <button class="btn-action btn-gold" onclick="document.getElementById('sys-modal').style.display='none'">OK</button>
             `;
             document.getElementById('sys-modal').style.display = 'flex';
         };
 
-        /**
-         * SEGURIDAD Y LOGIN
-         */
-        const buildNumpad = () => {
+        // --- PINPAD RESPONSIVO ---
+        const setupNumpad = () => {
             const pad = document.getElementById('numpad');
-            for(let i=1; i<=9; i++) pad.innerHTML += `<div onclick="window.keyIn(${i})" style="width:85px; height:85px; border-radius:50%; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:2rem; color:var(--dorado); background:var(--glass)">${i}</div>`;
-            pad.innerHTML += `<div onclick="window.keyIn('C')" style="display:flex; align-items:center; justify-content:center; color:var(--terracota); font-size:1.8rem"><i class="fa-solid fa-delete-left"></i></div>`;
-            pad.innerHTML += `<div onclick="window.keyIn(0)" style="width:85px; height:85px; border-radius:50%; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:2rem; color:var(--dorado); background:var(--glass)">0</div>`;
-            pad.innerHTML += `<div onclick="location.reload()" style="display:flex; align-items:center; justify-content:center; color:var(--terracota); font-size:1.8rem"><i class="fa-solid fa-power-off"></i></div>`;
+            for(let i=1; i<=9; i++) pad.innerHTML += `<div class="key-btn" onclick="window.keyPress(${i})">${i}</div>`;
+            pad.innerHTML += `<div class="key-btn" onclick="window.keyPress('C')" style="color:var(--terracota)"><i class="fa-solid fa-backspace"></i></div>`;
+            pad.innerHTML += `<div class="key-btn" onclick="window.keyPress(0)">0</div>`;
+            pad.innerHTML += `<div class="key-btn" onclick="location.reload()" style="color:var(--terracota)"><i class="fa-solid fa-power-off"></i></div>`;
         };
 
-        window.keyIn = async (v) => {
-            if(v === 'C') { pinInput = ""; refreshDots(); return; }
-            if(pinInput.length < 4) pinInput += v;
-            refreshDots();
+        window.keyPress = async (v) => {
+            if(v === 'C') { pinCode = ""; updateDots(); return; }
+            if(pinCode.length < 4) pinCode += v;
+            updateDots();
             
-            if(pinInput.length === 4) {
-                const q = query(collection(db, "usuarios"), where("pin", "==", pinInput));
+            if(pinCode.length === 4) {
+                const q = query(collection(db, "usuarios"), where("pin", "==", pinCode));
                 const snap = await getDocs(q);
                 if(!snap.empty) {
-                    authUser = { id: snap.docs[0].id, ...snap.docs[0].data() };
+                    userAuth = { id: snap.docs[0].id, ...snap.docs[0].data() };
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('nav-bar').style.display = 'grid';
-                    initAppCore();
+                    initApp();
                 } else {
-                    pinInput = ""; refreshDots();
-                    window.alertOS("ACCESO DENEGADO", "El PIN ingresado es incorrecto.", true);
+                    pinCode = ""; updateDots();
+                    window.alertOS("ERROR", "PIN Incorrecto", true);
                 }
             }
         };
 
-        const refreshDots = () => {
-            document.querySelectorAll('.pin-dot').forEach((dot, idx) => {
-                dot.classList.toggle('filled', idx < pinInput.length);
-            });
+        const updateDots = () => {
+            document.querySelectorAll('.pin-dot').forEach((dot, i) => dot.classList.toggle('filled', i < pinCode.length));
         };
 
-        /**
-         * NAVEGACIÓN ENTRE VISTAS
-         */
-        window.switchView = (vID) => {
-            if((vID === 'finanzas' || vID === 'admin') && authUser.rol !== 'Socio') {
-                window.alertOS("RESTRINGIDO", "Esta sección requiere privilegios de Socio.", true);
-                return;
-            }
-            document.querySelectorAll('.view-frame').forEach(v => v.style.display = 'none');
+        // --- NAVEGACIÓN ---
+        window.switchView = (v) => {
+            if((v === 'finanzas' || v === 'admin') && userAuth.rol !== 'Socio') return;
+            document.querySelectorAll('.view-frame').forEach(f => f.style.display = 'none');
             document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
-            document.getElementById(`view-${vID}`).style.display = 'block';
-            if(vID === 'agenda') renderCalendar();
+            document.getElementById(`view-${v}`).style.display = 'block';
+            if(v === 'agenda') loadCalendar();
             if(vID === 'bodega') loadBodega();
-            if(vID === 'admin') loadAdminData();
+            if(v === 'admin') loadAdminData();
         };
 
-        /**
-         * MÓDULO: FINANZAS Y CAJA
-         */
+        // --- FINANZAS ---
         window.saveFinance = async () => {
             const m = parseFloat(document.getElementById('fin-monto').value);
             const d = document.getElementById('fin-desc').value;
-            if(!m || !d) return window.alertOS("ERROR", "Debes ingresar monto y concepto.", true);
-
-            await addDoc(collection(db, "finanzas"), {
-                desc: d, monto: m,
-                tipo: document.getElementById('fin-tipo').value,
-                canal: document.getElementById('fin-canal').value,
-                fecha: new Date().toISOString()
-            });
-            window.alertOS("ÉXITO", "Transacción registrada correctamente.");
+            if(!m || !d) return;
+            await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('fin-tipo').value, canal: document.getElementById('fin-canal').value, fecha: new Date().toISOString() });
             document.getElementById('fin-monto').value = ""; document.getElementById('fin-desc').value = "";
-            refreshFinance();
+            loadFinances();
         };
 
-        window.refreshFinance = async () => {
+        window.loadFinances = async () => {
             const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
             let v = 0, g = 0;
             const list = document.getElementById('list-finance'); list.innerHTML = "";
-            
             snap.forEach(s => {
                 const data = s.data();
                 if(data.tipo === 'GASTO') g += data.monto; else v += data.monto;
-                list.innerHTML += `
-                    <div class="item-row">
-                        <div><b>${data.desc}</b><br><small style="opacity:0.4">${data.canal}</small></div>
-                        <b class="${data.tipo==='GASTO'?'txt-loss':'txt-gain'}">$${data.monto.toFixed(2)} 
-                        <button onclick="window.killDoc('finanzas','${s.id}','refreshFinance')" style="background:none; border:none; color:var(--terracota); margin-left:15px">×</button></b>
-                    </div>`;
+                list.innerHTML += `<div class="item-row"><span>${data.desc}</span> <b>$${data.monto} <button onclick="window.delDoc('finanzas','${s.id}','loadFinances')">×</button></b></div>`;
             });
-
-            const neto = v - g;
-            document.getElementById('display-neto').innerText = `$${neto.toFixed(2)}`;
+            document.getElementById('display-neto').innerText = `$${(v-g).toFixed(2)}`;
             document.getElementById('val-ventas').innerText = `$${v.toFixed(0)}`;
             document.getElementById('val-gastos').innerText = `$${g.toFixed(0)}`;
-            
             const total = v + g;
             if(total > 0) {
-                const ut = v > 0 ? ((v - g) / v * 100) : 0;
-                document.getElementById('bar-gain').style.width = (v / total * 100) + "%";
-                document.getElementById('bar-loss').style.width = (g / total * 100) + "%";
-                document.getElementById('label-utilidad').innerText = `${ut.toFixed(1)}% MARGEN UTILIDAD`;
-                document.getElementById('label-status').innerText = ut > 20 ? "SALUDABLE" : "REVISAR COSTOS";
+                document.getElementById('bar-gain').style.width = (v/total*100) + "%";
+                document.getElementById('bar-loss').style.width = (g/total*100) + "%";
+                document.getElementById('label-utilidad').innerText = `${((v-g)/v*100).toFixed(1)}% UTILIDAD`;
             }
         };
 
-        /**
-         * MÓDULO: AGENDA Y RESERVAS
-         */
-        window.navMonth = (dir) => { calDate.setMonth(calDate.getMonth() + dir); renderCalendar(); };
-
-        window.renderCalendar = async () => {
-            const grid = document.getElementById('cal-box'); grid.innerHTML = "";
-            document.getElementById('cal-title').innerText = calDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
-
+        // --- AGENDA ---
+        window.navMonth = (d) => { activeDate.setMonth(activeDate.getMonth() + d); loadCalendar(); };
+        window.loadCalendar = async () => {
+            const box = document.getElementById('cal-box'); box.innerHTML = "";
+            document.getElementById('cal-title').innerText = activeDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
             const snap = await getDocs(collection(db, "agenda"));
-            const dates = snap.docs.map(d => d.data().fecha);
-
-            const y = calDate.getFullYear(); const m = calDate.getMonth();
+            const evs = snap.docs.map(d => d.data().fecha);
+            const y = activeDate.getFullYear(), m = activeDate.getMonth();
             const start = new Date(y, m, 1).getDay();
             const days = new Date(y, m + 1, 0).getDate();
-
-            for(let i=0; i<start; i++) grid.innerHTML += `<div></div>`;
+            for(let i=0; i<start; i++) box.innerHTML += `<div></div>`;
             for(let i=1; i<=days; i++) {
-                const dKey = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                const hasEv = dates.includes(dKey);
-                const isSel = selDay === dKey;
-                grid.innerHTML += `<div class="cal-day ${hasEv?'event':''} ${isSel?'active':''}" onclick="window.pickDay('${dKey}')">${i}</div>`;
+                const k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                box.innerHTML += `<div class="cal-day ${evs.includes(k)?'event':''} ${selectedDay===k?'active':''}" onclick="window.pickDay('${k}')">${i}</div>`;
             }
         };
-
-        window.pickDay = (d) => { selDay = d; document.getElementById('cal-day-label').innerText = `DÍA SELECCIONADO: ${d}`; renderCalendar(); refreshEvents(d); };
-
+        window.pickDay = (d) => { selectedDay = d; document.getElementById('cal-day-label').innerText = `Día: ${d}`; loadCalendar(); refreshDayEvents(d); };
         window.saveEvent = async () => {
-            if(!selDay) return window.alertOS("ERROR", "Selecciona un día primero.", true);
-            await addDoc(collection(db, "agenda"), { tit: document.getElementById('ev-tit').value, hora: document.getElementById('ev-hor').value, fecha: selDay });
-            window.alertOS("AGENDADO", "Reserva guardada.");
-            refreshEvents(selDay); renderCalendar();
+            if(!selectedDay) return;
+            await addDoc(collection(db, "agenda"), { tit: document.getElementById('ev-tit').value, hora: document.getElementById('ev-hor').value, fecha: selectedDay });
+            loadCalendar(); refreshDayEvents(selectedDay);
         };
-
-        window.refreshEvents = async (f) => {
-            const q = query(collection(db, "agenda"), where("fecha", "==", f));
-            const snap = await getDocs(q);
+        window.refreshDayEvents = async (f) => {
+            const snap = await getDocs(query(collection(db, "agenda"), where("fecha", "==", f)));
             const list = document.getElementById('list-events'); list.innerHTML = "";
-            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.killDoc('agenda','${d.id}','renderCalendar')">×</button></div>`);
+            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.delDoc('agenda','${d.id}','loadCalendar')">×</button></div>`);
         };
 
-        /**
-         * MÓDULO: BODEGA (INVENTARIO Y RECETAS)
-         */
+        // --- BODEGA ---
         window.saveInventory = async () => {
-            const item = document.getElementById('inv-item').value;
-            const qty = parseFloat(document.getElementById('inv-qty').value);
-            if(!item || isNaN(qty)) return;
-            await addDoc(collection(db, "inventario"), { item, qty, fecha: new Date().toISOString() });
+            await addDoc(collection(db, "inventario"), { item: document.getElementById('inv-item').value, qty: document.getElementById('inv-qty').value });
             loadBodega();
         };
-
         window.saveRecipe = async () => {
             await addDoc(collection(db, "recetas"), { nom: document.getElementById('rec-nom').value, cost: document.getElementById('rec-cost').value, steps: document.getElementById('rec-steps').value });
             loadBodega();
         };
-
         window.loadBodega = async () => {
-            const iSnap = await getDocs(collection(db, "inventario"));
-            const rSnap = await getDocs(collection(db, "recetas"));
-            const iList = document.getElementById('list-inventory'); iList.innerHTML = "";
-            const rList = document.getElementById('list-recipes'); rList.innerHTML = "";
-
-            iSnap.forEach(d => iList.innerHTML += `<div class="item-row"><span>${d.data().item}</span> <b>${d.data().qty} un. <button onclick="window.killDoc('inventario','${d.id}','loadBodega')">×</button></b></div>`);
-            rSnap.forEach(d => rList.innerHTML += `<div class="item-row"><span>${d.data().nom}</span> <b>$${d.data().cost} <button onclick="window.killDoc('recetas','${d.id}','loadBodega')">×</button></b></div>`);
+            const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas"));
+            const iL = document.getElementById('list-inventory'), rL = document.getElementById('list-recipes');
+            iL.innerHTML = ""; rL.innerHTML = "";
+            iS.forEach(d => iL.innerHTML += `<div class="item-row">${d.data().item} <b>${d.data().qty} <button onclick="window.delDoc('inventario','${d.id}','loadBodega')">×</button></b></div>`);
+            rS.forEach(d => rL.innerHTML += `<div class="item-row">${d.data().nom} <b>$${d.data().cost} <button onclick="window.delDoc('recetas','${d.id}','loadBodega')">×</button></b></div>`);
         };
 
-        /**
-         * MÓDULO: ADMIN (NÓMINA Y CHECKLIST)
-         */
-        window.loadAdminData = async () => {
-            loadPayroll();
-            loadTasks();
-            loadStaffList();
-        };
-
+        // --- ADMIN / NÓMINA ---
+        window.loadAdminData = async () => { loadPayroll(); loadTasks(); loadStaff(); };
         window.loadPayroll = async () => {
-            const uSnap = await getDocs(collection(db, "usuarios"));
-            const aSnap = await getDocs(collection(db, "asistencias"));
+            const uS = await getDocs(collection(db, "usuarios")), aS = await getDocs(collection(db, "asistencias"));
             const render = document.getElementById('render-payroll'); render.innerHTML = "";
-
-            uSnap.forEach(uDoc => {
-                const u = uDoc.data();
-                const lPay = u.ultimoPago ? new Date(u.ultimoPago) : new Date(0);
-                const hits = aSnap.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) > lPay).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
-                
-                let totalHrs = 0;
+            uS.forEach(uDoc => {
+                const u = uDoc.data(); const lP = u.ultimoPago ? new Date(u.ultimoPago) : new Date(0);
+                const hits = aS.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) > lP).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+                let hrs = 0;
                 for(let i=0; i<hits.length; i++){
-                    if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){
-                        totalHrs += (new Date(hits[i+1].fecha) - new Date(hits[i].fecha)) / 3600000;
-                        i++;
-                    }
+                    if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA') { hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; }
                 }
-                const $pagar = totalHrs * (u.sueldo || 0);
-                render.innerHTML += `
-                    <div class="item-row">
-                        <div><b>${u.nombre}</b><br><small>${totalHrs.toFixed(1)} hrs acumuladas</small></div>
-                        <div style="text-align:right">
-                            <b style="display:block">$${$pagar.toFixed(0)}</b>
-                            <button class="btn-gold" style="padding:5px 10px; border-radius:10px; font-size:0.6rem" onclick="window.payStaff('${uDoc.id}','${u.nombre}',${$pagar})">PAGAR</button>
-                        </div>
-                    </div>`;
+                const pag = hrs * (u.sueldo || 0);
+                render.innerHTML += `<div class="item-row"><div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} hrs</small></div><b>$${pag.toFixed(0)} <button onclick="window.payStaff('${uDoc.id}','${u.nombre}',${pag})">PAGAR</button></b></div>`;
             });
         };
-
-        window.payStaff = async (uid, nom, monto) => {
-            if(monto <= 0) return window.alertOS("CERO", "No hay horas por pagar.", true);
-            await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto, tipo: 'GASTO', canal: 'CAJA', fecha: new Date().toISOString() });
+        window.payStaff = async (uid, nom, mon) => {
+            await addDoc(collection(db, "finanzas"), { desc: `PAGO: ${nom}`, monto: mon, tipo: 'GASTO', canal: 'CAJA', fecha: new Date().toISOString() });
             await updateDoc(doc(db, "usuarios", uid), { ultimoPago: new Date().toISOString() });
-            window.alertOS("LIQUIDADO", `Se han pagado $${monto} a ${nom}. El contador vuelve a 0.`);
-            loadPayroll(); refreshFinance();
+            window.alertOS("PAGADO", "Horas reiniciadas."); loadAdminData(); loadFinances();
         };
 
+        // --- CHECKLIST ---
         window.addNewTask = async () => {
-            const t = document.getElementById('task-name').value;
-            if(!t) return;
-            await addDoc(collection(db, "tareas"), { tarea: t, status: false });
-            document.getElementById('task-name').value = "";
-            loadTasks();
+            await addDoc(collection(db, "tareas"), { tarea: document.getElementById('task-name').value, status: false });
+            document.getElementById('task-name').value = ""; loadTasks();
         };
-
         window.loadTasks = async () => {
             const snap = await getDocs(collection(db, "tareas"));
             const render = document.getElementById('render-tasks'); render.innerHTML = "";
-            snap.forEach(d => {
-                render.innerHTML += `
-                    <div class="check-item">
-                        <input type="checkbox" ${d.data().status?'checked':''} onchange="window.toggleTask('${d.id}', this.checked)">
-                        <span style="flex:1">${d.data().tarea}</span>
-                        <button onclick="window.killDoc('tareas','${d.id}','loadTasks')" style="color:var(--terracota); background:none; border:none">×</button>
-                    </div>`;
-            });
+            snap.forEach(d => render.innerHTML += `<div class="item-row"><input type="checkbox" ${d.data().status?'checked':''} onchange="window.checkT('${d.id}',this.checked)"> ${d.data().tarea} <button onclick="window.delDoc('tareas','${d.id}','loadTasks')">×</button></div>`);
+        };
+        window.checkT = async (id, s) => await updateDoc(doc(db, "tareas", id), { status: s });
+
+        // --- ASISTENCIA ---
+        window.processPunch = async (t) => {
+            await addDoc(collection(db, "asistencias"), { uid: userAuth.id, name: userAuth.nombre, tipo: t, fecha: new Date().toISOString() });
+            window.alertOS("LISTO", `${t} registrada.`); loadRecent();
+        };
+        window.loadRecent = async () => {
+            const snap = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(5)));
+            const list = document.getElementById('list-recent-punches'); list.innerHTML = "<h4>RECIENTE</h4>";
+            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().name} - ${d.data().tipo}</div>`);
         };
 
-        window.toggleTask = async (id, s) => { await updateDoc(doc(db, "tareas", id), { status: s }); };
-
+        window.delDoc = async (c, i, cb) => { if(confirm("¿Eliminar?")) { await deleteDoc(doc(db, c, i)); window[cb](); } };
         window.addNewStaff = async () => {
             await addDoc(collection(db, "usuarios"), { nombre: document.getElementById('st-name').value, pin: document.getElementById('st-pin').value, sueldo: parseFloat(document.getElementById('st-wage').value), rol: 'Staff', ultimoPago: new Date().toISOString() });
-            loadStaffList();
+            loadStaff();
         };
-
-        window.loadStaffList = async () => {
+        window.loadStaff = async () => {
             const snap = await getDocs(collection(db, "usuarios"));
             const list = document.getElementById('list-staff'); list.innerHTML = "";
-            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().nombre} <button onclick="window.killDoc('usuarios','${d.id}','loadStaffList')">×</button></div>`);
+            snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().nombre} <button onclick="window.delDoc('usuarios','${d.id}','loadStaff')">×</button></div>`);
         };
 
-        /**
-         * MÓDULO: RELOJ CHECADOR
-         */
-        window.processPunch = async (tipo) => {
-            await addDoc(collection(db, "asistencias"), { uid: authUser.id, name: authUser.nombre, tipo, fecha: new Date().toISOString() });
-            window.alertOS("REGISTRADO", `${tipo} marcada a las ${new Date().toLocaleTimeString()}`);
-            loadRecentPunches();
-        };
-
-        window.loadRecentPunches = async () => {
-            const q = query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(5));
-            const snap = await getDocs(q);
-            const list = document.getElementById('list-recent-punches'); list.innerHTML = "<h4 style='margin-bottom:15px; color:var(--dorado)'>MOVIMIENTOS RECIENTES</h4>";
-            snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().name}</span> <b>${d.data().tipo}</b></div>`);
-        };
-
-        /**
-         * UTILIDADES GLOBALES
-         */
-        window.killDoc = async (col, id, cb) => {
-            if(confirm("¿Seguro que deseas eliminar este registro robusto?")) {
-                await deleteDoc(doc(db, col, id));
-                if(cb) window[cb]();
-            }
-        };
-
-        const initAppCore = () => {
-            window.switchView('reloj');
-            refreshFinance();
-            loadRecentPunches();
+        const initApp = () => {
+            window.switchView('reloj'); loadFinances(); loadRecent();
             setInterval(() => {
                 const n = new Date();
                 document.getElementById('live-clock').innerText = n.toLocaleTimeString();
-                document.getElementById('live-date').innerText = n.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' });
+                document.getElementById('live-date').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'});
             }, 1000);
         };
 
-        buildNumpad();
+        setupNumpad();
     </script>
 </body>
 </html>
