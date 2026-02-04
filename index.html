@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v14.0</title>
+    <title>EscarolaOS v14.1</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 
@@ -52,7 +52,6 @@
         }
         .header-s { border-left: 4px solid var(--dorado); padding-left: 15px; margin-bottom: 20px; letter-spacing: 2px; text-transform: uppercase; font-size: 0.75rem; color: var(--dorado); }
 
-        /* COMPONENTES PÍLDORA */
         .btn-p { 
             width: 100%; padding: 18px; border-radius: var(--pill); border: none; 
             font-weight: 900; letter-spacing: 1px; text-transform: uppercase; 
@@ -97,11 +96,9 @@
         .nav-item.active { opacity: 1; color: var(--dorado); }
         .nav-item i { font-size: 1.4rem; display: block; margin-bottom: 4px; }
 
-        /* COLORES DINÁMICOS */
         .txt-gasto { color: var(--terracota) !important; font-weight: 800; }
         .txt-ingreso { color: var(--dorado) !important; font-weight: 800; }
 
-        /* MODALES */
         .modal { 
             display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.92); 
             z-index: 1000000; align-items: center; justify-content: center; padding: 20px; 
@@ -250,7 +247,6 @@
         let activeMonth = new Date();
         let editingStaffId = null;
 
-        // --- AUTENTICACIÓN ---
         const initNumpad = () => {
             const grid = document.getElementById('numpad-grid');
             for(let i=1; i<=9; i++) grid.innerHTML += `<div class="key-btn" style="width:80px; height:80px; border-radius:50%; border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-size:1.8rem; color:var(--dorado); background:var(--glass)" onclick="window.pressKey(${i})">${i}</div>`;
@@ -280,30 +276,17 @@
             dots.forEach((d, i) => d.classList.toggle('filled', i < currentPin.length));
         };
 
-        // --- NAVEGACIÓN Y MODALES ---
         window.goTo = (view) => {
-            if((view === 'finanzas' || view === 'admin') && currentUser.rol !== 'Socio') {
-                window.showMsg("ACCESO RESTRINGIDO A SOCIOS"); return;
-            }
+            if((view === 'finanzas' || view === 'admin') && currentUser.rol !== 'Socio') return;
             document.querySelectorAll('.view-frame').forEach(f => f.style.display = 'none');
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
             document.getElementById(`v-${view}`).style.display = 'block';
         };
 
-        window.showMsg = (html) => {
-            document.getElementById('modal-body').innerHTML = html + `<br><br><button class="btn-p btn-gold" onclick="document.getElementById('modal-sys').style.display='none'">ENTENDIDO</button>`;
-            document.getElementById('modal-sys').style.display = 'flex';
-        };
-
-        // --- CAPITAL (FINANZAS) ---
         window.saveFin = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
             const d = document.getElementById('f-desc').value;
             if(!m || !d) return;
-            await addDoc(collection(db, "finanzas"), {
-                desc: d, monto: m, tipo: document.getElementById('f-tipo').value,
-                canal: document.getElementById('f-canal').value, fecha: new Date().toISOString()
-            });
+            await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('f-tipo').value, canal: document.getElementById('f-canal').value, fecha: new Date().toISOString() });
             loadFinData();
         };
 
@@ -316,18 +299,13 @@
                 const isGasto = data.tipo === 'GASTO';
                 if(isGasto) g += data.monto; else v += data.monto;
                 total += isGasto ? -data.monto : data.monto;
-                list.innerHTML += `<div class="item-row">
-                    <span>${data.desc} (${data.canal})</span>
-                    <b class="${isGasto ? 'txt-gasto' : 'txt-ingreso'}">$${data.monto} 
-                    <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')" style="background:none; border:none; color:var(--terracota); margin-left:10px">×</button></b>
-                </div>`;
+                list.innerHTML += `<div class="item-row"><span>${data.desc}</span> <b class="${isGasto ? 'txt-gasto' : 'txt-ingreso'}">$${data.monto} <button onclick="window.removeDoc('finanzas','${docSnap.id}','loadFinData')">×</button></b></div>`;
             });
             document.getElementById('neto-display').innerText = `$${total.toFixed(2)}`;
             document.getElementById('tot-ventas').innerText = `$${v.toFixed(2)}`;
             document.getElementById('tot-gastos').innerText = `$${g.toFixed(2)}`;
         };
 
-        // --- AGENDA ---
         window.moveMonth = (dir) => { activeMonth.setMonth(activeMonth.getMonth() + dir); loadAgenda(); };
         window.loadAgenda = async () => {
             const grid = document.getElementById('cal-render');
@@ -338,8 +316,7 @@
             const daysInMonth = new Date(activeMonth.getFullYear(), activeMonth.getMonth() + 1, 0).getDate();
             for(let i=1; i<=daysInMonth; i++) {
                 const dateStr = `${activeMonth.getFullYear()}-${String(activeMonth.getMonth()+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                const hasEv = activeDates.includes(dateStr);
-                grid.innerHTML += `<div class="cal-day ${hasEv ? 'has-event' : ''}" onclick="window.showDayTasks('${dateStr}')">${i}</div>`;
+                grid.innerHTML += `<div class="cal-day ${activeDates.includes(dateStr) ? 'has-event' : ''}" onclick="window.showDayTasks('${dateStr}')">${i}</div>`;
             }
         };
 
@@ -355,26 +332,18 @@
             snap.forEach(d => container.innerHTML += `<div class="item-row">${d.data().hora} - ${d.data().tit} <button onclick="window.removeDoc('agenda','${d.id}','loadAgenda')">×</button></div>`);
         };
 
-        // --- RELOJ Y CHECKLIST ---
         window.handlePunch = async (tipo) => {
             if(tipo === 'SALIDA') {
                 const tasks = await getDocs(collection(db, "tareas"));
-                let html = `<h3>CHECKLIST DE SALIDA</h3><p style="font-size:0.8rem; margin:10px 0">Marca las tareas realizadas</p>`;
-                tasks.forEach(t => html += `<label style="display:flex; align-items:center; gap:10px; margin-bottom:12px; font-size:1.1rem"><input type="checkbox" class="exit-chk" style="width:22px; height:22px"> ${t.data().tarea}</label>`);
-                html += `<br><button class="btn-p btn-gold" onclick="window.confirmExit()">FINALIZAR TURNO</button>`;
+                let html = `<h3>CHECKLIST SALIDA</h3>`;
+                tasks.forEach(t => html += `<label style="display:block; margin:10px 0"><input type="checkbox" class="exit-chk"> ${t.data().tarea}</label>`);
+                html += `<button class="btn-p btn-gold" onclick="window.confirmExit()">FINALIZAR</button>`;
                 document.getElementById('modal-body').innerHTML = html;
                 document.getElementById('modal-sys').style.display = 'flex';
             } else { recordPunch('ENTRADA'); }
         };
 
-        window.confirmExit = () => {
-            if(!Array.from(document.querySelectorAll('.exit-chk')).some(c => c.checked)) {
-                alert("Debes marcar al menos una tarea"); return;
-            }
-            recordPunch('SALIDA');
-            setTimeout(() => location.reload(), 1000);
-        };
-
+        window.confirmExit = () => { recordPunch('SALIDA'); setTimeout(() => location.reload(), 1000); };
         const recordPunch = async (t) => {
             await addDoc(collection(db, "asistencias"), { uid: currentUser.id, name: currentUser.nombre, tipo: t, fecha: new Date().toISOString() });
             if(currentUser.rol === 'Socio') loadPunchHistory();
@@ -386,7 +355,6 @@
             snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().name} (${d.data().tipo})</span> <button onclick="window.removeDoc('asistencias','${d.id}','loadPunchHistory')">×</button></div>`);
         };
 
-        // --- BODEGA ---
         window.saveReceta = async () => {
             await addDoc(collection(db, "recetas"), { platillo: document.getElementById('r-nom').value, costo: document.getElementById('r-cos').value, detalles: document.getElementById('r-det').value });
             loadBodegaData();
@@ -400,18 +368,14 @@
         window.loadBodegaData = async () => {
             const recS = await getDocs(collection(db, "recetas"));
             const invS = await getDocs(collection(db, "inventario"));
-            const rL = document.getElementById('recetas-list'); rL.innerHTML = "<h4>Libro de Cocina</h4>";
-            recS.forEach(d => rL.innerHTML += `<div class="item-row">${d.data().platillo} ($${d.data().costo}) <button onclick="window.removeDoc('recetas','${d.id}','loadBodegaData')">×</button></div>`);
-            const iL = document.getElementById('stock-list'); iL.innerHTML = "<h4>Existencias</h4>";
-            invS.forEach(d => iL.innerHTML += `<div class="item-row" onclick="window.editInsumo('${d.id}','${d.data().insumo}',${d.data().cant})"><span>${d.data().insumo}: <b>${d.data().cant}</b></span> <button onclick="window.removeDoc('inventario','${d.id}','loadBodegaData')">×</button></div>`);
+            document.getElementById('recetas-list').innerHTML = "<h4>Recetas</h4>";
+            recS.forEach(d => document.getElementById('recetas-list').innerHTML += `<div class="item-row">${d.data().platillo} ($${d.data().costo}) <button onclick="window.removeDoc('recetas','${d.id}','loadBodegaData')">×</button></div>`);
+            document.getElementById('stock-list').innerHTML = "<h4>Existencias</h4>";
+            invS.forEach(d => document.getElementById('stock-list').innerHTML += `<div class="item-row" onclick="window.editInsumo('${d.id}','${d.data().insumo}',${d.data().cant})">${d.data().insumo}: ${d.data().cant} <button onclick="window.removeDoc('inventario','${d.id}','loadBodegaData')">×</button></div>`);
         };
 
-        window.editInsumo = (id, nombre, actual) => {
-            const nueva = prompt(`Actualizar cantidad para ${nombre}:`, actual);
-            if(nueva !== null) { updateDoc(doc(db, "inventario", id), { cant: parseFloat(nueva) }).then(() => loadBodegaData()); }
-        };
+        window.editInsumo = (id, n, c) => { const nc = prompt(`Stock ${n}:`, c); if(nc !== null) updateDoc(doc(db, "inventario", id), { cant: parseFloat(nc) }).then(() => loadBodegaData()); };
 
-        // --- ADMIN & STAFF ---
         window.addStaff = async () => {
             await addDoc(collection(db, "usuarios"), { nombre: document.getElementById('u-nom').value, pin: document.getElementById('u-pin').value, sueldo: parseFloat(document.getElementById('u-pag').value), rol: document.getElementById('u-rol').value });
             loadStaffData();
@@ -420,20 +384,16 @@
         window.loadStaffData = async () => {
             const snap = await getDocs(collection(db, "usuarios"));
             const list = document.getElementById('staff-render'); list.innerHTML = "";
-            snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().nombre}</span> <button class="btn-gold" style="width:auto; padding:5px 15px; border-radius:12px" onclick="window.prepEditStaff('${d.id}')">EDITAR</button></div>`);
+            snap.forEach(d => list.innerHTML += `<div class="item-row"><span>${d.data().nombre}</span> <div><button class="btn-gold" style="width:auto; padding:5px 15px; border-radius:12px" onclick="window.prepEditStaff('${d.id}')">EDITAR</button> <button onclick="window.removeDoc('usuarios','${d.id}','loadStaffData')" style="background:none; border:none; color:var(--terracota); margin-left:10px; font-size:1.2rem">×</button></div></div>`);
             loadPayroll();
         };
 
         window.prepEditStaff = async (id) => {
-            const all = await getDocs(collection(db, "usuarios"));
-            const u = all.docs.find(x => x.id === id).data();
+            const snap = await getDocs(collection(db, "usuarios"));
+            const u = snap.docs.find(x => x.id === id).data();
             editingStaffId = id;
-            document.getElementById('u-nom').value = u.nombre;
-            document.getElementById('u-pin').value = u.pin;
-            document.getElementById('u-pag').value = u.sueldo;
-            document.getElementById('u-rol').value = u.rol;
-            document.getElementById('u-add-btn').style.display = 'none';
-            document.getElementById('u-edit-btns').style.display = 'flex';
+            document.getElementById('u-nom').value = u.nombre; document.getElementById('u-pin').value = u.pin; document.getElementById('u-pag').value = u.sueldo; document.getElementById('u-rol').value = u.rol;
+            document.getElementById('u-add-btn').style.display = 'none'; document.getElementById('u-edit-btns').style.display = 'flex';
         };
 
         window.updateStaff = async () => {
@@ -452,39 +412,23 @@
                 const hits = aS.docs.map(d=>d.data()).filter(p=>p.uid === uDoc.id).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
                 let hrs = 0;
                 for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs+=(new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
-                const monto = hrs * (u.sueldo || 0);
-                render.innerHTML += `<div class="item-row"><b>${u.nombre}</b> <span>$${monto.toFixed(0)} <button class="btn-gold" style="width:auto; padding:5px 10px; border-radius:10px" onclick="window.payStaff('${u.nombre}',${monto})">Pagar</button></span></div>`;
+                render.innerHTML += `<div class="item-row"><b>${u.nombre}</b> <span>$${(hrs * (u.sueldo || 0)).toFixed(0)} <button class="btn-gold" style="width:auto; padding:5px 10px; border-radius:10px" onclick="window.payStaff('${u.nombre}',${hrs * (u.sueldo || 0)})">Pagar</button></span></div>`;
             });
         };
 
-        window.payStaff = (nom, monto) => {
-            if(confirm(`¿Confirmar pago de $${monto} a ${nom}?`)) {
-                addDoc(collection(db, "finanzas"), { desc: `PAGO STAFF: ${nom}`, monto: monto, tipo: 'GASTO', canal: 'CAJA', fecha: new Date().toISOString() }).then(() => loadFinData());
-            }
-        };
+        window.payStaff = (nom, monto) => { if(confirm(`Pagar $${monto} a ${nom}?`)) { addDoc(collection(db, "finanzas"), { desc: `PAGO STAFF: ${nom}`, monto: monto, tipo: 'GASTO', canal: 'CAJA', fecha: new Date().toISOString() }).then(() => loadFinData()); } };
 
-        window.addTask = async () => {
-            await addDoc(collection(db, "tareas"), { tarea: document.getElementById('t-nom').value });
-            document.getElementById('t-nom').value = ""; loadTasks();
-        };
-
+        window.addTask = async () => { await addDoc(collection(db, "tareas"), { tarea: document.getElementById('t-nom').value }); document.getElementById('t-nom').value = ""; loadTasks(); };
         window.loadTasks = async () => {
             const snap = await getDocs(collection(db, "tareas"));
             const list = document.getElementById('task-render'); list.innerHTML = "";
             snap.forEach(d => list.innerHTML += `<div class="item-row">${d.data().tarea} <button onclick="window.removeDoc('tareas','${d.id}','loadTasks')">×</button></div>`);
         };
 
-        // --- FUNCIONES GLOBALES ---
-        window.removeDoc = async (col, id, cb) => {
-            if(confirm("¿Eliminar este registro permanentemente?")) {
-                await deleteDoc(doc(db, col, id));
-                window[cb](); if(col === 'finanzas') loadFinData();
-            }
-        };
+        window.removeDoc = async (col, id, cb) => { if(confirm("¿Eliminar registro?")) { await deleteDoc(doc(db, col, id)); window[cb](); } };
 
         const startApp = () => {
-            window.goTo('reloj');
-            loadFinData(); loadAgenda(); loadBodegaData();
+            window.goTo('reloj'); loadFinData(); loadAgenda(); loadBodegaData();
             if(currentUser.rol === 'Socio') { loadStaffData(); loadPunchHistory(); loadTasks(); }
             setInterval(() => {
                 const now = new Date();
