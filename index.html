@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v16.2 - Enterprise Management System</title>
+    <title>EscarolaOS v16.1 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
 
     <style>
         :root {
@@ -19,543 +19,287 @@
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(197, 160, 89, 0.3);
             --pill: 50px;
-            --shadow-premium: 0 25px 50px rgba(0,0,0,0.9);
-            --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            --shadow-premium: 0 20px 40px rgba(0,0,0,0.8);
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* ESTRUCTURA CORE */
+        /* ESTRUCTURA BASE */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: var(--verde-bosque); 
-            color: var(--cantera); 
-            height: 100vh; 
-            overflow: hidden; 
-            user-select: none;
-            background-image: radial-gradient(circle at 50% 50%, #1b3022 0%, #050505 100%);
-        }
+        body { background: var(--verde-bosque); color: var(--cantera); height: 100vh; overflow: hidden; user-select: none; }
         
-        /* VIEWPORTS DINÁMICOS */
         .main-viewport { 
             display: none; height: 100vh; overflow-y: auto; 
-            padding: 40px 25px 220px 25px; max-width: 900px; margin: 0 auto; 
-            animation: slideUp 0.7s ease-out;
-            scrollbar-width: none; 
+            padding: 35px 20px 200px 20px; max-width: 850px; margin: 0 auto; 
+            animation: slideUp 0.6s ease;
+            scrollbar-width: none;
         }
         .main-viewport::-webkit-scrollbar { display: none; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes pulseGlow { 0% { box-shadow: 0 0 5px var(--dorado); } 50% { box-shadow: 0 0 25px var(--dorado); } 100% { box-shadow: 0 0 5px var(--dorado); } }
+        @keyframes glowPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--dorado)); opacity: 0.8; } 50% { filter: drop-shadow(0 0 25px var(--dorado)); opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* COMPONENTES DE DISEÑO PREMIUM */
-        .card-panel { 
-            background: var(--verde-oscuro); 
-            border-radius: 40px; 
-            padding: 30px; 
-            margin-bottom: 30px; 
-            border: 1px solid var(--border); 
-            box-shadow: var(--shadow-premium);
-            position: relative;
-            overflow: hidden;
-        }
+        /* COMPONENTES UI */
+        .card-panel { background: var(--verde-oscuro); border-radius: 35px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: var(--shadow-premium); }
+        .tag-header { border-left: 6px solid var(--dorado); padding-left: 18px; margin-bottom: 25px; letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; color: var(--dorado); font-weight: 900; }
         
-        .tag-header { 
-            border-left: 6px solid var(--dorado); 
-            padding-left: 20px; 
-            margin-bottom: 30px; 
-            letter-spacing: 5px; 
-            text-transform: uppercase; 
-            font-size: 0.8rem; 
-            color: var(--dorado); 
-            font-weight: 900; 
-        }
+        .input-premium { width: 100%; padding: 18px 28px; border-radius: var(--pill); background: rgba(0,0,0,0.6); border: 1px solid var(--border); color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none; transition: var(--transition); }
+        .input-premium:focus { border-color: var(--dorado); box-shadow: 0 0 15px rgba(197, 160, 89, 0.2); }
         
-        .input-premium { 
-            width: 100%; padding: 20px 30px; border-radius: var(--pill); 
-            background: rgba(0,0,0,0.5); border: 1px solid var(--border); 
-            color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none; 
-            transition: var(--transition); 
-        }
-        .input-premium:focus { border-color: var(--dorado); background: rgba(0,0,0,0.8); transform: scale(1.02); }
-        
-        .btn-premium { 
-            width: 100%; padding: 22px; border-radius: var(--pill); border: none; 
-            font-weight: 900; letter-spacing: 2px; text-transform: uppercase; 
-            cursor: pointer; transition: var(--transition); 
-            display: flex; align-items: center; justify-content: center; gap: 15px; 
-        }
-        .gold-btn { background: var(--dorado); color: var(--negro); box-shadow: 0 10px 20px rgba(197, 160, 89, 0.2); }
+        .btn-premium { width: 100%; padding: 20px; border-radius: var(--pill); border: none; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .gold-btn { background: var(--dorado); color: var(--negro); }
         .red-btn { background: var(--terracota); color: #fff; }
-        .btn-premium:active { transform: scale(0.94); }
+        .btn-action-small { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--border); background: var(--glass); color: var(--dorado); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        .list-row { 
-            background: var(--glass); 
-            padding: 20px 25px; 
-            border-radius: 25px; 
-            margin-bottom: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border: 1px solid rgba(255,255,255,0.05); 
-            backdrop-filter: blur(10px);
-        }
+        .list-row { background: var(--glass); padding: 18px 25px; border-radius: var(--pill); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06); transition: 0.3s; }
 
-        .btn-action-small { 
-            width: 45px; height: 45px; border-radius: 50%; border: 1px solid var(--border); 
-            background: rgba(0,0,0,0.3); color: var(--dorado); display: flex; 
-            align-items: center; justify-content: center; cursor: pointer; transition: 0.3s;
-        }
-        .btn-action-small:hover { background: var(--terracota); color: white; border-color: var(--terracota); }
-
-        /* NAVEGACIÓN BOTTOM BAR */
+        /* NAV BAR */
         #command-bar { 
-            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); 
-            width: 94%; max-width: 850px; 
-            background: rgba(13, 26, 18, 0.96); border-radius: 50px; 
-            display: none; grid-template-columns: repeat(6, 1fr); 
-            padding: 15px; border: 1px solid var(--dorado); 
-            backdrop-filter: blur(30px); z-index: 9999;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.5);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 750px; 
+            background: rgba(13, 26, 18, 0.98); border-radius: var(--pill); display: none; grid-template-columns: repeat(6, 1fr); 
+            padding: 15px; border: 1px solid var(--dorado); backdrop-filter: blur(25px); z-index: 9999;
         }
-        .cmd-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.4s; }
-        .cmd-item.active { opacity: 1; color: var(--dorado); transform: translateY(-8px); }
-        .cmd-item i { font-size: 1.6rem; display: block; margin-bottom: 5px; }
+        .cmd-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.55rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .cmd-item.active { opacity: 1; color: var(--dorado); transform: translateY(-5px); }
+        .cmd-item i { font-size: 1.5rem; display: block; margin-bottom: 6px; }
 
-        /* LOGIN PINPAD */
+        /* PINPAD */
         #login-screen { 
-            position: fixed; inset: 0; background: radial-gradient(circle at center, #1b3022 0%, #050505 100%); 
+            position: fixed; inset: 0; background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro) 100%); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999; 
         }
-        .pin-indicator { display: flex; margin-bottom: 40px; gap: 20px; }
-        .dot { width: 20px; height: 20px; border: 2px solid var(--dorado); border-radius: 50%; transition: 0.3s; }
-        .dot.active { background: var(--dorado); box-shadow: 0 0 20px var(--dorado); transform: scale(1.2); }
-        .numpad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 300px; }
-        .key { width: 85px; height: 85px; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: var(--dorado); background: var(--glass); cursor: pointer; transition: 0.2s; }
-        .key:active { background: var(--dorado); color: var(--negro); transform: scale(0.9); }
+        .pin-indicator { display: flex; margin-bottom: 40px; gap: 18px; }
+        .dot { width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; }
+        .dot.active { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); }
+        .numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 320px; }
+        .key { aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--dorado); background: var(--glass); cursor: pointer; }
 
-        /* MODALES */
-        .modal-os { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 100000; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(15px); }
-        .modal-os-box { background: var(--verde-oscuro); padding: 40px; border-radius: 45px; width: 100%; max-width: 450px; border: 1px solid var(--dorado); box-shadow: 0 0 100px rgba(0,0,0,0.8); }
+        /* MODAL OS */
+        .modal-os { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 1000000; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(15px); }
+        .modal-os-box { background: var(--verde-oscuro); padding: 45px; border-radius: 45px; width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; }
 
-        /* CALENDARIO Y GRÁFICAS */
-        .cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
-        .cal-day { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 15px; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
-        .cal-day.active { background: var(--dorado); color: var(--negro); font-weight: 900; }
-        
-        .bar-container { height: 15px; background: #000; border-radius: 10px; overflow: hidden; margin: 20px 0; border: 1px solid var(--border); display: flex; }
-        .bar-fill { height: 100%; transition: width 1s cubic-bezier(0.4, 0, 0.2, 1); }
+        /* CALENDARIO */
+        .cal-box { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .cal-unit { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 15px; font-size: 0.9rem; cursor: pointer; }
+        .cal-unit.active { background: var(--dorado); color: var(--negro); font-weight: 900; }
     </style>
 </head>
 <body>
 
-    <section id="login-screen">
-        <h1 style="letter-spacing: 8px; margin-bottom: 30px; font-weight: 200; font-size: 2.5rem;">ESCAROLA <b style="color:var(--dorado)">OS</b></h1>
-        <div class="pin-indicator" id="pin-dots">
+    <div id="login-screen">
+        <h2 style="letter-spacing: 8px; margin-bottom: 35px; font-weight: 200;">ESCAROLA <span style="font-weight:900; color:var(--dorado)">OS</span></h2>
+        <div class="pin-indicator">
             <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
-        <div class="numpad" id="numpad-render"></div>
-    </section>
+        <div id="numpad-logic" class="numpad-container"></div>
+    </div>
 
-    <main id="os-content">
-        
+    <div id="os-shell">
         <div id="view-finanzas" class="main-viewport">
-            <div class="card-panel" style="text-align: center; padding: 50px 20px;">
-                <p style="font-size: 0.7rem; letter-spacing: 5px; opacity: 0.6; margin-bottom: 10px;">CAPITAL OPERATIVO NETO</p>
-                <h1 id="disp-neto" style="font-size: 4rem; margin-bottom: 25px; font-weight: 900;">$0</h1>
-                
-                <div class="bar-container">
-                    <div id="bar-ingresos" class="bar-fill" style="background: var(--dorado); width: 0%;"></div>
-                    <div id="bar-gastos" class="bar-fill" style="background: var(--terracota); width: 0%;"></div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; padding-top: 25px; border-top: 1px solid var(--border);">
-                    <div><small style="opacity:0.5">CAJA</small><br><span id="disp-caja" style="color:var(--dorado); font-weight:800">$0</span></div>
-                    <div><small style="opacity:0.5">CHICA</small><br><span id="disp-chica" style="color:var(--dorado); font-weight:800">$0</span></div>
-                    <div><small style="opacity:0.5">BANCO</small><br><span id="disp-banco" style="color:var(--dorado); font-weight:800">$0</span></div>
+            <div class="card-panel" style="text-align:center;">
+                <span style="font-size:0.7rem; letter-spacing:5px; opacity:0.6;">CAPITAL OPERATIVO</span>
+                <h1 id="neto-val" style="font-size:3.5rem; margin:10px 0; font-weight: 900;">$0</h1>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; border-top:1px solid var(--border); padding-top:20px">
+                    <div><small>CAJA</small><br><b id="cash-val" style="color:var(--dorado)">$0</b></div>
+                    <div><small>CHICA</small><br><b id="small-cash-val" style="color:var(--dorado)">$0</b></div>
+                    <div><small>BANCO</small><br><b id="bank-val" style="color:var(--dorado)">$0</b></div>
                 </div>
             </div>
-
             <div class="card-panel">
-                <div class="tag-header">Nuevo Registro Financiero</div>
-                <input type="text" id="f-desc" class="input-premium" placeholder="Concepto (ej. Pago Proveedor X)">
-                <input type="number" id="f-monto" class="input-premium" placeholder="Monto total $">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
-                    <select id="f-tipo" class="input-premium" style="margin:0"><option value="INGRESO">Entrada (+)</option><option value="GASTO">Salida (-)</option></select>
-                    <select id="f-canal" class="input-premium" style="margin:0">
-                        <option value="CAJA">Caja General</option>
-                        <option value="CAJA_CHICA">Caja Chica</option>
-                        <option value="BANCO">Banco / Transf</option>
-                    </select>
+                <div class="tag-header">Registrar Movimiento</div>
+                <input type="text" id="f-desc" class="input-premium" placeholder="Concepto">
+                <input type="number" id="f-monto" class="input-premium" placeholder="Monto $">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:15px">
+                    <select id="f-tipo" class="input-premium" style="margin:0"><option value="INGRESO">Ingreso (+)</option><option value="GASTO">Gasto (-)</option></select>
+                    <select id="f-canal" class="input-premium" style="margin:0"><option value="CAJA">Caja</option><option value="CAJA_CHICA">Caja Chica</option><option value="BANCO">Banco</option></select>
                 </div>
-                <button class="btn-premium gold-btn" onclick="window.fin_save()">REGISTRAR EN LIBROS</button>
+                <button class="btn-premium gold-btn" onclick="window.saveFinance()">GUARDAR</button>
             </div>
-            <div id="fin-list"></div>
+            <div id="lista-finanzas"></div>
         </div>
 
         <div id="view-agenda" class="main-viewport">
             <div class="card-panel">
-                <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                    <button class="btn-action-small" onclick="window.age_nav(-1)"><i class="fa-solid fa-chevron-left"></i></button>
-                    <h2 id="age-month-name" style="letter-spacing: 3px; font-weight: 900;">MES</h2>
-                    <button class="btn-action-small" onclick="window.age_nav(1)"><i class="fa-solid fa-chevron-right"></i></button>
-                </div>
-                <div class="cal-grid" id="age-grid"></div>
+                <div id="cal-grid-render" class="cal-box"></div>
             </div>
-            <div class="card-panel">
-                <div class="tag-header" id="age-selected-date">Seleccione una fecha</div>
-                <input type="text" id="age-tit" class="input-premium" placeholder="Nombre del evento">
-                <input type="time" id="age-time" class="input-premium">
-                <button class="btn-premium gold-btn" onclick="window.age_save()">AGENDAR EVENTO</button>
-            </div>
-            <div id="age-list"></div>
+            <div id="lista-agenda"></div>
         </div>
 
         <div id="view-reloj" class="main-viewport">
-            <div class="card-panel" style="text-align:center; padding: 80px 0;">
-                <h1 id="clock-h" style="font-size: 5.5rem; font-weight: 100; letter-spacing: -2px;">00:00:00</h1>
-                <p id="clock-d" style="color:var(--dorado); letter-spacing: 6px; font-weight: 900; text-transform: uppercase; margin-top: 10px;"></p>
+            <div class="card-panel" style="text-align:center;">
+                <h1 id="live-time" style="font-size:4.5rem; font-weight: 200;">00:00:00</h1>
+                <p id="live-date" style="color:var(--dorado); letter-spacing:4px; font-weight: 900;"></p>
             </div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
-                <button class="btn-premium gold-btn" style="height: 180px; flex-direction: column;" onclick="window.clock_punch('ENTRADA')">
-                    <i class="fa-solid fa-fingerprint fa-4x" style="margin-bottom:15px"></i>ENTRADA
-                </button>
-                <button class="btn-premium red-btn" style="height: 180px; flex-direction: column;" onclick="window.clock_punch('SALIDA')">
-                    <i class="fa-solid fa-door-open fa-4x" style="margin-bottom:15px"></i>SALIDA
-                </button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                <button class="btn-premium gold-btn" style="height:150px;" onclick="window.handlePunch('ENTRADA')">ENTRADA</button>
+                <button class="btn-premium red-btn" style="height:150px;" onclick="window.handlePunch('SALIDA')">SALIDA</button>
             </div>
-            <div id="punch-list" style="margin-top: 40px;"></div>
+            <div id="lista-asistencias" style="margin-top:30px"></div>
         </div>
 
         <div id="view-limpieza" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Configuración de Tareas</div>
-                <div style="display: flex; gap: 15px; margin-bottom: 20px;">
-                    <input type="text" id="clean-task-new" class="input-premium" placeholder="Nueva tarea..." style="margin:0">
-                    <button class="btn-premium gold-btn" style="width: 80px;" onclick="window.clean_add_task()">+</button>
-                </div>
-                <div id="clean-master-list"></div>
+                <div class="tag-header">Checklist Tareas</div>
+                <div id="render-clean-tasks"></div>
             </div>
-            <div class="card-panel">
-                <div class="tag-header">Historial de Cumplimiento (Hoy)</div>
-                <div id="clean-history-list"></div>
-            </div>
+            <div id="render-clean-history"></div>
         </div>
 
         <div id="view-bodega" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Control de Inventario</div>
-                <div style="display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                    <input type="text" id="inv-item" class="input-premium" placeholder="Insumo" style="margin:0">
-                    <input type="number" id="inv-qty" class="input-premium" placeholder="Cant." style="margin:0">
-                    <input type="number" id="inv-min" class="input-premium" placeholder="Mín." style="margin:0">
-                </div>
-                <button class="btn-premium gold-btn" onclick="window.inv_save()">ACTUALIZAR STOCK</button>
+                <div class="tag-header">Inventario</div>
+                <div id="lista-inventario"></div>
             </div>
-            <div id="inv-list"></div>
         </div>
 
         <div id="view-admin" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Gestión de Personal</div>
-                <input type="text" id="st-name" class="input-premium" placeholder="Nombre completo">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-                    <input type="number" id="st-pin" class="input-premium" placeholder="PIN Seguridad" style="margin:0">
-                    <input type="number" id="st-pay" class="input-premium" placeholder="Pago p/Hora $" style="margin:0">
-                </div>
-                <select id="st-rol" class="input-premium">
-                    <option value="Staff">Personal Operativo</option>
-                    <option value="Barista">Barista Especializado</option>
-                    <option value="Cocinero">Chef / Cocina</option>
-                    <option value="Socio">Socio Director</option>
-                </select>
-                <button class="btn-premium gold-btn" onclick="window.st_save()">REGISTRAR COLABORADOR</button>
+                <div class="tag-header">Nómina Semanal (Lun - Dom)</div>
+                <div id="render-nomina"></div>
             </div>
             <div class="card-panel">
-                <div class="tag-header">Nómina Semanal (Lunes - Domingo)</div>
-                <div id="st-payroll-list"></div>
+                <div class="tag-header">Personal</div>
+                <div id="lista-staff"></div>
             </div>
-            <div id="st-list"></div>
         </div>
-
-    </main>
-
-    <nav id="command-bar">
-        <div class="cmd-item" onclick="window.nav('finanzas')"><i class="fa-solid fa-vault"></i>Capital</div>
-        <div class="cmd-item" onclick="window.nav('agenda')"><i class="fa-solid fa-calendar-check"></i>Agenda</div>
-        <div class="cmd-item" onclick="window.nav('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
-        <div class="cmd-item" onclick="window.nav('limpieza')"><i class="fa-solid fa-broom"></i>Limpieza</div>
-        <div class="cmd-item" onclick="window.nav('bodega')"><i class="fa-solid fa-box-open"></i>Bodega</div>
-        <div class="cmd-item" onclick="window.nav('admin')"><i class="fa-solid fa-user-gear"></i>Admin</div>
-    </nav>
-
-    <div id="os-modal" class="modal-os">
-        <div class="modal-os-box" id="modal-box"></div>
     </div>
 
+    <nav id="command-bar">
+        <div class="cmd-item" onclick="window.nav('finanzas')"><i class="fa-solid fa-vault"></i>Cap</div>
+        <div class="cmd-item" onclick="window.nav('agenda')"><i class="fa-solid fa-calendar"></i>Age</div>
+        <div class="cmd-item" onclick="window.nav('reloj')"><i class="fa-solid fa-clock"></i>Rel</div>
+        <div class="cmd-item" onclick="window.nav('limpieza')"><i class="fa-solid fa-broom"></i>Lim</div>
+        <div class="cmd-item" onclick="window.nav('bodega')"><i class="fa-solid fa-box"></i>Bod</div>
+        <div class="cmd-item" onclick="window.nav('admin')"><i class="fa-solid fa-shield"></i>Adm</div>
+    </nav>
+
+    <div id="os-modal" class="modal-os"><div class="modal-os-box" id="os-modal-content"></div></div>
+
     <script type="module">
-        // IMPORTACIÓN COMPLETA DE FIREBASE
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
         let gPin = "";
         let sUser = null;
         let cDate = new Date();
-        let sDay = null;
 
-        // --- INICIALIZACIÓN DE PINPAD ---
-        window.init_keys = () => {
-            const container = document.getElementById('numpad-render');
-            container.innerHTML = "";
-            for(let i=1; i<=9; i++) container.innerHTML += `<div class="key" onclick="window.press(${i})">${i}</div>`;
-            container.innerHTML += `<div class="key" onclick="window.press('C')"><i class="fa-solid fa-eraser"></i></div>`;
-            container.innerHTML += `<div class="key" onclick="window.press(0)">0</div>`;
-            container.innerHTML += `<div class="key" onclick="location.reload()"><i class="fa-solid fa-power-off"></i></div>`;
+        // --- PINPAD ---
+        window.initKeys = () => {
+            const cont = document.getElementById('numpad-logic'); cont.innerHTML = "";
+            for(let i=1; i<=9; i++) cont.innerHTML += `<div class="key" onclick="window.press(${i})">${i}</div>`;
+            cont.innerHTML += `<div class="key" onclick="window.press('C')"><i class="fa-solid fa-backspace"></i></div>`;
+            cont.innerHTML += `<div class="key" onclick="window.press(0)">0</div>`;
+            cont.innerHTML += `<div class="key" onclick="location.reload()"><i class="fa-solid fa-power-off"></i></div>`;
         };
 
-        window.press = async (val) => {
-            if(val === 'C') { gPin = ""; update_dots(); return; }
-            if(gPin.length < 4) gPin += val;
-            update_dots();
-
-            if(gPin.length === 4) {
+        window.press = async (v) => {
+            if(v==='C'){ gPin=""; upDots(); return; }
+            if(gPin.length < 4) gPin += v; upDots();
+            if(gPin.length === 4){
                 const q = query(collection(db, "usuarios"), where("pin", "==", gPin));
                 const snap = await getDocs(q);
-                if(!snap.empty) {
+                if(!snap.empty){
                     sUser = { id: snap.docs[0].id, ...snap.docs[0].data() };
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('command-bar').style.display = 'grid';
-                    app_start();
-                } else {
-                    gPin = ""; update_dots();
-                    window.alert_os("ACCESO DENEGADO", "El PIN ingresado no es válido.");
-                }
+                    startApp();
+                } else { gPin=""; upDots(); }
             }
         };
+        const upDots = () => document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i < gPin.length));
 
-        const update_dots = () => {
-            const dots = document.querySelectorAll('.dot');
-            dots.forEach((d, i) => d.classList.toggle('active', i < gPin.length));
+        // --- NAVEGACIÓN ---
+        window.nav = (v) => {
+            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return alert("Acceso restringido.");
+            document.querySelectorAll('.main-viewport').forEach(view => view.style.display = 'none');
+            document.getElementById(`view-${v}`).style.display = 'block';
+            if(v==='finanzas') loadFin();
+            if(v==='reloj') loadPunches();
+            if(v==='admin') loadAdmin();
+            if(v==='limpieza') loadClean();
+            if(v==='bodega') loadBodega();
         };
 
-        // --- NAVEGACIÓN Y PERMISOS ---
-        window.nav = (target) => {
-            if((target === 'finanzas' || target === 'admin') && sUser.rol !== 'Socio') {
-                return window.alert_os("RESTRINGIDO", "Solo personal administrativo (Socio) tiene acceso.");
-            }
-            document.querySelectorAll('.main-viewport').forEach(v => v.style.display = 'none');
-            document.querySelectorAll('.cmd-item').forEach(c => c.classList.remove('active'));
-            document.getElementById(`view-${target}`).style.display = 'block';
-            
-            if(target === 'finanzas') fin_load();
-            if(target === 'reloj') clock_load_history();
-            if(target === 'agenda') age_render();
-            if(target === 'bodega') inv_load();
-            if(target === 'limpieza') clean_load();
-            if(target === 'admin') st_load();
+        // --- RELOJ (NUEVO: ELIMINAR Y SEMANAL) ---
+        window.handlePunch = async (t) => {
+            await addDoc(collection(db, "asistencias"), { uid: sUser.id, name: sUser.nombre, tipo: t, fecha: new Date().toISOString() });
+            loadPunches();
         };
 
-        // --- FINANZAS CON GRÁFICA ---
-        window.fin_save = async () => {
-            const m = parseFloat(document.getElementById('f-monto').value);
-            const d = document.getElementById('f-desc').value;
-            if(!m || !d) return;
-            await addDoc(collection(db, "finanzas"), {
-                desc: d, monto: m, tipo: document.getElementById('f-tipo').value,
-                canal: document.getElementById('f-canal').value, fecha: new Date().toISOString()
-            });
-            document.getElementById('f-monto').value = ""; document.getElementById('f-desc').value = "";
-            fin_load();
-        };
-
-        window.fin_load = async () => {
-            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let total = 0, c = 0, ch = 0, b = 0, tI = 0, tG = 0;
-            const list = document.getElementById('fin-list'); list.innerHTML = "";
-            
-            snap.forEach(docSnap => {
-                const d = docSnap.data();
-                const isG = d.tipo === 'GASTO';
-                if(isG) tG += d.monto; else tI += d.monto;
-                const amt = isG ? -d.monto : d.monto;
-                if(d.canal === 'CAJA') c += amt; else if(d.canal === 'CAJA_CHICA') ch += amt; else b += amt;
-                
-                list.innerHTML += `
-                    <div class="list-row">
-                        <div><b>${d.desc}</b><br><small>${d.canal}</small></div>
-                        <div style="display:flex; align-items:center; gap:15px">
-                            <b style="color:${isG?'var(--terracota)':'var(--dorado)'}">$${d.monto}</b>
-                            <button class="btn-action-small" onclick="window.secure_del('finanzas','${docSnap.id}','fin_load')"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
-            });
-            
-            total = c + ch + b;
-            document.getElementById('disp-neto').innerText = `$${total}`;
-            document.getElementById('disp-caja').innerText = `$${c}`;
-            document.getElementById('disp-chica').innerText = `$${ch}`;
-            document.getElementById('disp-banco').innerText = `$${b}`;
-            
-            const totalFlow = tI + tG;
-            document.getElementById('bar-ingresos').style.width = totalFlow > 0 ? (tI / totalFlow * 100) + "%" : "50%";
-            document.getElementById('bar-gastos').style.width = totalFlow > 0 ? (tG / totalFlow * 100) + "%" : "50%";
-        };
-
-        // --- RELOJ SEMANAL Y ELIMINACIÓN ---
-        const getWeekBoundaries = () => {
-            const now = new Date();
-            const day = now.getDay();
-            const diff = now.getDate() - day + (day === 0 ? -6 : 1);
-            const start = new Date(now.setDate(diff)); start.setHours(0,0,0,0);
-            const end = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23,59,59,999);
-            return { start, end };
-        };
-
-        window.clock_punch = async (tipo) => {
-            await addDoc(collection(db, "asistencias"), {
-                uid: sUser.id, nombre: sUser.nombre, tipo: tipo, fecha: new Date().toISOString()
-            });
-            window.alert_os("RELOJ", `Marcaje de ${tipo} registrado con éxito.`);
-            clock_load_history();
-        };
-
-        window.clock_load_history = async () => {
-            const snap = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(8)));
-            const list = document.getElementById('punch-list');
-            list.innerHTML = `<h4 style="margin-bottom:15px; font-size:0.7rem; letter-spacing:3px; opacity:0.5">ÚLTIMOS CHEQUEOS</h4>`;
+        window.loadPunches = async () => {
+            const q = query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(10));
+            const snap = await getDocs(q);
+            const list = document.getElementById('lista-asistencias');
+            list.innerHTML = `<h4 style="margin-bottom:15px; font-size:0.7rem; opacity:0.5">ÚLTIMOS MOVIMIENTOS</h4>`;
             snap.forEach(dDoc => {
                 const d = dDoc.data();
-                const hora = new Date(d.fecha).toLocaleTimeString();
-                list.innerHTML += `
-                    <div class="list-row">
-                        <div><b>${d.nombre}</b><br><small>${hora}</small></div>
-                        <div style="display:flex; align-items:center; gap:15px">
-                            <span style="font-weight:900; color:${d.tipo==='ENTRADA'?'var(--dorado)':'var(--terracota)'}">${d.tipo}</span>
-                            <button class="btn-action-small" onclick="window.secure_del('asistencias','${dDoc.id}','clock_load_history')"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
+                const f = new Date(d.fecha);
+                list.innerHTML += `<div class="list-row">
+                    <div><b>${d.name}</b><br><small>${f.toLocaleTimeString()}</small></div>
+                    <div style="display:flex; align-items:center; gap:15px">
+                        <span style="font-weight:900; color:${d.tipo==='ENTRADA'?'var(--dorado)':'var(--terracota)'}">${d.tipo}</span>
+                        <button class="btn-action-small" onclick="window.secureDel('asistencias','${dDoc.id}','loadPunches')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
             });
         };
 
-        // --- ADMIN & NÓMINA SEMANAL ---
-        window.st_load = async () => {
-            const uSnap = await getDocs(collection(db, "usuarios"));
-            const aSnap = await getDocs(collection(db, "asistencias"));
-            const list = document.getElementById('st-list');
-            const payroll = document.getElementById('st-payroll-list');
-            list.innerHTML = ""; payroll.innerHTML = "";
-            const { start, end } = getWeekBoundaries();
+        // --- LÓGICA SEMANAL (LUNES A DOMINGO) ---
+        const getWeekRange = () => {
+            const now = new Date();
+            const day = now.getDay(); 
+            const diff = now.getDate() - day + (day === 0 ? -6 : 1); // Ajuste para Lunes
+            const monday = new Date(now.setDate(diff));
+            monday.setHours(0,0,0,0);
+            const sunday = new Date(monday);
+            sunday.setDate(monday.getDate() + 6);
+            sunday.setHours(23,59,59,999);
+            return { monday, sunday };
+        };
 
-            uSnap.forEach(uDoc => {
+        window.loadAdmin = async () => {
+            const uS = await getDocs(collection(db, "usuarios")), aS = await getDocs(collection(db, "asistencias"));
+            const nL = document.getElementById('render-nomina'), sL = document.getElementById('lista-staff');
+            nL.innerHTML = ""; sL.innerHTML = "";
+            const { monday, sunday } = getWeekRange();
+
+            uS.forEach(uDoc => {
                 const u = uDoc.data();
-                list.innerHTML += `<div class="list-row"><span>${u.nombre} (${u.rol})</span><button class="btn-action-small" onclick="window.secure_del('usuarios','${uDoc.id}','st_load')"><i class="fa-solid fa-trash"></i></button></div>`;
+                sL.innerHTML += `<div class="list-row">${u.nombre} <button class="btn-action-small" onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')"><i class="fa-solid fa-trash"></i></button></div>`;
                 
-                const hits = aSnap.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) >= start && new Date(p.fecha) <= end).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+                const punches = aS.docs.map(d=>d.data())
+                    .filter(p => p.uid === uDoc.id && new Date(p.fecha) >= monday && new Date(p.fecha) <= sunday)
+                    .sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
+                
                 let ms = 0;
-                for(let i=0; i<hits.length; i++) {
-                    if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA') { ms += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha)); i++; }
+                for(let i=0; i<punches.length; i++) {
+                    if(punches[i].tipo === 'ENTRADA' && punches[i+1]?.tipo === 'SALIDA') {
+                        ms += (new Date(punches[i+1].fecha) - new Date(punches[i].fecha)); i++;
+                    }
                 }
                 const hrs = ms / 3600000;
-                payroll.innerHTML += `<div class="list-row"><div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} hrs esta semana</small></div><b style="color:var(--dorado)">$${Math.round(hrs * u.sueldo)}</b></div>`;
-            });
-        };
-
-        window.st_save = async () => {
-            const n = document.getElementById('st-name').value;
-            const p = document.getElementById('st-pin').value;
-            const s = parseFloat(document.getElementById('st-pay').value);
-            if(!n || !p || !s) return;
-            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, sueldo: s, rol: document.getElementById('st-rol').value });
-            st_load();
-        };
-
-        // --- LIMPIEZA CON ELIMINACIÓN ---
-        window.clean_add_task = async () => {
-            const t = document.getElementById('clean-task-new').value;
-            if(!t) return;
-            await addDoc(collection(db, "tareas_limpieza"), { tarea: t });
-            document.getElementById('clean-task-new').value = "";
-            clean_load();
-        };
-
-        window.clean_load = async () => {
-            const tasks = await getDocs(collection(db, "tareas_limpieza"));
-            const history = await getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])));
-            const mList = document.getElementById('clean-master-list'); mList.innerHTML = "";
-            const hList = document.getElementById('clean-history-list'); hList.innerHTML = "";
-            const doneIds = history.docs.map(h => h.data().taskId);
-
-            tasks.forEach(tDoc => {
-                const isDone = doneIds.includes(tDoc.id);
-                mList.innerHTML += `<div class="list-row">
-                    <span>${tDoc.data().tarea}</span>
-                    <div style="display:flex; gap:10px">
-                        ${isDone ? '<i class="fa-solid fa-check-circle" style="color:var(--dorado); font-size:1.5rem"></i>' : `<button class="btn-premium gold-btn" style="width:auto; padding:10px 15px; font-size:0.6rem" onclick="window.clean_mark_done('${tDoc.id}','${tDoc.data().tarea}')">MARCAR</button>`}
-                        <button class="btn-action-small" onclick="window.secure_del('tareas_limpieza','${tDoc.id}','clean_load')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            });
-
-            history.forEach(hDoc => {
-                hList.innerHTML += `<div class="list-row">
-                    <span>${hDoc.data().tarea} (${hDoc.data().empleado})</span>
-                    <button class="btn-action-small" onclick="window.secure_del('historial_limpieza','${hDoc.id}','clean_load')"><i class="fa-solid fa-trash"></i></button>
+                nL.innerHTML += `<div class="list-row">
+                    <div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} hrs esta semana</small></div>
+                    <b style="color:var(--dorado)">$${Math.round(hrs * (u.sueldo || 0))}</b>
                 </div>`;
             });
         };
 
-        window.clean_mark_done = async (id, nom) => {
-            await addDoc(collection(db, "historial_limpieza"), {
-                taskId: id, tarea: nom, empleado: sUser.nombre, fecha_dia: new Date().toISOString().split('T')[0]
-            });
-            clean_load();
-        };
-
-        // --- BODEGA ---
-        window.inv_save = async () => {
-            const i = document.getElementById('inv-item').value;
-            const q = parseFloat(document.getElementById('inv-qty').value);
-            const m = parseFloat(document.getElementById('inv-min').value);
-            if(!i) return;
-            await addDoc(collection(db, "inventario"), { item: i, qty: q, min: m });
-            inv_load();
-        };
-
-        window.inv_load = async () => {
-            const snap = await getDocs(collection(db, "inventario"));
-            const list = document.getElementById('inv-list'); list.innerHTML = "";
-            snap.forEach(dDoc => {
-                const d = dDoc.data();
-                list.innerHTML += `<div class="list-row">
-                    <div><b>${d.item}</b><br><small>Mín: ${d.min}</small></div>
-                    <div style="display:flex; align-items:center; gap:15px">
-                        <b style="color:${d.qty <= d.min ? 'var(--terracota)' : 'var(--dorado)'}">${d.qty} un.</b>
-                        <button class="btn-action-small" onclick="window.secure_del('inventario','${dDoc.id}','inv_load')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            });
-        };
-
-        // --- UTILS ---
-        window.alert_os = (t, m) => {
-            const box = document.getElementById('modal-box');
-            box.innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2><p style="opacity:0.8; margin-bottom:30px">${m}</p><button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">ENTENDIDO</button>`;
-            document.getElementById('os-modal').style.display = 'flex';
-        };
-
-        window.secure_del = (col, id, cb) => {
-            if(confirm("¿Estás seguro de eliminar este registro permanentemente?")) {
-                deleteDoc(doc(db, col, id)).then(() => window[cb]());
+        // --- UTILIDADES ---
+        window.secureDel = (c, i, cb) => {
+            if(confirm("¿Eliminar registro permanentemente?")) {
+                deleteDoc(doc(db, c, i)).then(() => window[cb]());
             }
         };
 
-        const app_start = () => {
+        const startApp = () => {
             window.nav('reloj');
             setInterval(() => {
                 const n = new Date();
-                document.getElementById('clock-h').innerText = n.toLocaleTimeString('es-MX', {hour12:false});
-                document.getElementById('clock-d').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
+                document.getElementById('live-time').innerText = n.toLocaleTimeString('es-MX', {hour12:false});
+                document.getElementById('live-date').innerText = n.toLocaleDateString('es-MX', {weekday:'long', day:'numeric', month:'long'}).toUpperCase();
             }, 1000);
         };
 
-        window.init_keys();
+        window.initKeys();
     </script>
 </body>
 </html>
