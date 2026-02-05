@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v17.0 - Enterprise Management System</title>
+    <title>EscarolaOS - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -23,190 +23,88 @@
             --glass: rgba(255, 255, 255, 0.05);
             --border: rgba(197, 160, 89, 0.3);
             --pill: 50px;
-            --shadow-premium: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            --shadow-premium: 0 20px 40px rgba(0,0,0,0.8);
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* RESET Y SCROLL PERSONALIZADO */
+        /* ESTRUCTURA BASE */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { 
-            background: var(--verde-bosque); 
-            color: var(--cantera); 
-            height: 100vh; 
-            overflow: hidden; 
-            user-select: none; 
-            background-attachment: fixed;
-        }
+        body { background: var(--verde-bosque); color: var(--cantera); height: 100vh; overflow: hidden; user-select: none; }
         
         .main-viewport { 
-            display: none; 
-            height: 100vh; 
-            overflow-y: auto; 
-            padding: 40px 25px 220px 25px; 
-            max-width: 900px; 
-            margin: 0 auto; 
-            animation: slideUp 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-            scrollbar-width: none; 
+            display: none; height: 100vh; overflow-y: auto; 
+            padding: 35px 20px 200px 20px; max-width: 850px; margin: 0 auto; 
+            animation: slideUp 0.6s ease;
+            -ms-overflow-style: none;  
+            scrollbar-width: none;  
         }
         .main-viewport::-webkit-scrollbar { display: none; } 
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes glowPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--dorado)); opacity: 0.8; } 50% { filter: drop-shadow(0 0 25px var(--dorado)); opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* CONTENEDORES DE INFORMACIÓN */
-        .card-panel { 
-            background: var(--verde-oscuro); 
-            border-radius: 40px; 
-            padding: 35px; 
-            margin-bottom: 30px; 
-            border: 1px solid var(--border); 
-            box-shadow: var(--shadow-premium);
-            position: relative;
-            overflow: hidden;
-        }
-        .tag-header { 
-            border-left: 6px solid var(--dorado); 
-            padding-left: 20px; 
-            margin-bottom: 30px; 
-            letter-spacing: 5px; 
-            text-transform: uppercase; 
-            font-size: 0.8rem; 
-            color: var(--dorado); 
-            font-weight: 900; 
-        }
+        /* COMPONENTES UI */
+        .card-panel { background: var(--verde-oscuro); border-radius: 35px; padding: 30px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: var(--shadow-premium); position: relative; }
+        .tag-header { border-left: 6px solid var(--dorado); padding-left: 18px; margin-bottom: 25px; letter-spacing: 4px; text-transform: uppercase; font-size: 0.75rem; color: var(--dorado); font-weight: 900; }
         
-        /* INTERFAZ DE ENTRADA */
-        .input-premium { 
-            width: 100%; 
-            padding: 20px 30px; 
-            border-radius: var(--pill); 
-            background: rgba(0,0,0,0.7); 
-            border: 1px solid var(--border); 
-            color: #fff; 
-            margin-bottom: 18px; 
-            font-size: 1rem; 
-            outline: none; 
-            transition: var(--transition); 
-        }
-        .input-premium:focus { border-color: var(--dorado); background: rgba(0,0,0,0.9); }
+        .input-premium { width: 100%; padding: 18px 28px; border-radius: var(--pill); background: rgba(0,0,0,0.6); border: 1px solid var(--border); color: #fff; margin-bottom: 15px; font-size: 1rem; outline: none; transition: var(--transition); }
+        .input-premium:focus { border-color: var(--dorado); box-shadow: 0 0 15px rgba(197, 160, 89, 0.2); }
         
-        .btn-premium { 
-            width: 100%; 
-            padding: 22px; 
-            border-radius: var(--pill); 
-            border: none; 
-            font-weight: 900; 
-            letter-spacing: 3px; 
-            text-transform: uppercase; 
-            cursor: pointer; 
-            transition: var(--transition); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            gap: 15px; 
-            margin-bottom: 10px;
-        }
+        .btn-premium { width: 100%; padding: 20px; border-radius: var(--pill); border: none; font-weight: 900; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 12px; }
         .gold-btn { background: var(--dorado); color: var(--negro); }
-        .gold-btn:active { transform: scale(0.96); filter: brightness(1.2); }
         .red-btn { background: var(--terracota); color: #fff; }
-        .red-btn:active { transform: scale(0.96); filter: brightness(1.2); }
+        .btn-action-small { width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--border); background: var(--glass); color: var(--dorado); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-        /* LISTADOS Y FILAS */
-        .list-row { 
-            background: var(--glass); 
-            padding: 22px 30px; 
-            border-radius: var(--pill); 
-            margin-bottom: 15px; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            border: 1px solid rgba(255,255,255,0.08); 
-            transition: var(--transition); 
-        }
-        .list-row:hover { background: rgba(255,255,255,0.1); }
-        .alert-low { border-color: var(--terracota); background: rgba(176, 65, 62, 0.1); }
+        .list-row { background: var(--glass); padding: 18px 25px; border-radius: var(--pill); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06); transition: 0.3s; }
+        .alert-low { border-color: var(--terracota); background: rgba(176, 65, 62, 0.15); box-shadow: 0 0 10px var(--terracota); }
 
-        .btn-action-small { 
-            width: 42px; 
-            height: 42px; 
-            border-radius: 50%; 
-            border: 1px solid var(--border); 
-            background: var(--glass); 
-            color: var(--dorado); 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            cursor: pointer; 
-            transition: 0.3s;
-        }
-        .btn-action-small:hover { background: var(--dorado); color: var(--negro); }
+        /* ANALYTICS */
+        .bar-wrap { height: 12px; background: #000; border-radius: 10px; overflow: hidden; display: flex; margin: 15px 0; border: 1px solid var(--border); }
+        .bar-i { background: var(--dorado); height: 100%; transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1); width: 0%; }
+        .bar-g { background: var(--terracota); height: 100%; transition: 1.5s cubic-bezier(0.19, 1, 0.22, 1); width: 0%; }
 
-        /* GRÁFICOS Y ANALYTICS */
-        .bar-wrap { height: 14px; background: #000; border-radius: 10px; overflow: hidden; display: flex; margin: 20px 0; border: 1px solid var(--border); }
-        .bar-i { background: var(--dorado); height: 100%; transition: 2s cubic-bezier(0.19, 1, 0.22, 1); width: 0%; }
-        .bar-g { background: var(--terracota); height: 100%; transition: 2s cubic-bezier(0.19, 1, 0.22, 1); width: 0%; }
-
-        /* NAVEGACIÓN PRINCIPAL */
+        /* NAV BAR */
         #command-bar { 
-            position: fixed; bottom: 35px; left: 50%; transform: translateX(-50%); 
-            width: 94%; max-width: 800px; 
-            background: rgba(13, 26, 18, 0.95); 
-            border-radius: var(--pill); 
-            display: none; 
-            grid-template-columns: repeat(7, 1fr); 
-            padding: 18px; 
-            border: 1px solid var(--dorado); 
-            backdrop-filter: blur(30px); 
-            z-index: 9999;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 92%; max-width: 750px; 
+            background: rgba(13, 26, 18, 0.98); border-radius: var(--pill); display: none; grid-template-columns: repeat(7, 1fr); 
+            padding: 15px; border: 1px solid var(--dorado); backdrop-filter: blur(25px); z-index: 9999;
         }
-        .cmd-item { text-align: center; color: var(--cantera); opacity: 0.5; font-size: 0.6rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
-        .cmd-item.active { opacity: 1; color: var(--dorado); transform: translateY(-8px); }
-        .cmd-item i { font-size: 1.7rem; display: block; margin-bottom: 8px; }
+        .cmd-item { text-align: center; color: var(--cantera); opacity: 0.4; font-size: 0.55rem; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .cmd-item.active { opacity: 1; color: var(--dorado); transform: translateY(-5px); }
+        .cmd-item i { font-size: 1.5rem; display: block; margin-bottom: 6px; }
 
         /* LOGIN SCREEN */
         #login-screen { 
-            position: fixed; inset: 0; 
-            background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro) 100%); 
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            z-index: 999999; 
+            position: fixed; inset: 0; background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro) 100%); 
+            display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999; 
         }
-        .pin-indicator { display: flex; margin-bottom: 50px; gap: 20px; }
-        .dot { width: 22px; height: 22px; border: 2px solid var(--dorado); border-radius: 50%; transition: var(--transition); }
-        .dot.active { background: var(--dorado); box-shadow: 0 0 25px var(--dorado); transform: scale(1.4); }
-        
-        .numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; width: 100%; max-width: 350px; }
-        .key { 
-            aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--border); 
-            display: flex; align-items: center; justify-content: center; 
-            font-size: 1.8rem; color: var(--dorado); background: var(--glass); 
-            cursor: pointer; transition: 0.2s; 
-        }
-        .key:active { transform: scale(0.85); background: var(--dorado); color: var(--negro); }
+        .pin-indicator { display: flex; margin-bottom: 40px; gap: 18px; }
+        .dot { width: 18px; height: 18px; border: 2px solid var(--dorado); border-radius: 50%; transition: var(--transition); }
+        .dot.active { background: var(--dorado); box-shadow: 0 0 15px var(--dorado); transform: scale(1.3); }
+        .numpad-container { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; width: 100%; max-width: 320px; }
+        .key { aspect-ratio: 1; border-radius: 50%; border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: var(--dorado); background: var(--glass); cursor: pointer; transition: var(--transition); }
+        .key:active { transform: scale(0.9); background: var(--dorado); color: var(--negro); }
 
         /* MODALES */
-        .modal-os { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.97); z-index: 1000000; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(20px); }
-        .modal-os-box { background: var(--verde-oscuro); padding: 50px; border-radius: 50px; width: 100%; max-width: 500px; border: 1px solid var(--dorado); text-align: center; }
+        .modal-os { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 1000000; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(15px); }
+        .modal-os-box { background: var(--verde-oscuro); padding: 45px; border-radius: 45px; width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; }
 
         /* CALENDARIO */
-        .cal-box { display: grid; grid-template-columns: repeat(7, 1fr); gap: 12px; }
-        .cal-unit { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.04); border-radius: 18px; font-size: 1rem; cursor: pointer; transition: 0.3s; }
+        .cal-box { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; }
+        .cal-unit { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border-radius: 15px; font-size: 0.9rem; cursor: pointer; transition: 0.3s; }
         .cal-unit.active { background: var(--dorado); color: var(--negro); font-weight: 900; }
-        .cal-unit.marked { position: relative; }
-        .cal-unit.marked::after { content: ''; position: absolute; bottom: 8px; width: 6px; height: 6px; background: var(--terracota); border-radius: 50%; }
+        .cal-unit.marked { border-bottom: 4px solid var(--terracota); }
 
         /* REPORTES */
-        .report-section { background: rgba(0,0,0,0.3); padding: 25px; border-radius: 30px; margin-bottom: 25px; border: 1px solid var(--border); }
-        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .btn-report { padding: 18px; font-size: 0.75rem; border-radius: 20px; background: var(--glass); border: 1px solid var(--border); color: var(--cantera); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; font-weight: 700; }
-        .btn-report:hover { border-color: var(--dorado); color: var(--dorado); }
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .btn-report { padding: 12px; font-size: 0.65rem; border-radius: 15px; background: var(--glass); border: 1px solid var(--border); color: var(--cantera); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
     </style>
 </head>
 <body>
 
     <div id="login-screen">
-        <img src="https://cdn-icons-png.flaticon.com/512/3448/3448636.png" style="width:120px; margin-bottom: 30px; animation: glowPulse 5s infinite">
-        <h1 style="letter-spacing: 12px; margin-bottom: 45px; font-weight: 200;">ESCAROLA <span style="font-weight:900; color:var(--dorado)">OS</span></h1>
+        <img src="logo.png" style="width:110px; margin-bottom: 25px; animation: glowPulse 4s infinite" onerror="this.src='https://cdn-icons-png.flaticon.com/512/3448/3448636.png'">
+        <h2 style="letter-spacing: 8px; margin-bottom: 35px; font-weight: 200;">ESCAROLA <span style="font-weight:900; color:var(--dorado)">OS</span></h2>
         <div class="pin-indicator">
             <div class="dot"></div><div class="dot"></div><div class="dot"></div><div class="dot"></div>
         </div>
@@ -216,220 +114,178 @@
     <div id="os-shell">
         
         <div id="view-finanzas" class="main-viewport">
-            <div class="card-panel" style="text-align:center; padding: 50px 25px;">
-                <span style="font-size:0.8rem; letter-spacing:6px; opacity:0.6; font-weight:700">CAPITAL TOTAL OPERATIVO</span>
-                <h1 id="neto-val" style="font-size:4rem; margin:15px 0; font-weight: 900; letter-spacing: -2px;">$0.00</h1>
-                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:15px; margin-top:30px; border-top:1px solid var(--border); padding-top:30px">
-                    <div><small style="opacity:0.5; display:block; margin-bottom:5px">CAJA GRAL</small><b id="cash-val" style="font-size:1.2rem">$0</b></div>
-                    <div><small style="opacity:0.5; display:block; margin-bottom:5px">CAJA CHICA</small><b id="small-cash-val" style="font-size:1.2rem">$0</b></div>
-                    <div><small style="opacity:0.5; display:block; margin-bottom:5px">BANCO</small><b id="bank-val" style="font-size:1.2rem">$0</b></div>
+            <div class="card-panel" style="text-align:center; padding: 40px 20px;">
+                <span style="font-size:0.7rem; letter-spacing:5px; opacity:0.6;">CAPITAL OPERATIVO</span>
+                <h1 id="neto-val" style="font-size:3.5rem; margin:10px 0; font-weight: 900;">$0</h1>
+                <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px; margin-top:20px; border-top:1px solid var(--border); padding-top:20px">
+                    <div><small>CAJA GRAL</small><br><b id="cash-val">$0</b></div>
+                    <div><small>CAJA CHICA</small><br><b id="small-cash-val">$0</b></div>
+                    <div><small>BANCO</small><br><b id="bank-val">$0</b></div>
                 </div>
             </div>
 
             <div class="card-panel">
-                <div class="tag-header">Análisis de Flujo Mensual</div>
+                <div class="tag-header">Análisis de Flujo</div>
                 <div class="bar-wrap">
                     <div id="bar-i" class="bar-i"></div>
                     <div id="bar-g" class="bar-g"></div>
                 </div>
-                <div style="display:flex; justify-content:space-between; font-size:0.8rem; font-weight:800">
+                <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:700">
                     <span id="util-txt" style="color:var(--dorado)">UTILIDAD: 0%</span>
                     <span style="opacity:0.4">INGRESOS VS GASTOS</span>
                 </div>
             </div>
 
             <div class="card-panel">
-                <div class="tag-header">Registro de Movimiento</div>
-                <input type="text" id="f-desc" class="input-premium" placeholder="Descripción del movimiento...">
-                <input type="number" id="f-monto" class="input-premium" placeholder="Monto exacto ($)">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px">
-                    <select id="f-tipo" class="input-premium" style="margin:0">
-                        <option value="INGRESO">Ingreso (+)</option>
-                        <option value="GASTO">Gasto (-)</option>
-                    </select>
+                <div class="tag-header">Nuevo Movimiento</div>
+                <input type="text" id="f-desc" class="input-premium" placeholder="Concepto">
+                <input type="number" id="f-monto" class="input-premium" placeholder="Monto $">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
+                    <select id="f-tipo" class="input-premium" style="margin:0"><option value="INGRESO">Entrada (+)</option><option value="GASTO">Salida (-)</option></select>
                     <select id="f-canal" class="input-premium" style="margin:0">
-                        <option value="CAJA">Caja Principal</option>
+                        <option value="CAJA">Caja Gral</option>
                         <option value="CAJA_CHICA">Caja Chica</option>
                         <option value="BANCO">Banco / Transf.</option>
                     </select>
                 </div>
-                <button class="btn-premium gold-btn" onclick="window.saveFinance()">ASENTAR EN LIBROS</button>
+                <button class="btn-premium gold-btn" onclick="window.saveFinance()">ASENTAR</button>
             </div>
             <div id="lista-finanzas"></div>
         </div>
 
         <div id="view-agenda" class="main-viewport">
             <div class="card-panel">
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:35px">
-                    <button onclick="window.navMonth(-1)" class="btn-action-small" style="width:50px; height:50px"><i class="fa-solid fa-chevron-left"></i></button>
-                    <h2 id="cal-month-display" style="font-size:1.2rem; letter-spacing:5px; font-weight:900; text-transform: uppercase;"></h2>
-                    <button onclick="window.navMonth(1)" class="btn-action-small" style="width:50px; height:50px"><i class="fa-solid fa-chevron-right"></i></button>
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px">
+                    <button onclick="window.navMonth(-1)" class="btn-premium" style="width:60px; background:var(--glass); padding:0"><i class="fa-solid fa-chevron-left"></i></button>
+                    <h2 id="cal-month-display" style="font-size:1rem; letter-spacing:4px; font-weight:900"></h2>
+                    <button onclick="window.navMonth(1)" class="btn-premium" style="width:60px; background:var(--glass); padding:0"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
                 <div id="cal-grid-render" class="cal-box"></div>
             </div>
             <div class="card-panel">
-                <div class="tag-header" id="cal-selected-label">Planificación de Evento</div>
-                <input type="text" id="ev-tit" class="input-premium" placeholder="Nombre del evento / reservación">
+                <div class="tag-header" id="cal-selected-label">Agenda</div>
+                <input type="text" id="ev-tit" class="input-premium" placeholder="Evento">
                 <input type="time" id="ev-hor" class="input-premium">
-                <button class="btn-premium gold-btn" onclick="window.saveEvent()">AGENDAR FECHA</button>
+                <button class="btn-premium gold-btn" onclick="window.saveEvent()">GUARDAR FECHA</button>
             </div>
             <div id="lista-agenda"></div>
         </div>
 
         <div id="view-reloj" class="main-viewport">
-            <div class="card-panel" style="text-align:center; padding:90px 0;">
-                <h1 id="live-time" style="font-size:6rem; font-weight:100; letter-spacing: -4px;">00:00:00</h1>
-                <p id="live-date" style="color:var(--dorado); letter-spacing:8px; font-weight:900; text-transform: uppercase; margin-top:10px;"></p>
+            <div class="card-panel" style="text-align:center; padding:80px 0;">
+                <h1 id="live-time" style="font-size:5rem; font-weight:100;">00:00:00</h1>
+                <p id="live-date" style="color:var(--dorado); letter-spacing:6px; font-weight:900;"></p>
             </div>
-            <div style="display:grid; grid-template-columns:1fr 1fr; gap:30px;">
-                <button class="btn-premium gold-btn" style="height:220px; flex-direction:column; border-radius: 50px;" onclick="window.handlePunch('ENTRADA')">
-                    <i class="fa-solid fa-fingerprint fa-4x" style="margin-bottom:15px"></i>
-                    <span>REGISTRAR<br>ENTRADA</span>
-                </button>
-                <button class="btn-premium red-btn" style="height:220px; flex-direction:column; border-radius: 50px;" onclick="window.handlePunch('SALIDA')">
-                    <i class="fa-solid fa-door-open fa-4x" style="margin-bottom:15px"></i>
-                    <span>REGISTRAR<br>SALIDA</span>
-                </button>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:25px;">
+                <button class="btn-premium gold-btn" style="height:180px; flex-direction:column" onclick="window.handlePunch('ENTRADA')"><i class="fa-solid fa-fingerprint fa-4x"></i>ENTRADA</button>
+                <button class="btn-premium red-btn" style="height:180px; flex-direction:column" onclick="window.handlePunch('SALIDA')"><i class="fa-solid fa-door-open fa-4x"></i>SALIDA</button>
             </div>
-            <div id="lista-asistencias" style="margin-top:50px"></div>
+            <div id="lista-asistencias" style="margin-top:40px"></div>
         </div>
 
         <div id="view-limpieza" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Checklist de Operaciones</div>
-                <div style="display:flex; gap:15px; margin-bottom:25px">
-                    <input type="text" id="clean-task-in" class="input-premium" placeholder="Nueva tarea de higiene..." style="margin:0">
-                    <button class="btn-premium gold-btn" style="width:80px; padding:0; margin:0" onclick="window.addCleanTask()">+</button>
+                <div class="tag-header">Checklist de Higiene</div>
+                <div style="display:flex; gap:15px; margin-bottom:20px">
+                    <input type="text" id="clean-task-in" class="input-premium" placeholder="Nueva tarea..." style="margin:0">
+                    <button class="btn-premium gold-btn" style="width:75px; padding:0" onclick="window.addCleanTask()">+</button>
                 </div>
                 <div id="render-clean-tasks"></div>
             </div>
             <div class="card-panel">
-                <div class="tag-header">Cumplimiento del Día</div>
+                <div class="tag-header">Log del Día</div>
                 <div id="render-clean-history"></div>
             </div>
         </div>
 
         <div id="view-bodega" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Almacén de Insumos</div>
-                <input type="text" id="search-inv" class="input-premium" placeholder=" Buscar insumo..." oninput="window.loadBodega()">
-                <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; margin-bottom:15px">
-                    <input type="text" id="inv-nom" class="input-premium" placeholder="Nombre" style="margin:0">
+                <div class="tag-header">Gestión de Stock</div>
+                <input type="text" id="search-inv" class="input-premium" placeholder=" Buscar..." oninput="window.loadBodega()">
+                <div style="display:grid; grid-template-columns:2fr 1fr 1fr; gap:12px; margin-bottom:12px">
+                    <input type="text" id="inv-nom" class="input-premium" placeholder="Item" style="margin:0">
                     <input type="number" id="inv-can" class="input-premium" placeholder="Cant." style="margin:0">
-                    <input type="number" id="inv-min" class="input-premium" placeholder="Min." style="margin:0">
+                    <input type="number" id="inv-min" class="input-premium" placeholder="Mín." style="margin:0">
                 </div>
-                <button class="btn-premium gold-btn" onclick="window.saveInv()">AÑADIR A BODEGA</button>
-                <div id="lista-inventario" style="margin-top:30px"></div>
+                <button class="btn-premium gold-btn" onclick="window.saveInv()">GUARDAR</button>
+                <div id="lista-inventario" style="margin-top:25px"></div>
             </div>
-
             <div class="card-panel">
-                <div class="tag-header">Recetario y Costeo</div>
-                <input type="text" id="search-rec" class="input-premium" placeholder=" Buscar receta..." oninput="window.loadBodega()">
-                <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:15px">
-                    <input type="text" id="rec-nom" class="input-premium" placeholder="Nombre Platillo" style="margin:0">
-                    <input type="number" id="rec-cos" class="input-premium" placeholder="Costo $" style="margin:0">
+                <div class="tag-header">Recetario</div>
+                <input type="text" id="search-rec" class="input-premium" placeholder=" Buscar..." oninput="window.loadBodega()">
+                <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:12px">
+                    <input type="text" id="rec-nom" class="input-premium" placeholder="Platillo" style="margin:0">
+                    <input type="number" id="rec-cos" class="input-premium" placeholder="Costo" style="margin:0">
                 </div>
-                <textarea id="rec-det" class="input-premium" placeholder="Ingredientes y proceso detallado..." style="height:120px; border-radius: 30px; resize: none;"></textarea>
-                <button class="btn-premium gold-btn" onclick="window.saveRecipe()">GUARDAR RECETA</button>
-                <div id="lista-recetas" style="margin-top:30px"></div>
+                <textarea id="rec-det" class="input-premium" placeholder="Instrucciones..." style="height:100px; border-radius: 25px"></textarea>
+                <button class="btn-premium gold-btn" onclick="window.saveRecipe()">GUARDAR</button>
+                <div id="lista-recetas" style="margin-top:25px"></div>
             </div>
-
             <div class="card-panel">
-                <div class="tag-header">Control de Mermas y Desperdicios</div>
-                <p style="font-size:0.8rem; margin-bottom:20px; opacity:0.7">Registre cualquier insumo que deba desecharse por daño, caducidad o error.</p>
-                <div style="display:grid; grid-template-columns:2fr 1fr; gap:15px; margin-bottom:15px">
-                    <input type="text" id="mer-nom" class="input-premium" placeholder="Producto mermado" style="margin:0">
+                <div class="tag-header">Control de Mermas</div>
+                <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:12px">
+                    <input type="text" id="mer-nom" class="input-premium" placeholder="Producto" style="margin:0">
                     <input type="number" id="mer-can" class="input-premium" placeholder="Cant." style="margin:0">
                 </div>
                 <select id="mer-mot" class="input-premium">
-                    <option value="Caducidad">Producto Caducado</option>
-                    <option value="Daño">Daño Físico / Rotura</option>
-                    <option value="Error">Error de Preparación</option>
-                    <option value="Calidad">Mala Calidad / Devolución</option>
-                    <option value="Otro">Otro Motivo</option>
+                    <option value="Caducado">Caducado</option>
+                    <option value="Dañado">Dañado</option>
+                    <option value="Error">Error</option>
                 </select>
-                <button class="btn-premium red-btn" onclick="window.saveMerma()">REGISTRAR PÉRDIDA</button>
-                <div id="lista-mermas" style="margin-top:30px"></div>
+                <button class="btn-premium red-btn" onclick="window.saveMerma()">REGISTRAR MERMA</button>
+                <div id="lista-mermas" style="margin-top:25px"></div>
             </div>
         </div>
 
         <div id="view-admin" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Generación de Reportes</div>
-                
-                <div class="report-section">
-                    <small style="color:var(--dorado); display:block; margin-bottom:15px; font-weight:800; letter-spacing:2px">FILTRO TEMPORAL</small>
-                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px">
+                <div class="tag-header">Reportes Enterprise</div>
+                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 25px; margin-bottom: 25px; border: 1px solid var(--border)">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
                         <select id="rep-periodo" class="input-premium" style="margin:0" onchange="window.toggleMonthSelect()">
-                            <option value="semanal">Esta Semana (L-D)</option>
-                            <option value="mensual">Reporte Mensual</option>
+                            <option value="semanal">Semanal</option>
+                            <option value="mensual">Mensual</option>
                         </select>
                         <select id="rep-mes" class="input-premium" style="margin:0; opacity:0.3" disabled>
-                            <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
-                            <option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option>
-                            <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
-                            <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
+                            <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option><option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option><option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option><option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
                         </select>
                     </div>
                 </div>
-
-                <div style="margin-bottom:25px">
-                    <small style="color:var(--dorado); font-weight:800; margin-bottom:10px; display:block">FINANZAS Y CAJA</small>
-                    <div class="report-grid">
-                        <button class="btn-report" onclick="window.exportFin('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                        <button class="btn-report" onclick="window.exportFin('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
-                    </div>
-                </div>
-                
-                <div style="margin-bottom:25px">
-                    <small style="color:var(--dorado); font-weight:800; margin-bottom:10px; display:block">NÓMINAS Y ASISTENCIAS</small>
-                    <div class="report-grid">
-                        <button class="btn-report" onclick="window.exportNomina('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                        <button class="btn-report" onclick="window.exportNomina('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
-                    </div>
-                </div>
-
-                <div style="margin-bottom:25px">
-                    <small style="color:var(--dorado); font-weight:800; margin-bottom:10px; display:block">INVENTARIO Y MERMAS</small>
-                    <div class="report-grid">
-                        <button class="btn-report" onclick="window.exportBodega('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                        <button class="btn-report" onclick="window.exportBodega('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
-                    </div>
+                <div class="report-grid">
+                    <button class="btn-report" onclick="window.exportFin('pdf')">PDF FINANZAS</button>
+                    <button class="btn-report" onclick="window.exportFin('xlsx')">EXCEL FINANZAS</button>
+                    <button class="btn-report" onclick="window.exportNomina('pdf')">PDF NÓMINA</button>
+                    <button class="btn-report" onclick="window.exportNomina('xlsx')">EXCEL NÓMINA</button>
                 </div>
             </div>
-
             <div class="card-panel">
-                <div class="tag-header">Nómina del Periodo Actual</div>
+                <div class="tag-header">Nómina</div>
                 <div id="render-nomina"></div>
             </div>
-
             <div class="card-panel">
-                <div class="tag-header">Gestión de Personal</div>
-                <input type="text" id="st-nom" class="input-premium" placeholder="Nombre Completo del Colaborador">
-                <input type="number" id="st-pin" class="input-premium" placeholder="PIN de Seguridad (4 dígitos)">
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; margin-bottom:20px">
-                    <input type="number" id="st-pag" class="input-premium" placeholder="Pago por Hora ($)" style="margin:0">
+                <div class="tag-header">Personal</div>
+                <input type="text" id="st-nom" class="input-premium" placeholder="Nombre">
+                <input type="number" id="st-pin" class="input-premium" placeholder="PIN 4 dígitos">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
+                    <input type="number" id="st-pag" class="input-premium" placeholder="Pago x Hora" style="margin:0">
                     <select id="st-rol" class="input-premium" style="margin:0">
-                        <option value="Staff">Piso / Salón</option>
-                        <option value="Cocina">Cocina / Barra</option>
-                        <option value="Limpieza">Mantenimiento</option>
-                        <option value="Socio">Gerencia / Socio</option>
+                        <option value="Staff">Staff</option><option value="Cocina">Cocina</option><option value="Socio">Socio</option>
                     </select>
                 </div>
-                <button class="btn-premium gold-btn" onclick="window.addStaffMember()">DAR DE ALTA COLABORADOR</button>
-                <div id="lista-staff" style="margin-top:30px"></div>
+                <button class="btn-premium gold-btn" onclick="window.addStaffMember()">REGISTRAR</button>
+                <div id="lista-staff" style="margin-top:25px"></div>
             </div>
         </div>
     </div>
 
     <nav id="command-bar">
-        <div class="cmd-item" onclick="window.nav('finanzas')"><i class="fa-solid fa-vault"></i>Capital</div>
-        <div class="cmd-item" onclick="window.nav('agenda')"><i class="fa-solid fa-calendar"></i>Agenda</div>
-        <div class="cmd-item" onclick="window.nav('reloj')"><i class="fa-solid fa-clock"></i>Reloj</div>
-        <div class="cmd-item" onclick="window.nav('limpieza')"><i class="fa-solid fa-broom"></i>Limpia</div>
-        <div class="cmd-item" onclick="window.nav('bodega')"><i class="fa-solid fa-box"></i>Bodega</div>
-        <div class="cmd-item" onclick="window.nav('admin')"><i class="fa-solid fa-shield"></i>Admin</div>
-        <div class="cmd-item" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>Salir</div>
+        <div class="cmd-item" onclick="window.nav('finanzas')"><i class="fa-solid fa-vault"></i>FIN</div>
+        <div class="cmd-item" onclick="window.nav('agenda')"><i class="fa-solid fa-calendar"></i>AGE</div>
+        <div class="cmd-item" onclick="window.nav('reloj')"><i class="fa-solid fa-clock"></i>REL</div>
+        <div class="cmd-item" onclick="window.nav('limpieza')"><i class="fa-solid fa-broom"></i>LIM</div>
+        <div class="cmd-item" onclick="window.nav('bodega')"><i class="fa-solid fa-box"></i>BOD</div>
+        <div class="cmd-item" onclick="window.nav('admin')"><i class="fa-solid fa-shield"></i>ADM</div>
+        <div class="cmd-item" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>OFF</div>
     </nav>
 
     <div id="os-modal" class="modal-os"><div class="modal-os-box" id="os-modal-content"></div></div>
@@ -437,35 +293,25 @@
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
-        // VARIABLES GLOBALES DE ESTADO
         let gPin = "", sUser = null, cDate = new Date(), sDay = null;
 
-        // --- SISTEMA DE DIÁLOGOS ---
+        // DIÁLOGOS
         window.notify = (t, m) => {
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:20px; letter-spacing:2px">${t}</h2>
-                <p style="opacity:0.8; margin-bottom:35px; line-height:1.6">${m}</p>
-                <button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">ENTENDIDO</button>`;
+            document.getElementById('os-modal-content').innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2><p style="opacity:0.8; margin-bottom:30px">${m}</p><button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">CERRAR</button>`;
             document.getElementById('os-modal').style.display = 'flex';
         };
 
         window.ask = (t, m, callback) => {
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:20px; letter-spacing:2px">${t}</h2>
-                <p style="opacity:0.8; margin-bottom:35px; line-height:1.6">${m}</p>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                    <button class="btn-premium" style="background:var(--glass)" onclick="document.getElementById('os-modal').style.display='none'">CANCELAR</button>
-                    <button class="btn-premium gold-btn" id="modal-confirm-btn">CONFIRMAR</button>
-                </div>`;
+            document.getElementById('os-modal-content').innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2><p style="opacity:0.8; margin-bottom:30px">${m}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px"><button class="btn-premium" style="background:var(--glass)" onclick="document.getElementById('os-modal').style.display='none'">NO</button><button class="btn-premium gold-btn" id="modal-confirm-btn">SÍ</button></div>`;
             document.getElementById('os-modal').style.display = 'flex';
             document.getElementById('modal-confirm-btn').onclick = () => { document.getElementById('os-modal').style.display = 'none'; callback(); };
         };
 
-        // --- SISTEMA DE ACCESO (PINPAD) ---
+        // ACCESO
         const initKeys = () => {
             const cont = document.getElementById('numpad-logic'); cont.innerHTML = "";
             for(let i=1; i<=9; i++) cont.innerHTML += `<div class="key" onclick="window.press(${i})">${i}</div>`;
-            cont.innerHTML += `<div class="key" onclick="window.press('C')" style="color:var(--terracota)"><i class="fa-solid fa-backspace"></i></div>`;
+            cont.innerHTML += `<div class="key" onclick="window.press('C')"><i class="fa-solid fa-backspace"></i></div>`;
             cont.innerHTML += `<div class="key" onclick="window.press(0)">0</div>`;
             cont.innerHTML += `<div class="key" onclick="location.reload()"><i class="fa-solid fa-power-off"></i></div>`;
         };
@@ -474,411 +320,194 @@
             if(v==='C'){ gPin=""; upDots(); return; }
             if(gPin.length < 4) gPin += v; upDots();
             if(gPin.length === 4){
-                const q = query(collection(db, "usuarios"), where("pin", "==", gPin));
-                const snap = await getDocs(q);
+                const snap = await getDocs(query(collection(db, "usuarios"), where("pin", "==", gPin)));
                 if(!snap.empty){
                     sUser = { id: snap.docs[0].id, ...snap.docs[0].data() };
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('command-bar').style.display = 'grid';
                     startApp();
-                } else { gPin=""; upDots(); window.notify("ACCESO DENEGADO", "El PIN ingresado no es válido."); }
+                } else { gPin=""; upDots(); }
             }
         };
-
         const upDots = () => document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i < gPin.length));
 
-        // --- NAVEGACIÓN ENTRE VISTAS ---
+        // NAVEGACIÓN
         window.nav = (v) => {
-            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return window.notify("RESTRINGIDO", "Solo el personal de gerencia tiene acceso a este módulo.");
+            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return window.notify("ACCESO SOCIO", "No tienes permisos.");
             document.querySelectorAll('.main-viewport').forEach(view => view.style.display = 'none');
-            document.querySelectorAll('.cmd-item').forEach(i => i.classList.remove('active'));
             document.getElementById(`view-${v}`).style.display = 'block';
-            
-            // Carga dinámica según vista
-            if(v==='finanzas') loadFin(); 
-            if(v==='agenda') renderCal(); 
-            if(v==='limpieza') loadClean(); 
-            if(v==='bodega') loadBodega(); 
-            if(v==='admin') loadAdmin(); 
-            if(v==='reloj') loadPunches();
-            
-            // Marcar icono activo
-            const items = document.querySelectorAll('.cmd-item');
-            const targetIndex = ['finanzas','agenda','reloj','limpieza','bodega','admin','salir'].indexOf(v);
-            if(targetIndex !== -1) items[targetIndex].classList.add('active');
+            if(v==='finanzas') loadFin(); if(v==='agenda') renderCal(); if(v==='limpieza') loadClean(); if(v==='bodega') loadBodega(); if(v==='admin') loadAdmin(); if(v==='reloj') loadPunches();
         };
 
-        // --- MÓDULO: FINANZAS ---
+        // FINANZAS
         window.saveFinance = async () => {
             const m = parseFloat(document.getElementById('f-monto').value), d = document.getElementById('f-desc').value;
-            if(!m || !d) return window.notify("DATOS FALTANTES", "Debe ingresar descripción y monto.");
-            await addDoc(collection(db, "finanzas"), { 
-                desc: d, monto: m, 
-                tipo: document.getElementById('f-tipo').value, 
-                canal: document.getElementById('f-canal').value, 
-                fecha: new Date().toISOString(),
-                autor: sUser.nombre
-            });
+            if(!m || !d) return;
+            await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('f-tipo').value, canal: document.getElementById('f-canal').value, fecha: new Date().toISOString() });
             document.getElementById('f-monto').value = ""; document.getElementById('f-desc').value = ""; loadFin();
         };
 
         window.loadFin = async () => {
-            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc"), limit(50)));
+            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
             let mainCash = 0, smallCash = 0, bank = 0, tI = 0, tG = 0;
             const list = document.getElementById('lista-finanzas'); list.innerHTML = "";
-            
             snap.forEach(dDoc => {
                 const data = dDoc.data(), isG = data.tipo === 'GASTO', amt = isG ? -data.monto : data.monto;
                 if(isG) tG += data.monto; else tI += data.monto;
                 if(data.canal === 'CAJA') mainCash += amt; else if(data.canal === 'CAJA_CHICA') smallCash += amt; else bank += amt;
-                
-                list.innerHTML += `
-                    <div class="list-row">
-                        <div><b>${data.desc}</b><br><small>${data.canal} | ${new Date(data.fecha).toLocaleDateString()}</small></div>
-                        <div style="display:flex; align-items:center; gap:20px">
-                            <b style="color:${isG?'var(--terracota)':'var(--dorado)'}">${isG?'-':'+'} $${data.monto}</b>
-                            <button class="btn-action-small" onclick="window.secureDel('finanzas','${dDoc.id}','loadFin')"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
+                list.innerHTML += `<div class="list-row"><div><b>${data.desc}</b></div><div style="display:flex; align-items:center; gap:15px"><b style="color:${isG?'var(--terracota)':'var(--dorado)'}">$${data.monto}</b><button class="btn-action-small" onclick="window.secureDel('finanzas','${dDoc.id}','loadFin')"><i class="fa-solid fa-trash"></i></button></div></div>`;
             });
-            
-            const total = mainCash + smallCash + bank;
-            document.getElementById('neto-val').innerText = `$${total.toLocaleString('es-MX', {minimumFractionDigits:2})}`;
-            document.getElementById('cash-val').innerText = `$${mainCash.toLocaleString()}`;
-            document.getElementById('small-cash-val').innerText = `$${smallCash.toLocaleString()}`;
-            document.getElementById('bank-val').innerText = `$${bank.toLocaleString()}`;
-            
+            document.getElementById('neto-val').innerText = `$${Math.round(mainCash + smallCash + bank)}`;
+            document.getElementById('cash-val').innerText = `$${Math.round(mainCash)}`;
+            document.getElementById('small-cash-val').innerText = `$${Math.round(smallCash)}`;
+            document.getElementById('bank-val').innerText = `$${Math.round(bank)}`;
             if((tI+tG) > 0) {
                 document.getElementById('bar-i').style.width = (tI / (tI+tG) * 100) + "%";
                 document.getElementById('bar-g').style.width = (tG / (tI+tG) * 100) + "%";
-                const marg = tI > 0 ? ((tI - tG) / tI * 100) : 0;
-                document.getElementById('util-txt').innerText = `UTILIDAD: ${Math.round(marg)}%`;
+                document.getElementById('util-txt').innerText = `UTILIDAD: ${Math.round(tI > 0 ? ((tI - tG) / tI * 100) : 0)}%`;
             }
         };
 
-        // --- MÓDULO: BODEGA (INVENTARIO, RECETAS Y MERMAS) ---
+        // BODEGA & MERMAS
         window.saveInv = async () => {
             const n = document.getElementById('inv-nom').value, c = parseFloat(document.getElementById('inv-can').value), m = parseFloat(document.getElementById('inv-min').value) || 0;
-            if(!n || isNaN(c)) return; 
-            await addDoc(collection(db, "inventario"), { item: n, qty: c, min: m }); 
-            loadBodega();
+            if(!n) return; await addDoc(collection(db, "inventario"), { item: n, qty: c, min: m }); loadBodega();
         };
-
         window.saveRecipe = async () => {
-            const n = document.getElementById('rec-nom').value, c = document.getElementById('rec-cos').value;
-            if(!n) return;
-            await addDoc(collection(db, "recetas"), { nom: n, cost: c, detail: document.getElementById('rec-det').value }); 
-            loadBodega();
+            await addDoc(collection(db, "recetas"), { nom: document.getElementById('rec-nom').value, cost: document.getElementById('rec-cos').value, detail: document.getElementById('rec-det').value }); loadBodega();
         };
-
         window.saveMerma = async () => {
             const n = document.getElementById('mer-nom').value, c = parseFloat(document.getElementById('mer-can').value), m = document.getElementById('mer-mot').value;
-            if(!n || !c) return window.notify("DATOS FALTANTES", "Ingrese producto y cantidad mermada.");
-            await addDoc(collection(db, "mermas"), { 
-                item: n, qty: c, motivo: m, 
-                fecha: new Date().toISOString(), 
-                responsable: sUser.nombre 
-            });
-            window.notify("MERMA REGISTRADA", `Se han descontado simbólicamente ${c} de ${n} por ${m}.`);
-            document.getElementById('mer-nom').value = ""; document.getElementById('mer-can').value = ""; 
-            loadBodega();
+            if(!n || !c) return;
+            await addDoc(collection(db, "mermas"), { item: n, qty: c, motivo: m, fecha: new Date().toISOString(), responsable: sUser.nombre });
+            document.getElementById('mer-nom').value = ""; document.getElementById('mer-can').value = ""; loadBodega();
         };
-
         window.loadBodega = async () => {
-            const [iS, rS, mS] = await Promise.all([
-                getDocs(collection(db, "inventario")),
-                getDocs(collection(db, "recetas")),
-                getDocs(query(collection(db, "mermas"), orderBy("fecha", "desc"), limit(15)))
-            ]);
-            
+            const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas")), mS = await getDocs(query(collection(db, "mermas"), orderBy("fecha", "desc"), limit(10)));
             const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas'), mL = document.getElementById('lista-mermas');
             const sI = document.getElementById('search-inv').value.toLowerCase(), sR = document.getElementById('search-rec').value.toLowerCase();
-            
             iL.innerHTML = ""; rL.innerHTML = ""; mL.innerHTML = "";
-
             iS.forEach(d => {
                 const data = d.data(); if(!data.item.toLowerCase().includes(sI)) return;
-                const isLow = data.qty <= (data.min || 0);
-                iL.innerHTML += `
-                    <div class="list-row ${isLow?'alert-low':''}">
-                        <div><b>${data.item}</b><br><small>Mínimo: ${data.min}</small></div>
-                        <div style="display:flex; align-items:center; gap:15px">
-                            <b onclick="window.restockModal('${d.id}','${data.item}',${data.qty})" style="font-size:1.1rem">${data.qty}</b>
-                            <button class="btn-action-small" onclick="window.secureDel('inventario','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
+                iL.innerHTML += `<div class="list-row ${data.qty<=(data.min||0)?'alert-low':''}"><div><b>${data.item}</b></div><div style="display:flex; align-items:center; gap:15px"><b onclick="window.restockModal('${d.id}','${data.item}',${data.qty})">${data.qty}</b><button class="btn-action-small" onclick="window.secureDel('inventario','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button></div></div>`;
             });
-
             rS.forEach(d => {
                 const data = d.data(); if(!data.nom.toLowerCase().includes(sR)) return;
-                rL.innerHTML += `
-                    <div class="list-row">
-                        <div><b>${data.nom}</b><br><small>Costo Est: $${data.cost}</small></div>
-                        <div style="display:flex; gap:10px">
-                            <button class="btn-action-small" onclick="window.viewRecipe('${data.nom}','${data.detail.replace(/\n/g, '<br>')}')"><i class="fa-solid fa-eye"></i></button>
-                            <button class="btn-action-small" onclick="window.secureDel('recetas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
+                rL.innerHTML += `<div class="list-row"><div><b>${data.nom}</b><br><small>$${data.cost}</small></div><button class="btn-action-small" onclick="window.secureDel('recetas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button></div>`;
             });
-
             mS.forEach(d => {
                 const data = d.data();
-                mL.innerHTML += `
-                    <div class="list-row" style="border-left: 5px solid var(--terracota)">
-                        <div><b>${data.item} (${data.qty})</b><br><small>${data.motivo} - ${data.responsable}</small></div>
-                        <button class="btn-action-small" onclick="window.secureDel('mermas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
-                    </div>`;
+                mL.innerHTML += `<div class="list-row" style="border-left: 4px solid var(--terracota)"><div><b>${data.item} (${data.qty})</b><br><small>${data.motivo}</small></div><button class="btn-action-small" onclick="window.secureDel('mermas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button></div>`;
             });
         };
-
         window.restockModal = (id, nom, q) => {
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:20px">AJUSTAR STOCK: ${nom}</h2>
-                <input type="number" id="n-st" class="input-premium" value="${q}">
-                <button class="btn-premium gold-btn" id="up-st">ACTUALIZAR CANTIDAD</button>`;
+            document.getElementById('os-modal-content').innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">${nom}</h2><input type="number" id="n-st" class="input-premium" value="${q}"><button class="btn-premium gold-btn" id="up-st">OK</button>`;
             document.getElementById('os-modal').style.display='flex';
-            document.getElementById('up-st').onclick = async () => { 
-                await updateDoc(doc(db, "inventario", id), { qty: parseFloat(document.getElementById('n-st').value) }); 
-                document.getElementById('os-modal').style.display='none'; 
-                loadBodega(); 
-            };
+            document.getElementById('up-st').onclick = async () => { await updateDoc(doc(db, "inventario", id), { qty: parseFloat(document.getElementById('n-st').value) }); document.getElementById('os-modal').style.display='none'; loadBodega(); };
         };
 
-        window.viewRecipe = (nom, det) => {
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:20px">${nom}</h2>
-                <div style="text-align:left; background:rgba(0,0,0,0.4); padding:25px; border-radius:20px; max-height:300px; overflow-y:auto; margin-bottom:25px; line-height:1.6">${det}</div>
-                <button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">CERRAR</button>`;
-            document.getElementById('os-modal').style.display='flex';
-        };
-
-        // --- MÓDULO: RELOJ CHECADOR ---
+        // RELOJ
         window.handlePunch = async (t) => {
-            await addDoc(collection(db, "asistencias"), { 
-                uid: sUser.id, name: sUser.nombre, 
-                tipo: t, fecha: new Date().toISOString() 
-            });
-            window.notify("MARCAJE EXITOSO", `Se ha registrado tu ${t} a las ${new Date().toLocaleTimeString()}.`); 
-            loadPunches();
+            await addDoc(collection(db, "asistencias"), { uid: sUser.id, name: sUser.nombre, tipo: t, fecha: new Date().toISOString() });
+            window.notify("RELOJ", `Marcado: ${t}`); loadPunches();
         };
-
         window.loadPunches = async () => {
-            const s = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(15)));
-            const l = document.getElementById('lista-asistencias'); 
-            l.innerHTML = "<h4 style='letter-spacing:4px; margin-bottom:15px; opacity:0.6'>ÚLTIMOS MOVIMIENTOS</h4>";
-            s.forEach(d => { 
-                const data = d.data(); 
-                l.innerHTML += `
-                    <div class="list-row">
-                        <div><span>${data.name}</span><br><small>${new Date(data.fecha).toLocaleString()}</small></div>
-                        <b style="color:${data.tipo==='ENTRADA'?'var(--dorado)':'var(--terracota)'}">${data.tipo}</b>
-                    </div>`; 
-            });
+            const s = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(10)));
+            const l = document.getElementById('lista-asistencias'); l.innerHTML = "";
+            s.forEach(d => { const data = d.data(); l.innerHTML += `<div class="list-row"><div><span>${data.name}</span></div><b>${data.tipo}</b></div>`; });
         };
 
-        // --- MÓDULO: ADMINISTRACIÓN Y NÓMINA ---
+        // ADMIN
         const getWeekRange = () => {
             const now = new Date(), day = now.getDay(), diff = now.getDate() - day + (day === 0 ? -6 : 1);
-            const monday = new Date(now.setDate(diff)); monday.setHours(0,0,0,0);
-            const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6); sunday.setHours(23,59,59,999);
-            return { monday, sunday };
+            const m = new Date(now.setDate(diff)); m.setHours(0,0,0,0);
+            const s = new Date(m); s.setDate(m.getDate() + 6); s.setHours(23,59,59,999);
+            return { m, s };
         };
-
         window.loadAdmin = async () => {
             const [uS, aS] = await Promise.all([getDocs(collection(db, "usuarios")), getDocs(collection(db, "asistencias"))]);
             const sL = document.getElementById('lista-staff'), nL = document.getElementById('render-nomina');
-            sL.innerHTML = ""; nL.innerHTML = ""; 
-            const { monday, sunday } = getWeekRange();
-
+            sL.innerHTML = ""; nL.innerHTML = ""; const { m, s } = getWeekRange();
             uS.forEach(uDoc => {
                 const u = uDoc.data();
-                sL.innerHTML += `
-                    <div class="list-row">
-                        <span><b>${u.nombre}</b> (${u.rol})</span>
-                        <div style="display:flex; gap:10px">
-                            <button class="btn-action-small" onclick="window.editStaffOS('${uDoc.id}','${u.nombre}',${u.sueldo})"><i class="fa-solid fa-pen"></i></button>
-                            <button class="btn-action-small" onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')"><i class="fa-solid fa-trash"></i></button>
-                        </div>
-                    </div>`;
-
-                const lastPay = u.ultimoPago ? new Date(u.ultimoPago) : monday;
-                const effectiveStart = lastPay > monday ? lastPay : monday;
-                
-                const punches = aS.docs.map(d=>d.data())
-                    .filter(p => p.uid === uDoc.id && new Date(p.fecha) >= effectiveStart && new Date(p.fecha) <= sunday)
-                    .sort((a,b) => new Date(a.fecha) - new Date(b.fecha));
-
-                let totalHrs = 0;
-                for(let i=0; i < punches.length; i++) {
-                    if(punches[i].tipo === 'ENTRADA' && punches[i+1]?.tipo === 'SALIDA') {
-                        totalHrs += (new Date(punches[i+1].fecha) - new Date(punches[i].fecha)) / 3600000;
-                        i++;
-                    }
-                }
-
-                const totalPay = Math.round(totalHrs * (u.sueldo || 0));
-                nL.innerHTML += `
-                    <div class="list-row">
-                        <div><b>${u.nombre}</b><br><small>${totalHrs.toFixed(2)} horas acumuladas</small></div>
-                        <button class="btn-premium gold-btn" style="width:auto; padding:10px 20px; font-size:0.8rem" onclick="window.payModal('${uDoc.id}','${u.nombre}',${totalPay})">PAGAR $${totalPay}</button>
-                    </div>`;
+                sL.innerHTML += `<div class="list-row"><span>${u.nombre}</span><div style="display:flex; gap:10px"><button class="btn-action-small" onclick="window.editStaff('${uDoc.id}',${u.sueldo})"><i class="fa-solid fa-pen"></i></button><button class="btn-action-small" onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')"><i class="fa-solid fa-trash"></i></button></div></div>`;
+                const hits = aS.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) >= (u.ultimoPago?new Date(u.ultimoPago):m) && new Date(p.fecha) <= s).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+                let hrs = 0; for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
+                const tot = Math.round(hrs * (u.sueldo || 0));
+                nL.innerHTML += `<div class="list-row"><div><b>${u.nombre}</b></div><button class="btn-premium gold-btn" style="width:auto; padding:8px 15px; font-size:0.7rem" onclick="window.payModal('${uDoc.id}','${u.nombre}',${tot})">PAGAR $${tot}</button></div>`;
             });
         };
-
         window.addStaffMember = async () => {
             const n = document.getElementById('st-nom').value, p = document.getElementById('st-pin').value, s = document.getElementById('st-pag').value;
-            if(!n || !p || !s) return window.notify("ERROR", "Complete todos los campos del nuevo colaborador.");
-            await addDoc(collection(db, "usuarios"), { 
-                nombre: n, pin: p, sueldo: parseFloat(s), rol: document.getElementById('st-rol').value, ultimoPago: null 
-            });
-            loadAdmin();
+            if(!n || !p || !s) return;
+            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, sueldo: parseFloat(s), rol: document.getElementById('st-rol').value, ultimoPago: null }); loadAdmin();
         };
-
+        window.editStaff = (id, sueldo) => {
+            document.getElementById('os-modal-content').innerHTML = `<h2>SUELDO</h2><input type="number" id="ed-s" class="input-premium" value="${sueldo}"><button class="btn-premium gold-btn" id="save-e">OK</button>`;
+            document.getElementById('os-modal').style.display = 'flex';
+            document.getElementById('save-e').onclick = async () => { await updateDoc(doc(db, "usuarios", id), { sueldo: parseFloat(document.getElementById('ed-s').value) }); document.getElementById('os-modal').style.display = 'none'; loadAdmin(); };
+        };
         window.payModal = (uid, nom, tot) => {
-            if(tot <= 0) return window.notify("SIN SALDO", "Este colaborador no tiene horas por liquidar en el periodo actual.");
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:20px">LIQUIDAR NÓMINA</h2>
-                <p>Monto a pagar: <b>$${tot}</b> a ${nom}</p>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:30px">
-                    <button class="btn-premium gold-btn" onclick="window.executePay('${uid}','${nom}',${tot},'CAJA')">EFECTIVO</button>
-                    <button class="btn-premium gold-btn" onclick="window.executePay('${uid}','${nom}',${tot},'BANCO')">TRANSFERENCIA</button>
-                </div>`;
+            document.getElementById('os-modal-content').innerHTML = `<h2>PAGAR $${tot}</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px"><button class="btn-premium gold-btn" onclick="window.finalPay('${uid}','${nom}',${tot},'CAJA')">CAJA</button><button class="btn-premium gold-btn" onclick="window.finalPay('${uid}','${nom}',${tot},'BANCO')">BANCO</button></div>`;
             document.getElementById('os-modal').style.display='flex';
         };
-
-        window.executePay = async (uid, nom, tot, canal) => {
-            await addDoc(collection(db, "finanzas"), { 
-                desc: `PAGO NÓMINA: ${nom}`, monto: tot, tipo: 'GASTO', canal: canal, fecha: new Date().toISOString() 
-            });
+        window.finalPay = async (uid, nom, tot, can) => {
+            await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: tot, tipo: 'GASTO', canal: can, fecha: new Date().toISOString() });
             await updateDoc(doc(db, "usuarios", uid), { ultimoPago: new Date().toISOString() });
-            document.getElementById('os-modal').style.display='none'; 
-            loadAdmin(); loadFin();
+            document.getElementById('os-modal').style.display='none'; loadAdmin(); loadFin();
         };
 
-        // --- AGENDA Y CALENDARIO ---
+        // AGENDA & LIMPIEZA
         window.navMonth = (d) => { cDate.setMonth(cDate.getMonth() + d); renderCal(); };
         window.renderCal = async () => {
             const grid = document.getElementById('cal-grid-render'); grid.innerHTML = "";
             document.getElementById('cal-month-display').innerText = cDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
-            
             const snap = await getDocs(collection(db, "agenda"));
-            const eventDates = snap.docs.map(d => d.data().fecha);
-            
-            const year = cDate.getFullYear(), month = cDate.getMonth();
-            const startDay = new Date(year, month, 1).getDay();
-            const totalDays = new Date(year, month + 1, 0).getDate();
-
-            for(let i=0; i<startDay; i++) grid.innerHTML += `<div></div>`;
-            for(let i=1; i<=totalDays; i++) {
-                const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                const hasEvent = eventDates.includes(dateKey);
-                grid.innerHTML += `<div class="cal-unit ${hasEvent?'marked':''} ${sDay===dateKey?'active':''}" onclick="window.pickDay('${dateKey}')">${i}</div>`;
+            const dates = snap.docs.map(d => d.data().fecha);
+            const y = cDate.getFullYear(), m = cDate.getMonth(), start = new Date(y, m, 1).getDay(), days = new Date(y, m + 1, 0).getDate();
+            for(let i=0; i<start; i++) grid.innerHTML += `<div></div>`;
+            for(let i=1; i<=days; i++) {
+                const k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
+                grid.innerHTML += `<div class="cal-unit ${dates.includes(k)?'marked':''} ${sDay===k?'active':''}" onclick="window.pick('${k}')">${i}</div>`;
             }
         };
-
-        window.pickDay = (d) => { sDay = d; document.getElementById('cal-selected-label').innerText = `EVENTOS: ${d}`; renderCal(); loadEvents(d); };
-        window.saveEvent = async () => { 
-            if(!sDay || !document.getElementById('ev-tit').value) return; 
-            await addDoc(collection(db, "agenda"), { 
-                tit: document.getElementById('ev-tit').value, 
-                hora: document.getElementById('ev-hor').value, 
-                fecha: sDay 
-            }); 
-            renderCal(); loadEvents(sDay); 
-        };
-
+        window.pick = (d) => { sDay = d; renderCal(); loadEvents(d); };
+        window.saveEvent = async () => { if(!sDay) return; await addDoc(collection(db, "agenda"), { tit: document.getElementById('ev-tit').value, hora: document.getElementById('ev-hor').value, fecha: sDay }); renderCal(); loadEvents(sDay); };
         window.loadEvents = async (f) => {
             const s = await getDocs(query(collection(db, "agenda"), where("fecha", "==", f)));
             const l = document.getElementById('lista-agenda'); l.innerHTML = "";
-            s.forEach(d => l.innerHTML += `
-                <div class="list-row">
-                    <span><b>${d.data().hora}</b> - ${d.data().tit}</span>
-                    <button class="btn-action-small" onclick="window.secureDel('agenda','${d.id}','renderCal')"><i class="fa-solid fa-trash"></i></button>
-                </div>`);
+            s.forEach(d => l.innerHTML += `<div class="list-row"><b>${d.data().hora}</b> ${d.data().tit} <button class="btn-action-small" onclick="window.secureDel('agenda','${d.id}','renderCal')"><i class="fa-solid fa-trash"></i></button></div>`);
         };
-
-        // --- MÓDULO: LIMPIEZA ---
-        window.addCleanTask = async () => { 
-            const t = document.getElementById('clean-task-in').value;
-            if(!t) return;
-            await addDoc(collection(db, "tareas_limpieza"), { tarea: t }); 
-            document.getElementById('clean-task-in').value = "";
-            loadClean(); 
-        };
-
+        window.addCleanTask = async () => { if(!document.getElementById('clean-task-in').value) return; await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-task-in').value }); loadClean(); };
         window.loadClean = async () => {
-            const [tS, hS] = await Promise.all([
-                getDocs(collection(db, "tareas_limpieza")),
-                getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])))
-            ]);
-            const r = document.getElementById('render-clean-tasks'), hr = document.getElementById('render-clean-history');
+            const [tS, hS] = await Promise.all([getDocs(collection(db, "tareas_limpieza")), getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])))]);
+            const r = document.getElementById('render-clean-tasks'), hr = document.getElementById('render-clean-history'), doneIds = hS.docs.map(h => h.data().taskId);
             r.innerHTML = ""; hr.innerHTML = "";
-            const completed = hS.docs.map(h => h.data().taskId);
-            
             tS.forEach(t => {
-                const isDone = completed.includes(t.id);
-                r.innerHTML += `
-                    <div class="list-row">
-                        <span>${t.data().tarea}</span>
-                        <div>${isDone?'<i class="fa-solid fa-circle-check" style="color:var(--dorado); font-size:1.5rem"></i>':`<button onclick="window.doClean('${t.id}','${t.data().tarea}')" class="btn-premium gold-btn" style="padding:10px 20px; font-size:0.7rem; margin:0">LOG</button>`}</div>
-                    </div>`;
-            });
-            
-            hS.forEach(h => {
-                const data = h.data();
-                hr.innerHTML += `<div class="list-row" style="opacity:0.6"><small>${data.empleado} finalizó: ${data.tarea}</small></div>`;
+                const isD = doneIds.includes(t.id);
+                r.innerHTML += `<div class="list-row"><span>${t.data().tarea}</span><div>${isD?'<i class="fa-solid fa-check"></i>':`<button onclick="window.doClean('${t.id}','${t.data().tarea}')">OK</button>`}</div></div>`;
             });
         };
+        window.doClean = async (id, nom) => { await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: nom, empleado: sUser.nombre, fecha_dia: new Date().toISOString().split('T')[0] }); loadClean(); };
 
-        window.doClean = async (id, nom) => { 
-            await addDoc(collection(db, "historial_limpieza"), { 
-                taskId: id, tarea: nom, empleado: sUser.nombre, 
-                fecha_dia: new Date().toISOString().split('T')[0] 
-            }); 
-            loadClean(); 
+        // REPORTES
+        window.toggleMonthSelect = () => { const isM = document.getElementById('rep-periodo').value === 'mensual'; document.getElementById('rep-mes').disabled = !isM; document.getElementById('rep-mes').style.opacity = isM ? "1" : "0.3"; };
+        window.exportFin = async (fmt) => {
+            const snap = await getDocs(collection(db, "finanzas")), raw = snap.docs.map(d => d.data());
+            if(fmt==='xlsx') { const ws = XLSX.utils.json_to_sheet(raw); const wb = XLSX.utils.book_new(); XLSX.utils.book_append_sheet(wb, ws, "F"); XLSX.writeFile(wb, "Fin.xlsx"); }
+            else { const { jsPDF } = window.jspdf; const doc = new jsPDF(); doc.autoTable({ body: raw.map(r => [r.fecha, r.desc, r.monto]) }); doc.save("Fin.pdf"); }
         };
 
-        // --- EXPORTACIÓN DE REPORTES ---
-        window.toggleMonthSelect = () => { 
-            const isM = document.getElementById('rep-periodo').value === 'mensual'; 
-            document.getElementById('rep-mes').disabled = !isM; 
-            document.getElementById('rep-mes').style.opacity = isM ? "1" : "0.3"; 
-        };
-
-        window.exportFin = async (format) => {
-            const snap = await getDocs(collection(db, "finanzas"));
-            const data = snap.docs.map(d => ({ Fecha: d.data().fecha, Concepto: d.data().desc, Monto: d.data().monto, Tipo: d.data().tipo, Canal: d.data().canal }));
-            if(format === 'xlsx') {
-                const ws = XLSX.utils.json_to_sheet(data);
-                const wb = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(wb, ws, "Finanzas");
-                XLSX.writeFile(wb, "EscarolaOS_Finanzas.xlsx");
-            } else {
-                const { jsPDF } = window.jspdf;
-                const doc = new jsPDF();
-                doc.text("Reporte de Finanzas - EscarolaOS", 14, 15);
-                doc.autoTable({ head: [["Fecha", "Concepto", "Monto", "Canal"]], body: data.map(d => [d.Fecha.split('T')[0], d.Concepto, d.Monto, d.Canal]), startY: 20 });
-                doc.save("EscarolaOS_Finanzas.pdf");
-            }
-        };
-
-        // --- UTILERÍA ---
-        window.secureDel = (col, id, cb) => { 
-            window.ask("ELIMINAR REGISTRO", "¿Está seguro de eliminar este elemento permanentemente?", async () => { 
-                await deleteDoc(doc(db, col, id)); 
-                if(cb) window[cb](); 
-            }); 
-        };
-
+        // UTILS
+        window.secureDel = (c, i, cb) => { window.ask("BORRAR", "Confirmar", async () => { await deleteDoc(doc(db, c, i)); if(cb) window[cb](); }); };
         const startApp = () => {
             window.nav('reloj');
             setInterval(() => {
-                const now = new Date();
-                document.getElementById('live-time').innerText = now.toLocaleTimeString('es-MX', { hour12: false });
-                document.getElementById('live-date').innerText = now.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' });
+                const n = new Date();
+                document.getElementById('live-time').innerText = n.toLocaleTimeString('es-MX', { hour12: false });
+                document.getElementById('live-date').innerText = n.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' }).toUpperCase();
             }, 1000);
         };
-
         initKeys();
     </script>
 </body>
