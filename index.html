@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v16.4 - Enterprise System</title>
+    <title>EscarolaOS v16.5 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -329,7 +329,7 @@
             if(v==='reloj') loadPunches();
         };
 
-        // --- MÓDULO CAPITAL (AJUSTE: COLOR ROJO EN NEGATIVOS) ---
+        // --- MÓDULO CAPITAL ---
         window.saveFinance = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
             const d = document.getElementById('f-desc').value;
@@ -359,23 +359,16 @@
                     </div>
                 </div>`;
             });
-
-            // Función interna para pintar rojos
             const paintRed = (val) => val < 0 ? 'var(--terracota)' : 'var(--dorado)';
-            
             const totalNeto = mainCash + smallCash + bank;
             document.getElementById('neto-val').innerText = `$${Math.round(totalNeto)}`;
             document.getElementById('neto-val').style.color = paintRed(totalNeto);
-            
             document.getElementById('cash-val').innerText = `$${Math.round(mainCash)}`;
             document.getElementById('cash-val').style.color = paintRed(mainCash);
-            
             document.getElementById('small-cash-val').innerText = `$${Math.round(smallCash)}`;
             document.getElementById('small-cash-val').style.color = paintRed(smallCash);
-            
             document.getElementById('bank-val').innerText = `$${Math.round(bank)}`;
             document.getElementById('bank-val').style.color = paintRed(bank);
-
             const totalFlujo = totalIngresado + totalGastado;
             if(totalFlujo > 0) {
                 document.getElementById('bar-i').style.width = (totalIngresado / totalFlujo * 100) + "%";
@@ -386,7 +379,7 @@
             }
         };
 
-        // --- MÓDULO BODEGA (AJUSTE: MÍNIMOS HASTA ARRIBA) ---
+        // --- MÓDULO BODEGA ---
         window.saveInv = async () => {
             const n = document.getElementById('inv-nom').value;
             const c = parseFloat(document.getElementById('inv-can').value);
@@ -402,8 +395,6 @@
             const searchI = document.getElementById('search-inv').value.toLowerCase();
             const searchR = document.getElementById('search-rec').value.toLowerCase();
             iL.innerHTML = ""; rL.innerHTML = "";
-            
-            // Lógica de prioridad para Bodega
             const items = iS.docs.map(d => ({id: d.id, ...d.data()}))
                         .filter(data => data.item.toLowerCase().includes(searchI))
                         .sort((a, b) => {
@@ -411,7 +402,6 @@
                             const lowB = b.qty <= (b.min || 0) ? 0 : 1;
                             return lowA - lowB;
                         });
-
             items.forEach(data => {
                 const isLow = data.qty <= (data.min || 0);
                 iL.innerHTML += `<div class="list-row ${isLow ? 'alert-low' : ''}">
@@ -422,7 +412,6 @@
                     </div>
                 </div>`;
             });
-
             rS.forEach(d => {
                 const data = d.data();
                 if(!data.nom.toLowerCase().includes(searchR)) return;
@@ -453,7 +442,7 @@
             loadBodega();
         };
 
-        // --- MÓDULO ADMIN (AJUSTE: REINICIO DE NÓMINA AL PAGAR) ---
+        // --- MÓDULO ADMIN ---
         const getWeekRange = () => {
             const now = new Date();
             const day = now.getDay(); 
@@ -471,7 +460,6 @@
             const sL = document.getElementById('lista-staff'), nL = document.getElementById('render-nomina');
             sL.innerHTML = ""; nL.innerHTML = "";
             const { monday, sunday } = getWeekRange();
-
             uS.forEach(uDoc => {
                 const u = uDoc.data();
                 sL.innerHTML += `<div class="list-row">
@@ -481,15 +469,11 @@
                         <button class="btn-action-small" onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>`;
-                
-                // Ajuste: El contador solo suma horas posteriores al "ultimoPago" o al inicio de la semana actual
                 const baseTime = u.ultimoPago ? new Date(u.ultimoPago) : monday;
                 const effectiveStart = baseTime > monday ? baseTime : monday;
-
                 const hits = aS.docs.map(d=>d.data())
                     .filter(p => p.uid === uDoc.id && new Date(p.fecha) >= effectiveStart && new Date(p.fecha) <= sunday)
                     .sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
-                
                 let hrs = 0;
                 for(let i=0; i<hits.length; i++){ 
                     if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ 
@@ -534,7 +518,6 @@
 
         window.finalPay = async (uid, nom, tot, canal) => {
             await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: tot, tipo: 'GASTO', canal: canal, fecha: new Date().toISOString() });
-            // Al actualizar el "ultimoPago", la función loadAdmin dejará de contar las horas previas
             await updateDoc(doc(db, "usuarios", uid), { ultimoPago: new Date().toISOString() });
             document.getElementById('os-modal').style.display = 'none';
             loadAdmin(); loadFin();
@@ -599,7 +582,7 @@
             s.forEach(d => l.innerHTML += `<div class="list-row">${d.data().hora} - ${d.data().tit} <button class="btn-action-small" onclick="window.secureDel('agenda','${d.id}','renderCal')"><i class="fa-solid fa-trash"></i></button></div>`);
         };
 
-        // --- LIMPIEZA (AJUSTE: ELIMINACIÓN SOLO POR SOCIOS) ---
+        // --- LIMPIEZA (AJUSTE: HISTORIAL EDITABLE) ---
         window.addCleanTask = async () => {
             await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-task-in').value });
             document.getElementById('clean-task-in').value = ""; loadClean();
@@ -620,14 +603,17 @@
                     </div>
                 </div>`;
             });
-            history.forEach(h => histRender.innerHTML += `<div class="list-row"><span>${h.data().tarea} por ${h.data().empleado}</span></div>`);
+            history.forEach(h => {
+                histRender.innerHTML += `<div class="list-row">
+                    <span>${h.data().tarea} por ${h.data().empleado}</span>
+                    <button class="btn-action-small" onclick="window.secureDel('historial_limpieza','${h.id}','loadClean')"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
         };
-        
         window.cleanDelLogic = (c, i, cb) => {
             if(sUser.rol !== 'Socio') return window.notify("PERMISO DENEGADO", "Solo un Socio puede eliminar tareas maestras.");
             window.secureDel(c, i, cb);
         };
-
         window.doClean = async (id, nom) => {
             await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: nom, empleado: sUser.nombre, hora: new Date().toLocaleTimeString(), fecha_dia: new Date().toISOString().split('T')[0] });
             loadClean();
@@ -640,7 +626,6 @@
                 if(cb) window[cb]();
             });
         };
-
         const startApp = () => {
             window.nav('reloj'); loadFin();
             setInterval(() => {
@@ -649,7 +634,6 @@
                 document.getElementById('live-date').innerText = n.toLocaleDateString('es-MX', { weekday:'long', day:'numeric', month:'long' }).toUpperCase();
             }, 1000);
         };
-
         initKeys();
     </script>
 </body>
