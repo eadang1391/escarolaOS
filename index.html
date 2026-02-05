@@ -3,10 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v16.5 - Enterprise System</title>
+    <title>EscarolaOS v16.6 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         :root {
@@ -53,6 +57,10 @@
 
         .list-row { background: var(--glass); padding: 18px 25px; border-radius: var(--pill); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06); transition: 0.3s; }
         .alert-low { border-color: var(--terracota); background: rgba(176, 65, 62, 0.15); box-shadow: 0 0 10px var(--terracota); }
+
+        .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .btn-report { padding: 12px; font-size: 0.65rem; border-radius: 15px; background: var(--glass); border: 1px solid var(--border); color: var(--cantera); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
+        .btn-report:active { background: var(--dorado); color: var(--negro); }
 
         /* ANALYTICS */
         .bar-wrap { height: 12px; background: #000; border-radius: 10px; overflow: hidden; display: flex; margin: 15px 0; border: 1px solid var(--border); }
@@ -216,6 +224,43 @@
         </div>
 
         <div id="view-admin" class="main-viewport">
+            <div class="card-panel">
+                <div class="tag-header">Centro de Reportes y Auditoría</div>
+                <p style="font-size:0.7rem; opacity:0.6; margin-bottom:15px">Descarga de movimientos, nóminas e inventario.</p>
+                
+                <div style="margin-bottom:20px">
+                    <small style="color:var(--dorado); letter-spacing:2px">CAPITAL Y FINANZAS</small>
+                    <div class="report-grid">
+                        <button class="btn-report" onclick="window.exportFin('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                        <button class="btn-report" onclick="window.exportFin('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px">
+                    <small style="color:var(--dorado); letter-spacing:2px">PERSONAL Y NÓMINA</small>
+                    <div class="report-grid">
+                        <button class="btn-report" onclick="window.exportNomina('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                        <button class="btn-report" onclick="window.exportNomina('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
+                    </div>
+                </div>
+
+                <div style="margin-bottom:20px">
+                    <small style="color:var(--dorado); letter-spacing:2px">BODEGA Y STOCK</small>
+                    <div class="report-grid">
+                        <button class="btn-report" onclick="window.exportBodega('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                        <button class="btn-report" onclick="window.exportBodega('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
+                    </div>
+                </div>
+
+                <div>
+                    <small style="color:var(--dorado); letter-spacing:2px">HISTORIAL DE LIMPIEZA</small>
+                    <div class="report-grid">
+                        <button class="btn-report" onclick="window.exportLimpieza('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
+                        <button class="btn-report" onclick="window.exportLimpieza('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
+                    </div>
+                </div>
+            </div>
+
             <div class="card-panel">
                 <div class="tag-header">Nómina Semanal (Lunes-Domingo)</div>
                 <div id="render-nomina"></div>
@@ -582,7 +627,7 @@
             s.forEach(d => l.innerHTML += `<div class="list-row">${d.data().hora} - ${d.data().tit} <button class="btn-action-small" onclick="window.secureDel('agenda','${d.id}','renderCal')"><i class="fa-solid fa-trash"></i></button></div>`);
         };
 
-        // --- LIMPIEZA (AJUSTE: HISTORIAL EDITABLE) ---
+        // --- LIMPIEZA ---
         window.addCleanTask = async () => {
             await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-task-in').value });
             document.getElementById('clean-task-in').value = ""; loadClean();
@@ -617,6 +662,70 @@
         window.doClean = async (id, nom) => {
             await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: nom, empleado: sUser.nombre, hora: new Date().toLocaleTimeString(), fecha_dia: new Date().toISOString().split('T')[0] });
             loadClean();
+        };
+
+        // --- LÓGICA DE EXPORTACIÓN (NUEVO v16.6) ---
+        const generateXLSX = (data, name) => {
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
+            XLSX.writeFile(wb, `${name}_${new Date().toLocaleDateString()}.xlsx`);
+        };
+
+        const generatePDF = (title, headers, body) => {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            doc.setFontSize(18);
+            doc.text(title, 14, 22);
+            doc.setFontSize(10);
+            doc.text(`Generado por EscarolaOS el ${new Date().toLocaleString()}`, 14, 30);
+            doc.autoTable({ head: [headers], body: body, startY: 35, theme: 'grid', headStyles: {fillColor: [197, 160, 89]} });
+            doc.save(`${title.replace(/ /g, '_')}.pdf`);
+        };
+
+        window.exportFin = async (fmt) => {
+            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
+            const raw = snap.docs.map(d => {
+                const r = d.data();
+                return { Fecha: new Date(r.fecha).toLocaleString(), Concepto: r.desc, Monto: r.monto, Tipo: r.tipo, Canal: r.canal };
+            });
+            if(fmt==='xlsx') generateXLSX(raw, "Finanzas");
+            else generatePDF("REPORTE FINANCIERO", ["Fecha", "Concepto", "Monto", "Tipo", "Canal"], raw.map(o => Object.values(o)));
+        };
+
+        window.exportNomina = async (fmt) => {
+            const uS = await getDocs(collection(db, "usuarios")), aS = await getDocs(collection(db, "asistencias"));
+            const { monday, sunday } = getWeekRange();
+            const raw = uS.docs.map(uDoc => {
+                const u = uDoc.data();
+                const baseTime = u.ultimoPago ? new Date(u.ultimoPago) : monday;
+                const hits = aS.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) >= baseTime && new Date(p.fecha) <= sunday).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+                let hrs = 0;
+                for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
+                return { Empleado: u.nombre, Rol: u.rol, Horas: hrs.toFixed(1), Pago_Hr: u.sueldo, Total: Math.round(hrs * u.sueldo) };
+            });
+            if(fmt==='xlsx') generateXLSX(raw, "Nomina");
+            else generatePDF("REPORTE DE NOMINA", ["Empleado", "Rol", "Horas", "Pago Hr", "Total"], raw.map(o => Object.values(o)));
+        };
+
+        window.exportBodega = async (fmt) => {
+            const snap = await getDocs(collection(db, "inventario"));
+            const raw = snap.docs.map(d => {
+                const r = d.data();
+                return { Insumo: r.item, Cantidad: r.qty, Minimo: r.min, Estatus: r.qty <= r.min ? "REORDEN" : "OK" };
+            });
+            if(fmt==='xlsx') generateXLSX(raw, "Bodega");
+            else generatePDF("REPORTE DE INVENTARIO", ["Insumo", "Cantidad", "Mínimo", "Estatus"], raw.map(o => Object.values(o)));
+        };
+
+        window.exportLimpieza = async (fmt) => {
+            const snap = await getDocs(query(collection(db, "historial_limpieza"), orderBy("fecha_dia", "desc")));
+            const raw = snap.docs.map(d => {
+                const r = d.data();
+                return { Tarea: r.tarea, Empleado: r.empleado, Hora: r.hora, Fecha: r.fecha_dia };
+            });
+            if(fmt==='xlsx') generateXLSX(raw, "Limpieza");
+            else generatePDF("HISTORIAL DE LIMPIEZA", ["Tarea", "Empleado", "Hora", "Fecha"], raw.map(o => Object.values(o)));
         };
 
         // --- UTILS ---
