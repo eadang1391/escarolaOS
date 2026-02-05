@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v16.7 - Enterprise System</title>
+    <title>EscarolaOS v17 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -211,6 +211,22 @@
                 <button class="btn-premium gold-btn" onclick="window.saveInv()">ACTUALIZAR INVENTARIO</button>
                 <div id="lista-inventario" style="margin-top:25px"></div>
             </div>
+
+            <div class="card-panel">
+                <div class="tag-header">Control de Mermas</div>
+                <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:12px">
+                    <input type="text" id="mer-nom" class="input-premium" placeholder="Producto Mermado" style="margin:0">
+                    <input type="number" id="mer-can" class="input-premium" placeholder="Cant." style="margin:0">
+                </div>
+                <select id="mer-mot" class="input-premium">
+                    <option value="Caducidad">Caducidad</option>
+                    <option value="Dañado">Dañado / Accidente</option>
+                    <option value="Error">Error de Preparación</option>
+                </select>
+                <button class="btn-premium red-btn" onclick="window.saveMerma()">REGISTRAR PÉRDIDA</button>
+                <div id="lista-mermas" style="margin-top:25px"></div>
+            </div>
+
             <div class="card-panel">
                 <div class="tag-header">Costeo de Recetas</div>
                 <input type="text" id="search-rec" class="input-premium" placeholder=" Buscar receta..." oninput="window.loadBodega()">
@@ -452,19 +468,28 @@
             loadBodega();
         };
 
+        window.saveMerma = async () => {
+            const n = document.getElementById('mer-nom').value;
+            const c = parseFloat(document.getElementById('mer-can').value);
+            const m = document.getElementById('mer-mot').value;
+            if(!n || !c) return;
+            await addDoc(collection(db, "mermas"), { item: n, qty: c, motivo: m, fecha: new Date().toISOString(), responsable: sUser.nombre });
+            document.getElementById('mer-nom').value = ""; document.getElementById('mer-can').value = "";
+            loadBodega();
+        };
+
         window.loadBodega = async () => {
             const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas"));
-            const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas');
+            const mS = await getDocs(query(collection(db, "mermas"), orderBy("fecha", "desc"), limit(10)));
+            const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas'), mL = document.getElementById('lista-mermas');
             const searchI = document.getElementById('search-inv').value.toLowerCase();
             const searchR = document.getElementById('search-rec').value.toLowerCase();
-            iL.innerHTML = ""; rL.innerHTML = "";
+            iL.innerHTML = ""; rL.innerHTML = ""; mL.innerHTML = "";
+            
             const items = iS.docs.map(d => ({id: d.id, ...d.data()}))
                         .filter(data => data.item.toLowerCase().includes(searchI))
-                        .sort((a, b) => {
-                            const lowA = a.qty <= (a.min || 0) ? 0 : 1;
-                            const lowB = b.qty <= (b.min || 0) ? 0 : 1;
-                            return lowA - lowB;
-                        });
+                        .sort((a, b) => (a.qty <= (a.min || 0) ? 0 : 1) - (b.qty <= (b.min || 0) ? 0 : 1));
+            
             items.forEach(data => {
                 const isLow = data.qty <= (data.min || 0);
                 iL.innerHTML += `<div class="list-row ${isLow ? 'alert-low' : ''}">
@@ -475,6 +500,18 @@
                     </div>
                 </div>`;
             });
+
+            mS.forEach(d => {
+                const m = d.data();
+                mL.innerHTML += `<div class="list-row" style="border-left: 4px solid var(--terracota)">
+                    <div><b>${m.item}</b><br><small>${m.motivo} - ${m.responsable}</small></div>
+                    <div style="display:flex; align-items:center; gap:15px">
+                        <b style="color:var(--terracota)">-${m.qty}</b>
+                        <button class="btn-action-small" onclick="window.secureDel('mermas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+
             rS.forEach(d => {
                 const data = d.data();
                 if(!data.nom.toLowerCase().includes(searchR)) return;
@@ -682,7 +719,7 @@
             loadClean();
         };
 
-        // --- LÓGICA DE EXPORTACIÓN CON FILTROS (v16.7) ---
+        // --- LÓGICA DE EXPORTACIÓN CON FILTROS ---
         window.toggleMonthSelect = () => {
             const isMensual = document.getElementById('rep-periodo').value === 'mensual';
             const mSel = document.getElementById('rep-mes');
