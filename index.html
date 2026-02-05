@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v16.7 - Enterprise System</title>
+    <title>EscarolaOS v16.8 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -27,7 +27,7 @@
             --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
         }
 
-        /* ESTRUCTURA BASE Y OCULTAR SCROLLBAR */
+        /* ESTRUCTURA BASE */
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background: var(--verde-bosque); color: var(--cantera); height: 100vh; overflow: hidden; user-select: none; }
         
@@ -58,7 +58,6 @@
         .list-row { background: var(--glass); padding: 18px 25px; border-radius: var(--pill); margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.06); transition: 0.3s; }
         .alert-low { border-color: var(--terracota); background: rgba(176, 65, 62, 0.15); box-shadow: 0 0 10px var(--terracota); }
 
-        /* REPORTES ESPECIALES */
         .report-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
         .btn-report { padding: 12px; font-size: 0.65rem; border-radius: 15px; background: var(--glass); border: 1px solid var(--border); color: var(--cantera); cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: 0.3s; }
         .btn-report:active { background: var(--dorado); color: var(--negro); }
@@ -78,11 +77,11 @@
         .cmd-item.active { opacity: 1; color: var(--dorado); transform: translateY(-5px); }
         .cmd-item i { font-size: 1.5rem; display: block; margin-bottom: 6px; }
 
-        /* MODAL OS */
+        /* MODAL */
         .modal-os { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.96); z-index: 1000000; align-items: center; justify-content: center; padding: 25px; backdrop-filter: blur(15px); }
         .modal-os-box { background: var(--verde-oscuro); padding: 45px; border-radius: 45px; width: 100%; max-width: 450px; border: 1px solid var(--dorado); text-align: center; box-shadow: 0 0 50px rgba(0,0,0,1); }
 
-        /* PINPAD LOGIN */
+        /* LOGIN */
         #login-screen { 
             position: fixed; inset: 0; background: radial-gradient(circle at center, var(--verde-bosque) 0%, var(--negro) 100%); 
             display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 999999; 
@@ -211,6 +210,7 @@
                 <button class="btn-premium gold-btn" onclick="window.saveInv()">ACTUALIZAR INVENTARIO</button>
                 <div id="lista-inventario" style="margin-top:25px"></div>
             </div>
+
             <div class="card-panel">
                 <div class="tag-header">Costeo de Recetas</div>
                 <input type="text" id="search-rec" class="input-premium" placeholder=" Buscar receta..." oninput="window.loadBodega()">
@@ -222,12 +222,28 @@
                 <button class="btn-premium gold-btn" onclick="window.saveRecipe()">GUARDAR EN RECETARIO</button>
                 <div id="lista-recetas" style="margin-top:25px"></div>
             </div>
+
+            <div class="card-panel">
+                <div class="tag-header">Registro de Mermas / Desperdicio</div>
+                <div style="display:grid; grid-template-columns:2fr 1fr; gap:12px; margin-bottom:12px">
+                    <input type="text" id="mer-nom" class="input-premium" placeholder="Insumo mermado" style="margin:0">
+                    <input type="number" id="mer-can" class="input-premium" placeholder="Cantidad" style="margin:0">
+                </div>
+                <select id="mer-mot" class="input-premium">
+                    <option value="Vencimiento">Vencimiento / Caducidad</option>
+                    <option value="Daño">Daño Físico / Rotura</option>
+                    <option value="Error">Error de Preparación</option>
+                    <option value="Mal_Estado">Mal Estado (Proveedor)</option>
+                    <option value="Otro">Otro Motivo</option>
+                </select>
+                <button class="btn-premium red-btn" onclick="window.saveMerma()">REGISTRAR MERMA</button>
+                <div id="lista-mermas" style="margin-top:25px"></div>
+            </div>
         </div>
 
         <div id="view-admin" class="main-viewport">
             <div class="card-panel">
                 <div class="tag-header">Centro de Reportes Inteligente</div>
-                
                 <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 25px; margin-bottom: 25px; border: 1px solid var(--border)">
                     <small style="color:var(--dorado); display:block; margin-bottom:10px; font-weight:800">CONFIGURAR FILTRO DE EXPORTACIÓN</small>
                     <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
@@ -236,46 +252,18 @@
                             <option value="mensual">Mensual (Específico)</option>
                         </select>
                         <select id="rep-mes" class="input-premium" style="margin:0; opacity:0.3" disabled>
-                            <option value="0">Enero</option><option value="1">Febrero</option>
-                            <option value="2">Marzo</option><option value="3">Abril</option>
-                            <option value="4">Mayo</option><option value="5">Junio</option>
-                            <option value="6">Julio</option><option value="7">Agosto</option>
-                            <option value="8">Septiembre</option><option value="9">Octubre</option>
-                            <option value="10">Noviembre</option><option value="11">Diciembre</option>
+                            <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+                            <option value="3">Abril</option><option value="4">Mayo</option><option value="5">Junio</option>
+                            <option value="6">Julio</option><option value="7">Agosto</option><option value="8">Septiembre</option>
+                            <option value="9">Octubre</option><option value="10">Noviembre</option><option value="11">Diciembre</option>
                         </select>
                     </div>
                 </div>
-
-                <div style="margin-bottom:20px">
-                    <small style="color:var(--dorado); letter-spacing:2px">FINANZAS Y CAJA</small>
-                    <div class="report-grid">
-                        <button class="btn-report" onclick="window.exportFin('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                        <button class="btn-report" onclick="window.exportFin('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
-                    </div>
-                </div>
-
-                <div style="margin-bottom:20px">
-                    <small style="color:var(--dorado); letter-spacing:2px">NÓMINAS LIQUIDADAS</small>
-                    <div class="report-grid">
-                        <button class="btn-report" onclick="window.exportNomina('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                        <button class="btn-report" onclick="window.exportNomina('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
-                    </div>
-                </div>
-
-                <div style="margin-bottom:20px">
-                    <small style="color:var(--dorado); letter-spacing:2px">LOG DE HIGIENE</small>
-                    <div class="report-grid">
-                        <button class="btn-report" onclick="window.exportLimpieza('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                        <button class="btn-report" onclick="window.exportLimpieza('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
-                    </div>
-                </div>
-
-                <div>
-                    <small style="color:var(--dorado); letter-spacing:2px">ESTADO DE BODEGA (STOCK)</small>
-                    <div class="report-grid">
-                        <button class="btn-report" onclick="window.exportBodega('pdf')"><i class="fa-solid fa-file-pdf"></i> PDF</button>
-                        <button class="btn-report" onclick="window.exportBodega('xlsx')"><i class="fa-solid fa-file-excel"></i> EXCEL</button>
-                    </div>
+                <div class="report-grid">
+                    <button class="btn-report" onclick="window.exportFin('pdf')"><i class="fa-solid fa-file-pdf"></i> FINANZAS</button>
+                    <button class="btn-report" onclick="window.exportNomina('pdf')"><i class="fa-solid fa-file-pdf"></i> NÓMINA</button>
+                    <button class="btn-report" onclick="window.exportLimpieza('pdf')"><i class="fa-solid fa-file-pdf"></i> LIMPIEZA</button>
+                    <button class="btn-report" onclick="window.exportBodega('pdf')"><i class="fa-solid fa-file-pdf"></i> BODEGA</button>
                 </div>
             </div>
 
@@ -290,10 +278,8 @@
                 <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-bottom:15px">
                     <input type="number" id="st-pag" class="input-premium" placeholder="Pago por Hora" style="margin:0">
                     <select id="st-rol" class="input-premium" style="margin:0">
-                        <option value="Staff">Staff</option>
-                        <option value="Cocina">Cocina</option>
-                        <option value="Limpieza">Limpieza</option>
-                        <option value="Socio">Socio / Gerente</option>
+                        <option value="Staff">Staff</option><option value="Cocina">Cocina</option>
+                        <option value="Limpieza">Limpieza</option><option value="Socio">Socio / Gerente</option>
                     </select>
                 </div>
                 <button class="btn-premium gold-btn" onclick="window.addStaffMember()">REGISTRAR NUEVO PERSONAL</button>
@@ -312,58 +298,36 @@
         <div class="cmd-item" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>OFF</div>
     </nav>
 
-    <div id="os-modal" class="modal-os">
-        <div class="modal-os-box" id="os-modal-content"></div>
-    </div>
+    <div id="os-modal" class="modal-os"><div class="modal-os-box" id="os-modal-content"></div></div>
 
     <script type="module">
         import { db, collection, addDoc, getDocs, query, where, doc, deleteDoc, updateDoc, orderBy, limit } from './firebase-config.js';
 
-        let gPin = "";
-        let sUser = null;
-        let cDate = new Date();
-        let sDay = null;
+        let gPin = "", sUser = null, cDate = new Date(), sDay = null;
 
         // --- SISTEMA DE NOTIFICACIONES ---
         window.notify = (t, m) => {
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2>
-                <p style="opacity:0.8; margin-bottom:30px">${m}</p>
-                <button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">CERRAR</button>
-            `;
+            document.getElementById('os-modal-content').innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2><p style="opacity:0.8; margin-bottom:30px">${m}</p><button class="btn-premium gold-btn" onclick="document.getElementById('os-modal').style.display='none'">CERRAR</button>`;
             document.getElementById('os-modal').style.display = 'flex';
         };
 
         window.ask = (t, m, callback) => {
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2>
-                <p style="opacity:0.8; margin-bottom:30px">${m}</p>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                    <button class="btn-premium" style="background:var(--glass)" onclick="document.getElementById('os-modal').style.display='none'">CANCELAR</button>
-                    <button class="btn-premium gold-btn" id="modal-confirm-btn">CONFIRMAR</button>
-                </div>
-            `;
+            document.getElementById('os-modal-content').innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2><p style="opacity:0.8; margin-bottom:30px">${m}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px"><button class="btn-premium" style="background:var(--glass)" onclick="document.getElementById('os-modal').style.display='none'">CANCELAR</button><button class="btn-premium gold-btn" id="modal-confirm-btn">CONFIRMAR</button></div>`;
             document.getElementById('os-modal').style.display = 'flex';
-            document.getElementById('modal-confirm-btn').onclick = () => {
-                document.getElementById('os-modal').style.display = 'none';
-                callback();
-            };
+            document.getElementById('modal-confirm-btn').onclick = () => { document.getElementById('os-modal').style.display = 'none'; callback(); };
         };
 
-        // --- LÓGICA DE ACCESO PINPAD ---
+        // --- ACCESO ---
         const initKeys = () => {
-            const cont = document.getElementById('numpad-logic');
-            cont.innerHTML = "";
+            const cont = document.getElementById('numpad-logic'); cont.innerHTML = "";
             for(let i=1; i<=9; i++) cont.innerHTML += `<div class="key" onclick="window.press(${i})">${i}</div>`;
             cont.innerHTML += `<div class="key" onclick="window.press('C')" style="color:var(--terracota)"><i class="fa-solid fa-backspace"></i></div>`;
             cont.innerHTML += `<div class="key" onclick="window.press(0)">0</div>`;
             cont.innerHTML += `<div class="key" onclick="location.reload()"><i class="fa-solid fa-power-off"></i></div>`;
         };
-
         window.press = async (v) => {
             if(v==='C'){ gPin=""; upDots(); return; }
-            if(gPin.length < 4) gPin += v;
-            upDots();
+            if(gPin.length < 4) gPin += v; upDots();
             if(gPin.length === 4){
                 const q = query(collection(db, "usuarios"), where("pin", "==", gPin));
                 const snap = await getDocs(q);
@@ -379,402 +343,153 @@
 
         // --- NAVEGACIÓN ---
         window.nav = (v) => {
-            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return window.notify("RESTRINGIDO", "Requiere nivel Socio/Gerente.");
+            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return window.notify("RESTRINGIDO", "Nivel Socio requerido.");
             document.querySelectorAll('.main-viewport').forEach(view => view.style.display = 'none');
             document.querySelectorAll('.cmd-item').forEach(i => i.classList.remove('active'));
             document.getElementById(`view-${v}`).style.display = 'block';
-            
-            if(v==='finanzas') loadFin();
-            if(v==='agenda') renderCal();
-            if(v==='limpieza') loadClean();
-            if(v==='bodega') loadBodega();
-            if(v==='admin') loadAdmin();
-            if(v==='reloj') loadPunches();
+            if(v==='finanzas') loadFin(); if(v==='agenda') renderCal(); if(v==='limpieza') loadClean(); if(v==='bodega') loadBodega(); if(v==='admin') loadAdmin(); if(v==='reloj') loadPunches();
         };
 
-        // --- MÓDULO CAPITAL ---
+        // --- FINANZAS ---
         window.saveFinance = async () => {
-            const m = parseFloat(document.getElementById('f-monto').value);
-            const d = document.getElementById('f-desc').value;
+            const m = parseFloat(document.getElementById('f-monto').value), d = document.getElementById('f-desc').value;
             if(!m || !d) return;
             await addDoc(collection(db, "finanzas"), { desc: d, monto: m, tipo: document.getElementById('f-tipo').value, canal: document.getElementById('f-canal').value, fecha: new Date().toISOString() });
-            document.getElementById('f-monto').value = ""; document.getElementById('f-desc').value = "";
-            loadFin();
+            document.getElementById('f-monto').value = ""; document.getElementById('f-desc').value = ""; loadFin();
         };
-
         window.loadFin = async () => {
             const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            let mainCash = 0, smallCash = 0, bank = 0, totalIngresado = 0, totalGastado = 0;
+            let mainCash = 0, smallCash = 0, bank = 0, tI = 0, tG = 0;
             const list = document.getElementById('lista-finanzas'); list.innerHTML = "";
             snap.forEach(dDoc => {
-                const data = dDoc.data();
-                const isG = data.tipo === 'GASTO';
-                const amt = isG ? -data.monto : data.monto;
-                if(isG) totalGastado += data.monto; else totalIngresado += data.monto;
-                if(data.canal === 'CAJA') mainCash += amt;
-                else if(data.canal === 'CAJA_CHICA') smallCash += amt;
-                else bank += amt;
-                list.innerHTML += `<div class="list-row">
-                    <div><b>${data.desc}</b><br><small>${data.canal.replace('_',' ')}</small></div>
-                    <div style="display:flex; align-items:center; gap:15px">
-                        <b style="color:${isG?'var(--terracota)':'var(--dorado)'}">$${data.monto}</b>
-                        <button class="btn-action-small" onclick="window.secureDel('finanzas','${dDoc.id}','loadFin')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
+                const data = dDoc.data(), isG = data.tipo === 'GASTO', amt = isG ? -data.monto : data.monto;
+                if(isG) tG += data.monto; else tI += data.monto;
+                if(data.canal === 'CAJA') mainCash += amt; else if(data.canal === 'CAJA_CHICA') smallCash += amt; else bank += amt;
+                list.innerHTML += `<div class="list-row"><div><b>${data.desc}</b><br><small>${data.canal}</small></div><div style="display:flex; align-items:center; gap:15px"><b style="color:${isG?'var(--terracota)':'var(--dorado)'}">$${data.monto}</b><button class="btn-action-small" onclick="window.secureDel('finanzas','${dDoc.id}','loadFin')"><i class="fa-solid fa-trash"></i></button></div></div>`;
             });
-            const paintRed = (val) => val < 0 ? 'var(--terracota)' : 'var(--dorado)';
-            const totalNeto = mainCash + smallCash + bank;
-            document.getElementById('neto-val').innerText = `$${Math.round(totalNeto)}`;
-            document.getElementById('neto-val').style.color = paintRed(totalNeto);
+            const tN = mainCash + smallCash + bank;
+            document.getElementById('neto-val').innerText = `$${Math.round(tN)}`;
             document.getElementById('cash-val').innerText = `$${Math.round(mainCash)}`;
-            document.getElementById('cash-val').style.color = paintRed(mainCash);
             document.getElementById('small-cash-val').innerText = `$${Math.round(smallCash)}`;
-            document.getElementById('small-cash-val').style.color = paintRed(smallCash);
             document.getElementById('bank-val').innerText = `$${Math.round(bank)}`;
-            document.getElementById('bank-val').style.color = paintRed(bank);
-            const totalFlujo = totalIngresado + totalGastado;
-            if(totalFlujo > 0) {
-                document.getElementById('bar-i').style.width = (totalIngresado / totalFlujo * 100) + "%";
-                document.getElementById('bar-g').style.width = (totalGastado / totalFlujo * 100) + "%";
-                const margen = totalIngresado > 0 ? ((totalIngresado - totalGastado) / totalIngresado * 100) : 0;
-                document.getElementById('util-txt').innerText = `UTILIDAD: ${Math.round(margen)}%`;
-                document.getElementById('util-txt').style.color = paintRed(margen);
+            if((tI+tG) > 0) {
+                document.getElementById('bar-i').style.width = (tI / (tI+tG) * 100) + "%";
+                document.getElementById('bar-g').style.width = (tG / (tI+tG) * 100) + "%";
+                const marg = tI > 0 ? ((tI - tG) / tI * 100) : 0;
+                document.getElementById('util-txt').innerText = `UTILIDAD: ${Math.round(marg)}%`;
             }
         };
 
-        // --- MÓDULO BODEGA ---
+        // --- BODEGA (STOCK, RECETAS Y MERMAS) ---
         window.saveInv = async () => {
-            const n = document.getElementById('inv-nom').value;
-            const c = parseFloat(document.getElementById('inv-can').value);
-            const m = parseFloat(document.getElementById('inv-min').value) || 0;
-            if(!n) return;
-            await addDoc(collection(db, "inventario"), { item: n, qty: c, min: m });
+            const n = document.getElementById('inv-nom').value, c = parseFloat(document.getElementById('inv-can').value), m = parseFloat(document.getElementById('inv-min').value) || 0;
+            if(!n) return; await addDoc(collection(db, "inventario"), { item: n, qty: c, min: m }); loadBodega();
+        };
+
+        window.saveRecipe = async () => {
+            await addDoc(collection(db, "recetas"), { nom: document.getElementById('rec-nom').value, cost: document.getElementById('rec-cos').value, detail: document.getElementById('rec-det').value }); loadBodega();
+        };
+
+        window.saveMerma = async () => {
+            const n = document.getElementById('mer-nom').value, c = parseFloat(document.getElementById('mer-can').value), m = document.getElementById('mer-mot').value;
+            if(!n || !c) return;
+            await addDoc(collection(db, "mermas"), { item: n, qty: c, motivo: m, fecha: new Date().toISOString(), responsable: sUser.nombre });
+            window.notify("MERMA REGISTRADA", `${c} unidad(es) de ${n} registradas como merma.`);
+            document.getElementById('mer-nom').value = ""; document.getElementById('mer-can').value = "";
             loadBodega();
         };
 
         window.loadBodega = async () => {
-            const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas"));
-            const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas');
-            const searchI = document.getElementById('search-inv').value.toLowerCase();
-            const searchR = document.getElementById('search-rec').value.toLowerCase();
-            iL.innerHTML = ""; rL.innerHTML = "";
-            const items = iS.docs.map(d => ({id: d.id, ...d.data()}))
-                        .filter(data => data.item.toLowerCase().includes(searchI))
-                        .sort((a, b) => {
-                            const lowA = a.qty <= (a.min || 0) ? 0 : 1;
-                            const lowB = b.qty <= (b.min || 0) ? 0 : 1;
-                            return lowA - lowB;
-                        });
-            items.forEach(data => {
-                const isLow = data.qty <= (data.min || 0);
-                iL.innerHTML += `<div class="list-row ${isLow ? 'alert-low' : ''}">
-                    <div><b>${data.item}</b><br><small>Mín: ${data.min || 0}</small></div>
-                    <div style="display:flex; align-items:center; gap:15px">
-                        <b style="cursor:pointer" onclick="window.restockModal('${data.id}', '${data.item}', ${data.qty})">${data.qty} un.</b>
-                        <button class="btn-action-small" onclick="window.secureDel('inventario','${data.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
+            const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas")), mS = await getDocs(query(collection(db, "mermas"), orderBy("fecha", "desc"), limit(15)));
+            const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas'), mL = document.getElementById('lista-mermas');
+            const sI = document.getElementById('search-inv').value.toLowerCase(), sR = document.getElementById('search-rec').value.toLowerCase();
+            iL.innerHTML = ""; rL.innerHTML = ""; mL.innerHTML = "";
+
+            iS.forEach(d => {
+                const data = d.data(); if(!data.item.toLowerCase().includes(sI)) return;
+                const isL = data.qty <= (data.min || 0);
+                iL.innerHTML += `<div class="list-row ${isL?'alert-low':''}"><div><b>${data.item}</b><br><small>Mín: ${data.min}</small></div><div style="display:flex; align-items:center; gap:15px"><b onclick="window.restockModal('${d.id}','${data.item}',${data.qty})">${data.qty} un.</b><button class="btn-action-small" onclick="window.secureDel('inventario','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button></div></div>`;
             });
             rS.forEach(d => {
+                const data = d.data(); if(!data.nom.toLowerCase().includes(sR)) return;
+                rL.innerHTML += `<div class="list-row"><div><b>${data.nom}</b><br><small>$${data.cost}</small></div><button class="btn-action-small" onclick="window.secureDel('recetas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button></div>`;
+            });
+            mS.forEach(d => {
                 const data = d.data();
-                if(!data.nom.toLowerCase().includes(searchR)) return;
-                rL.innerHTML += `<div class="list-row">
-                    <div><b>${data.nom}</b><br><small>$${data.cost} por porción</small></div>
-                    <button class="btn-action-small" onclick="window.secureDel('recetas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
-                </div>`;
+                mL.innerHTML += `<div class="list-row" style="border-left: 4px solid var(--terracota)"><div><b>${data.item} (${data.qty})</b><br><small>${data.motivo} - ${data.responsable}</small></div><button class="btn-action-small" onclick="window.secureDel('mermas','${d.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button></div>`;
             });
         };
 
-        window.restockModal = (id, nom, qtyActual) => {
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:15px">RESTOCK: ${nom}</h2>
-                <input type="number" id="new-stock-val" class="input-premium" value="${qtyActual}">
-                <button class="btn-premium gold-btn" id="save-restock-btn">ACTUALIZAR STOCK</button>
-            `;
-            document.getElementById('os-modal').style.display = 'flex';
-            document.getElementById('save-restock-btn').onclick = async () => {
-                const nVal = parseFloat(document.getElementById('new-stock-val').value);
-                await updateDoc(doc(db, "inventario", id), { qty: nVal });
-                document.getElementById('os-modal').style.display = 'none';
-                loadBodega();
-            };
+        window.restockModal = (id, nom, q) => {
+            document.getElementById('os-modal-content').innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">STOCK: ${nom}</h2><input type="number" id="n-st" class="input-premium" value="${q}"><button class="btn-premium gold-btn" id="up-st">ACTUALIZAR</button>`;
+            document.getElementById('os-modal').style.display='flex';
+            document.getElementById('up-st').onclick = async () => { await updateDoc(doc(db, "inventario", id), { qty: parseFloat(document.getElementById('n-st').value) }); document.getElementById('os-modal').style.display='none'; loadBodega(); };
         };
 
-        window.saveRecipe = async () => {
-            await addDoc(collection(db, "recetas"), { nom: document.getElementById('rec-nom').value, cost: document.getElementById('rec-cos').value, detail: document.getElementById('rec-det').value });
-            loadBodega();
-        };
-
-        // --- MÓDULO ADMIN ---
+        // --- ADMIN & NOMINA ---
         const getWeekRange = () => {
-            const now = new Date();
-            const day = now.getDay(); 
-            const diff = now.getDate() - day + (day === 0 ? -6 : 1); 
-            const monday = new Date(now.setDate(diff));
-            monday.setHours(0,0,0,0);
-            const sunday = new Date(monday);
-            sunday.setDate(monday.getDate() + 6);
-            sunday.setHours(23,59,59,999);
-            return { monday, sunday };
+            const now = new Date(), day = now.getDay(), diff = now.getDate() - day + (day === 0 ? -6 : 1);
+            const m = new Date(now.setDate(diff)); m.setHours(0,0,0,0);
+            const s = new Date(m); s.setDate(m.getDate() + 6); s.setHours(23,59,59,999);
+            return { m, s };
         };
-
         window.loadAdmin = async () => {
             const uS = await getDocs(collection(db, "usuarios")), aS = await getDocs(collection(db, "asistencias"));
             const sL = document.getElementById('lista-staff'), nL = document.getElementById('render-nomina');
-            sL.innerHTML = ""; nL.innerHTML = "";
-            const { monday, sunday } = getWeekRange();
+            sL.innerHTML = ""; nL.innerHTML = ""; const { m, s } = getWeekRange();
             uS.forEach(uDoc => {
                 const u = uDoc.data();
-                sL.innerHTML += `<div class="list-row">
-                    <span>${u.nombre} (${u.rol})</span>
-                    <div style="display:flex; gap:10px">
-                        <button class="btn-action-small" onclick="window.editStaffOS('${uDoc.id}', '${u.nombre}', '${u.pin}', ${u.sueldo})"><i class="fa-solid fa-pen"></i></button>
-                        <button class="btn-action-small" onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-                const baseTime = u.ultimoPago ? new Date(u.ultimoPago) : monday;
-                const effectiveStart = baseTime > monday ? baseTime : monday;
-                const hits = aS.docs.map(d=>d.data())
-                    .filter(p => p.uid === uDoc.id && new Date(p.fecha) >= effectiveStart && new Date(p.fecha) <= sunday)
-                    .sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
-                let hrs = 0;
-                for(let i=0; i<hits.length; i++){ 
-                    if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ 
-                        hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; 
-                    } 
-                }
+                sL.innerHTML += `<div class="list-row"><span>${u.nombre} (${u.rol})</span><div style="display:flex; gap:10px"><button class="btn-action-small" onclick="window.editStaffOS('${uDoc.id}','${u.nombre}','${u.pin}',${u.sueldo})"><i class="fa-solid fa-pen"></i></button><button class="btn-action-small" onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')"><i class="fa-solid fa-trash"></i></button></div></div>`;
+                const lastP = u.ultimoPago ? new Date(u.ultimoPago) : m;
+                const eff = lastP > m ? lastP : m;
+                const hits = aS.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) >= eff && new Date(p.fecha) <= s).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
+                let hrs = 0; for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
                 const tot = Math.round(hrs * (u.sueldo || 0));
-                nL.innerHTML += `<div class="list-row">
-                    <div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} h pendientes</small></div> 
-                    <button class="btn-premium gold-btn" style="width:auto; padding:8px 20px; font-size:0.7rem" onclick="window.payMethodModal('${uDoc.id}','${u.nombre}',${tot})">PAGAR $${tot}</button>
-                </div>`;
+                nL.innerHTML += `<div class="list-row"><div><b>${u.nombre}</b><br><small>${hrs.toFixed(1)} h</small></div><button class="btn-premium gold-btn" style="width:auto; padding:8px 15px; font-size:0.7rem" onclick="window.payMethodModal('${uDoc.id}','${u.nombre}',${tot})">PAGAR $${tot}</button></div>`;
             });
         };
-
-        window.editStaffOS = (id, nom, pin, sueldo) => {
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:15px">EDITAR: ${nom}</h2>
-                <input type="number" id="ed-pin" class="input-premium" value="${pin}" placeholder="PIN">
-                <input type="number" id="ed-sueldo" class="input-premium" value="${sueldo}" placeholder="Sueldo/Hr">
-                <button class="btn-premium gold-btn" id="save-edit-staff">GUARDAR CAMBIOS</button>
-            `;
-            document.getElementById('os-modal').style.display = 'flex';
-            document.getElementById('save-edit-staff').onclick = async () => {
-                await updateDoc(doc(db, "usuarios", id), { pin: document.getElementById('ed-pin').value, sueldo: parseFloat(document.getElementById('ed-sueldo').value) });
-                document.getElementById('os-modal').style.display = 'none';
-                loadAdmin();
-            };
-        };
-
         window.payMethodModal = (uid, nom, tot) => {
-            if(tot <= 0) return window.notify("ALERTA", "Sin saldo pendiente.");
-            document.getElementById('os-modal-content').innerHTML = `
-                <h2 style="color:var(--dorado); margin-bottom:15px">LIQUIDAR NÓMINA</h2>
-                <p style="margin-bottom:30px">¿Cómo deseas pagar $${tot} a ${nom}?</p>
-                <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px">
-                    <button class="btn-premium gold-btn" onclick="window.finalPay('${uid}','${nom}',${tot},'CAJA')">EFECTIVO</button>
-                    <button class="btn-premium gold-btn" onclick="window.finalPay('${uid}','${nom}',${tot},'BANCO')">BANCO</button>
-                </div>
-            `;
-            document.getElementById('os-modal').style.display = 'flex';
+            if(tot <= 0) return window.notify("ERROR", "No hay saldo acumulado.");
+            document.getElementById('os-modal-content').innerHTML = `<h2 style="color:var(--dorado); margin-bottom:15px">LIQUIDAR</h2><p>Pagar $${tot} a ${nom}</p><div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px"><button class="btn-premium gold-btn" onclick="window.finalPay('${uid}','${nom}',${tot},'CAJA')">EFECTIVO</button><button class="btn-premium gold-btn" onclick="window.finalPay('${uid}','${nom}',${tot},'BANCO')">BANCO</button></div>`;
+            document.getElementById('os-modal').style.display='flex';
         };
-
-        window.finalPay = async (uid, nom, tot, canal) => {
-            await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: tot, tipo: 'GASTO', canal: canal, fecha: new Date().toISOString() });
+        window.finalPay = async (uid, nom, tot, can) => {
+            await addDoc(collection(db, "finanzas"), { desc: `NÓMINA: ${nom}`, monto: tot, tipo: 'GASTO', canal: can, fecha: new Date().toISOString() });
             await updateDoc(doc(db, "usuarios", uid), { ultimoPago: new Date().toISOString() });
-            document.getElementById('os-modal').style.display = 'none';
-            loadAdmin(); loadFin();
-        };
-
-        window.addStaffMember = async () => {
-            const n = document.getElementById('st-nom').value;
-            const p = document.getElementById('st-pin').value;
-            const s = parseFloat(document.getElementById('st-pag').value);
-            if(!n || !p || !s) return;
-            await addDoc(collection(db, "usuarios"), { nombre: n, pin: p, sueldo: s, rol: document.getElementById('st-rol').value, ultimoPago: new Date().toISOString() });
-            loadAdmin();
+            document.getElementById('os-modal').style.display='none'; loadAdmin(); loadFin();
         };
 
         // --- RELOJ ---
         window.handlePunch = async (t) => {
             await addDoc(collection(db, "asistencias"), { uid: sUser.id, name: sUser.nombre, tipo: t, fecha: new Date().toISOString() });
-            window.notify("RELOJ", `Marcaje de ${t} registrado.`);
-            loadPunches();
+            window.notify("RELOJ", `Marcaje de ${t} registrado.`); loadPunches();
         };
-
         window.loadPunches = async () => {
             const s = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(10)));
             const l = document.getElementById('lista-asistencias'); l.innerHTML = "<h4>LOG RECIENTE</h4>";
-            s.forEach(d => {
-                const data = d.data();
-                l.innerHTML += `<div class="list-row">
-                    <div><span>${data.name}</span><br><small>${new Date(data.fecha).toLocaleTimeString()}</small></div>
-                    <div style="display:flex; align-items:center; gap:10px">
-                        <b>${data.tipo}</b>
-                        <button class="btn-action-small" onclick="window.secureDel('asistencias','${d.id}','loadPunches')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            });
-        };
-
-        // --- AGENDA ---
-        window.navMonth = (d) => { cDate.setMonth(cDate.getMonth() + d); renderCal(); };
-        window.renderCal = async () => {
-            const grid = document.getElementById('cal-grid-render'); grid.innerHTML = "";
-            document.getElementById('cal-month-display').innerText = cDate.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
-            const snap = await getDocs(collection(db, "agenda"));
-            const dates = snap.docs.map(d => d.data().fecha);
-            const y = cDate.getFullYear(), m = cDate.getMonth();
-            const start = new Date(y, m, 1).getDay();
-            const days = new Date(y, m + 1, 0).getDate();
-            for(let i=0; i<start; i++) grid.innerHTML += `<div></div>`;
-            for(let i=1; i<=days; i++) {
-                const k = `${y}-${String(m+1).padStart(2,'0')}-${String(i).padStart(2,'0')}`;
-                grid.innerHTML += `<div class="cal-unit ${dates.includes(k)?'marked':''} ${sDay===k?'active':''}" onclick="window.pick('${k}')">${i}</div>`;
-            }
-        };
-        window.pick = (d) => { sDay = d; document.getElementById('cal-selected-label').innerText = `DÍA: ${d}`; renderCal(); loadEvents(d); };
-        window.saveEvent = async () => {
-            if(!sDay) return;
-            await addDoc(collection(db, "agenda"), { tit: document.getElementById('ev-tit').value, hora: document.getElementById('ev-hor').value, fecha: sDay });
-            renderCal(); loadEvents(sDay);
-        };
-        window.loadEvents = async (f) => {
-            const s = await getDocs(query(collection(db, "agenda"), where("fecha", "==", f)));
-            const l = document.getElementById('lista-agenda'); l.innerHTML = "";
-            s.forEach(d => l.innerHTML += `<div class="list-row">${d.data().hora} - ${d.data().tit} <button class="btn-action-small" onclick="window.secureDel('agenda','${d.id}','renderCal')"><i class="fa-solid fa-trash"></i></button></div>`);
+            s.forEach(d => { const data = d.data(); l.innerHTML += `<div class="list-row"><div><span>${data.name}</span><br><small>${new Date(data.fecha).toLocaleTimeString()}</small></div><b>${data.tipo}</b></div>`; });
         };
 
         // --- LIMPIEZA ---
-        window.addCleanTask = async () => {
-            await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-task-in').value });
-            document.getElementById('clean-task-in').value = ""; loadClean();
-        };
+        window.addCleanTask = async () => { await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-task-in').value }); loadClean(); };
         window.loadClean = async () => {
-            const tasks = await getDocs(collection(db, "tareas_limpieza"));
-            const history = await getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])));
-            const render = document.getElementById('render-clean-tasks'); render.innerHTML = "";
-            const histRender = document.getElementById('render-clean-history'); histRender.innerHTML = "";
-            const doneIds = history.docs.map(h => h.data().taskId);
-            tasks.forEach(tDoc => {
-                const isDone = doneIds.includes(tDoc.id);
-                render.innerHTML += `<div class="list-row">
-                    <span>${tDoc.data().tarea}</span>
-                    <div style="display:flex; gap:12px; align-items:center">
-                        ${isDone ? '<i class="fa-solid fa-check-circle" style="color:var(--dorado)"></i>' : `<button onclick="window.doClean('${tDoc.id}','${tDoc.data().tarea}')" style="background:var(--dorado); border:none; padding:5px 10px; border-radius:5px">MARCAR</button>`}
-                        <button class="btn-action-small" onclick="window.cleanDelLogic('tareas_limpieza','${tDoc.id}','loadClean')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            });
-            history.forEach(h => {
-                histRender.innerHTML += `<div class="list-row">
-                    <span>${h.data().tarea} por ${h.data().empleado}</span>
-                    <button class="btn-action-small" onclick="window.secureDel('historial_limpieza','${h.id}','loadClean')"><i class="fa-solid fa-trash"></i></button>
-                </div>`;
+            const tS = await getDocs(collection(db, "tareas_limpieza")), hS = await getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])));
+            const r = document.getElementById('render-clean-tasks'), hr = document.getElementById('render-clean-history');
+            r.innerHTML = ""; hr.innerHTML = ""; const doneIds = hS.docs.map(h => h.data().taskId);
+            tS.forEach(t => {
+                const isD = doneIds.includes(t.id);
+                r.innerHTML += `<div class="list-row"><span>${t.data().tarea}</span><div>${isD?'<i class="fa-solid fa-check-circle" style="color:var(--dorado)"></i>':`<button onclick="window.doClean('${t.id}','${t.data().tarea}')" class="btn-premium gold-btn" style="padding:5px 10px; font-size:0.6rem">OK</button>`}</div></div>`;
             });
         };
-        window.cleanDelLogic = (c, i, cb) => {
-            if(sUser.rol !== 'Socio') return window.notify("PERMISO DENEGADO", "Solo un Socio puede eliminar tareas maestras.");
-            window.secureDel(c, i, cb);
-        };
-        window.doClean = async (id, nom) => {
-            await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: nom, empleado: sUser.nombre, hora: new Date().toLocaleTimeString(), fecha_dia: new Date().toISOString().split('T')[0] });
-            loadClean();
-        };
+        window.doClean = async (id, nom) => { await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: nom, empleado: sUser.nombre, fecha_dia: new Date().toISOString().split('T')[0] }); loadClean(); };
 
-        // --- LÓGICA DE EXPORTACIÓN CON FILTROS (v16.7) ---
-        window.toggleMonthSelect = () => {
-            const isMensual = document.getElementById('rep-periodo').value === 'mensual';
-            const mSel = document.getElementById('rep-mes');
-            mSel.disabled = !isMensual;
-            mSel.style.opacity = isMensual ? "1" : "0.3";
-        };
-
-        const getFilterDates = () => {
-            const period = document.getElementById('rep-periodo').value;
-            const now = new Date();
-            let start, end;
-            if(period === 'semanal') {
-                const range = getWeekRange(); start = range.monday; end = range.sunday;
-            } else {
-                const mes = parseInt(document.getElementById('rep-mes').value);
-                start = new Date(now.getFullYear(), mes, 1, 0, 0, 0);
-                end = new Date(now.getFullYear(), mes + 1, 0, 23, 59, 59);
-            }
-            return { start, end };
-        };
-
-        const generateXLSX = (data, name) => {
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Reporte");
-            XLSX.writeFile(wb, `${name}_${new Date().toLocaleDateString()}.xlsx`);
-        };
-
-        const generatePDF = (title, headers, body) => {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.setFontSize(18); doc.text(title, 14, 22);
-            doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, 14, 30);
-            doc.autoTable({ head: [headers], body: body, startY: 35, theme: 'grid', headStyles: {fillColor: [197, 160, 89]} });
-            doc.save(`${title.replace(/ /g, '_')}.pdf`);
-        };
-
-        window.exportFin = async (fmt) => {
-            const { start, end } = getFilterDates();
-            const snap = await getDocs(query(collection(db, "finanzas"), orderBy("fecha", "desc")));
-            const raw = snap.docs.map(d => d.data())
-                .filter(r => new Date(r.fecha) >= start && new Date(r.fecha) <= end)
-                .map(r => ({ Fecha: new Date(r.fecha).toLocaleString(), Concepto: r.desc, Monto: r.monto, Tipo: r.tipo, Canal: r.canal }));
-            if(fmt==='xlsx') generateXLSX(raw, "Finanzas");
-            else generatePDF("REPORTE FINANCIERO FILTRADO", ["Fecha", "Concepto", "Monto", "Tipo", "Canal"], raw.map(o => Object.values(o)));
-        };
-
-        window.exportNomina = async (fmt) => {
-            const { start, end } = getFilterDates();
-            const uS = await getDocs(collection(db, "usuarios")), aS = await getDocs(collection(db, "asistencias"));
-            const raw = uS.docs.map(uDoc => {
-                const u = uDoc.data();
-                const baseTime = u.ultimoPago ? new Date(u.ultimoPago) : start;
-                const effectiveStart = baseTime > start ? baseTime : start;
-                const hits = aS.docs.map(d=>d.data()).filter(p => p.uid === uDoc.id && new Date(p.fecha) >= effectiveStart && new Date(p.fecha) <= end).sort((a,b)=>new Date(a.fecha)-new Date(b.fecha));
-                let hrs = 0;
-                for(let i=0; i<hits.length; i++){ if(hits[i].tipo==='ENTRADA' && hits[i+1]?.tipo==='SALIDA'){ hrs += (new Date(hits[i+1].fecha)-new Date(hits[i].fecha))/3600000; i++; } }
-                return { Empleado: u.nombre, Rol: u.rol, Horas: hrs.toFixed(1), Pago_Hr: u.sueldo, Total: Math.round(hrs * u.sueldo) };
-            });
-            if(fmt==='xlsx') generateXLSX(raw, "Nomina");
-            else generatePDF("REPORTE NOMINA FILTRADO", ["Empleado", "Rol", "Horas", "Pago Hr", "Total"], raw.map(o => Object.values(o)));
-        };
-
-        window.exportLimpieza = async (fmt) => {
-            const { start, end } = getFilterDates();
-            const snap = await getDocs(query(collection(db, "historial_limpieza"), orderBy("fecha_dia", "desc")));
-            const raw = snap.docs.map(d => d.data())
-                .filter(r => new Date(r.fecha_dia + "T00:00:00") >= start && new Date(r.fecha_dia + "T23:59:59") <= end)
-                .map(r => ({ Tarea: r.tarea, Empleado: r.empleado, Hora: r.hora, Fecha: r.fecha_dia }));
-            if(fmt==='xlsx') generateXLSX(raw, "Limpieza");
-            else generatePDF("HISTORIAL LIMPIEZA FILTRADO", ["Tarea", "Empleado", "Hora", "Fecha"], raw.map(o => Object.values(o)));
-        };
-
-        window.exportBodega = async (fmt) => {
-            const snap = await getDocs(collection(db, "inventario"));
-            const raw = snap.docs.map(d => {
-                const r = d.data();
-                return { Insumo: r.item, Cantidad: r.qty, Minimo: r.min, Estatus: r.qty <= r.min ? "REORDEN" : "OK" };
-            });
-            if(fmt==='xlsx') generateXLSX(raw, "Bodega_Estado_Actual");
-            else generatePDF("ESTADO ACTUAL BODEGA", ["Insumo", "Cantidad", "Mínimo", "Estatus"], raw.map(o => Object.values(o)));
-        };
-
-        // --- UTILS ---
-        window.secureDel = (c, i, cb) => {
-            window.ask("CONFIRMAR", "¿Eliminar registro permanentemente?", async () => {
-                await deleteDoc(doc(db, c, i));
-                if(cb) window[cb]();
-            });
-        };
+        // --- REPORTES ---
+        window.toggleMonthSelect = () => { const isM = document.getElementById('rep-periodo').value === 'mensual'; document.getElementById('rep-mes').disabled = !isM; document.getElementById('rep-mes').style.opacity = isM ? "1" : "0.3"; };
+        
+        // UTILS
+        window.secureDel = (c, i, cb) => { window.ask("CONFIRMAR", "¿Eliminar permanentemente?", async () => { await deleteDoc(doc(db, c, i)); if(cb) window[cb](); }); };
         const startApp = () => {
-            window.nav('reloj'); loadFin();
+            window.nav('reloj');
             setInterval(() => {
                 const n = new Date();
                 document.getElementById('live-time').innerText = n.toLocaleTimeString('es-MX', { hour12: false });
