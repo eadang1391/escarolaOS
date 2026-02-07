@@ -213,7 +213,8 @@
             </div>
 
             <div class="card-panel">
-                <div class="tag-header">Explosión de Insumos (Pacto POS)</div>
+                <div class="tag-header">Explosión de Insumos (Vincular Pacto POS)</div>
+                <p style="font-size:0.7rem; margin-bottom:15px; opacity:0.6">Indique qué insumos descuenta cada platillo vendido en el POS.</p>
                 <input type="text" id="exp-platillo" class="input-premium" placeholder="Nombre exacto en Pacto POS">
                 <div id="exp-ingredients-cont">
                     <div style="display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-bottom:10px">
@@ -222,7 +223,7 @@
                     </div>
                 </div>
                 <button class="btn-premium" style="background:var(--glass); border:1px dashed var(--dorado); margin-bottom:15px; height:50px" onclick="window.addExpRow()">+ AÑADIR INGREDIENTE</button>
-                <button class="btn-premium gold-btn" onclick="window.saveExplosion()">VINCULAR RECETA A POS</button>
+                <button class="btn-premium gold-btn" onclick="window.saveExplosion()">GUARDAR VINCULACIÓN</button>
                 <div id="lista-explosiones" style="margin-top:25px"></div>
             </div>
 
@@ -233,29 +234,73 @@
                     <input type="text" id="rec-nom" class="input-premium" placeholder="Nombre Platillo" style="margin:0">
                     <input type="number" id="rec-cos" class="input-premium" placeholder="Costo $" style="margin:0">
                 </div>
-                <textarea id="rec-det" class="input-premium" placeholder="Instrucciones..." style="height:100px; border-radius: 25px"></textarea>
-                <button class="btn-premium gold-btn" onclick="window.saveRecipe()">GUARDAR RECETA</button>
+                <textarea id="rec-det" class="input-premium" placeholder="Instrucciones detalladas..." style="height:100px; border-radius: 25px"></textarea>
+                <button class="btn-premium gold-btn" onclick="window.saveRecipe()">GUARDAR EN RECETARIO</button>
                 <div id="lista-recetas" style="margin-top:25px"></div>
             </div>
         </div>
 
+        <div id="view-mermas" class="main-viewport">
+            <div class="card-panel">
+                <div class="tag-header">Mermas y Consumo Personal</div>
+                <input type="text" id="merma-nom" class="input-premium" placeholder="Nombre exacto del producto (Bodega)">
+                <input type="number" id="merma-qty" class="input-premium" placeholder="Cantidad a descontar">
+                <select id="merma-tipo" class="input-premium">
+                    <option value="CONSUMO">Consumo Personal</option>
+                    <option value="MERMA">Merma / Desperdicio</option>
+                    <option value="ERROR">Error de Preparación</option>
+                </select>
+                <button class="btn-premium red-btn" onclick="window.processMerma()">REGISTRAR Y DESCONTAR</button>
+            </div>
+            <div id="lista-mermas"></div>
+        </div>
+
         <div id="view-admin" class="main-viewport">
             <div class="card-panel">
-                <div class="tag-header">Ventas Pacto POS (.CSV)</div>
+                <div class="tag-header">Sincronización Pacto POS (.CSV)</div>
                 <div style="border: 2px dashed var(--dorado); padding: 40px; border-radius: 30px; text-align: center; background: rgba(0,0,0,0.2)" onclick="document.getElementById('pos-file').click()">
                     <i class="fa-solid fa-cloud-arrow-up fa-3x" style="color:var(--dorado); margin-bottom:15px"></i>
-                    <p style="font-weight:700">SUBIR REPORTE DE VENTAS</p>
+                    <p style="font-weight:700">SUBIR REPORTE DE VENTAS (CSV)</p>
+                    <small>Se descontarán automáticamente los insumos vinculados</small>
                     <input type="file" id="pos-file" accept=".csv" hidden onchange="window.processPactoPOS(this)">
                 </div>
             </div>
 
             <div class="card-panel">
-                <div class="tag-header">Nóminas y Staff</div>
+                <div class="tag-header">Centro de Reportes Inteligente</div>
+                <div style="background: rgba(0,0,0,0.3); padding: 20px; border-radius: 25px; margin-bottom: 25px; border: 1px solid var(--border)">
+                    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px">
+                        <select id="rep-periodo" class="input-premium" style="margin:0" onchange="window.toggleMonthSelect()">
+                            <option value="semanal">Semana Actual</option>
+                            <option value="mensual">Mensual (Específico)</option>
+                        </select>
+                        <select id="rep-mes" class="input-premium" style="margin:0; opacity:0.3" disabled>
+                            <option value="0">Enero</option><option value="1">Febrero</option><option value="2">Marzo</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="report-grid">
+                    <button class="btn-report" onclick="window.exportFin('pdf')"><i class="fa-solid fa-file-pdf"></i> FINANZAS</button>
+                    <button class="btn-report" onclick="window.exportNomina('pdf')"><i class="fa-solid fa-file-pdf"></i> NÓMINA</button>
+                    <button class="btn-report" onclick="window.exportLimpieza('pdf')"><i class="fa-solid fa-file-pdf"></i> HIGIENE</button>
+                    <button class="btn-report" onclick="window.exportBodega('pdf')"><i class="fa-solid fa-file-pdf"></i> STOCK</button>
+                </div>
+            </div>
+
+            <div class="card-panel">
+                <div class="tag-header">Nómina Semanal</div>
                 <div id="render-nomina"></div>
+            </div>
+
+            <div class="card-panel">
+                <div class="tag-header">Control de Colaboradores</div>
                 <input type="text" id="st-nom" class="input-premium" placeholder="Nombre Completo">
                 <input type="number" id="st-pin" class="input-premium" placeholder="PIN 4 dígitos">
-                <input type="number" id="st-pag" class="input-premium" placeholder="Pago x Hora">
-                <button class="btn-premium gold-btn" onclick="window.addStaffMember()">REGISTRAR STAFF</button>
+                <input type="number" id="st-pag" class="input-premium" placeholder="Pago por Hora">
+                <select id="st-rol" class="input-premium">
+                    <option value="Staff">Staff</option><option value="Socio">Socio</option>
+                </select>
+                <button class="btn-premium gold-btn" onclick="window.addStaffMember()">REGISTRAR PERSONAL</button>
                 <div id="lista-staff" style="margin-top:25px"></div>
             </div>
         </div>
@@ -267,8 +312,9 @@
         <div class="cmd-item" onclick="window.nav('reloj')"><i class="fa-solid fa-clock"></i>Rel</div>
         <div class="cmd-item" onclick="window.nav('limpieza')"><i class="fa-solid fa-broom"></i>Lim</div>
         <div class="cmd-item" onclick="window.nav('bodega')"><i class="fa-solid fa-box"></i>Bod</div>
+        <div class="cmd-item" onclick="window.nav('mermas')"><i class="fa-solid fa-trash-can"></i>Mer</div>
         <div class="cmd-item" onclick="window.nav('admin')"><i class="fa-solid fa-shield"></i>Adm</div>
-        <div class="cmd-item" onclick="location.reload()" style="color:var(--terracota)"><i class="fa-solid fa-power-off"></i>OFF</div>
+        <div class="cmd-item" onclick="location.reload()" style="color:var(--terracota); opacity:1"><i class="fa-solid fa-power-off"></i>OFF</div>
     </nav>
 
     <div id="os-modal" class="modal-os"><div class="modal-os-box" id="os-modal-content"></div></div>
@@ -278,7 +324,7 @@
 
         let gPin = "", sUser = null, cDate = new Date(), sDay = null;
 
-        // --- NOTIFICACIONES ---
+        // --- SISTEMA DE NOTIFICACIONES ---
         window.notify = (t, m) => {
             document.getElementById('os-modal-content').innerHTML = `
                 <h2 style="color:var(--dorado); margin-bottom:15px">${t}</h2>
@@ -304,7 +350,7 @@
             };
         };
 
-        // --- ACCESO PIN ---
+        // --- ACCESO PINPAD ---
         const initKeys = () => {
             const cont = document.getElementById('numpad-logic');
             cont.innerHTML = "";
@@ -325,7 +371,7 @@
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('command-bar').style.display = 'grid';
                     startApp();
-                } else { gPin=""; upDots(); window.notify("DENEGADO", "PIN Incorrecto"); }
+                } else { gPin=""; upDots(); window.notify("ACCESO DENEGADO", "PIN Incorrecto"); }
             }
         };
         const upDots = () => document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i < gPin.length));
@@ -335,10 +381,56 @@
             if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return window.notify("RESTRINGIDO", "Requiere nivel Socio.");
             document.querySelectorAll('.main-viewport').forEach(view => view.style.display = 'none');
             document.getElementById(`view-${v}`).style.display = 'block';
-            if(v==='finanzas') loadFin(); if(v==='bodega') loadBodega(); if(v==='limpieza') loadClean(); if(v==='admin') loadAdmin();
+            if(v==='finanzas') loadFin();
+            if(v==='limpieza') loadClean();
+            if(v==='bodega') loadBodega();
+            if(v==='mermas') loadMermas();
+            if(v==='admin') loadAdmin();
+            if(v==='reloj') loadPunches();
         };
 
-        // --- FINANZAS (RECUPERADO V17.2) ---
+        // --- LÓGICA DE EXPLOSIÓN PACTO POS ---
+        window.addExpRow = () => {
+            const row = document.createElement('div');
+            row.style = "display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-bottom:10px";
+            row.innerHTML = `<input type="text" class="input-premium exp-ing-nom" placeholder="Insumo"><input type="number" class="input-premium exp-ing-qty" placeholder="Cant.">`;
+            document.getElementById('exp-ingredients-cont').appendChild(row);
+        };
+
+        window.saveExplosion = async () => {
+            const plat = document.getElementById('exp-platillo').value;
+            const ings = [], noms = document.querySelectorAll('.exp-ing-nom'), qtys = document.querySelectorAll('.exp-ing-qty');
+            noms.forEach((n, i) => { if(n.value) ings.push({ item: n.value, qty: parseFloat(qtys[i].value) }); });
+            await addDoc(collection(db, "explosiones"), { platillo: plat, ingredientes: ings });
+            window.notify("ÉXITO", "Vínculo de explosión guardado.");
+            loadBodega();
+        };
+
+        window.processPactoPOS = async (input) => {
+            const reader = new FileReader();
+            reader.onload = async (e) => {
+                const lines = e.target.result.split('\n');
+                const eS = await getDocs(collection(db, "explosiones"));
+                const recipes = {}; eS.forEach(d => recipes[d.data().platillo] = d.data().ingredientes);
+                
+                const iS = await getDocs(collection(db, "inventario"));
+                const stock = {}; iS.forEach(d => stock[d.data().item] = { id: d.id, q: d.data().qty });
+
+                for(let i=1; i<lines.length; i++){
+                    const col = lines[i].split(','); if(col.length < 2) continue;
+                    const name = col[0].trim(), sold = parseFloat(col[col.length-1]) || 0;
+                    if(recipes[name]) for(const ing of recipes[name]) if(stock[ing.item]) { 
+                        stock[ing.item].q -= (ing.qty * sold); 
+                        await updateDoc(doc(db, "inventario", stock[ing.item].id), { qty: stock[ing.item].q });
+                    }
+                }
+                window.notify("PACTO POS", "Inventario actualizado según ventas.");
+                loadBodega();
+            };
+            reader.readAsText(input.files[0]);
+        };
+
+        // --- MÓDULO CAPITAL ---
         window.saveFinance = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
             const d = document.getElementById('f-desc').value;
@@ -353,72 +445,18 @@
             let mainCash = 0, smallCash = 0, bank = 0, tI = 0, tG = 0;
             const list = document.getElementById('lista-finanzas'); list.innerHTML = "";
             snap.forEach(dDoc => {
-                const data = dDoc.data();
-                const isG = data.tipo === 'GASTO';
-                const amt = isG ? -data.monto : data.monto;
+                const data = dDoc.data(), isG = data.tipo === 'GASTO', amt = isG ? -data.monto : data.monto;
                 if(isG) tG += data.monto; else tI += data.monto;
-                if(data.canal === 'CAJA') mainCash += amt;
-                else if(data.canal === 'CAJA_CHICA') smallCash += amt;
-                else bank += amt;
-                list.innerHTML += `<div class="list-row">
-                    <div><b>${data.desc}</b><br><small>${data.canal}</small></div>
-                    <div style="display:flex; align-items:center; gap:15px">
-                        <b style="color:${isG?'var(--terracota)':'var(--dorado)'}">$${data.monto}</b>
-                        <button class="btn-action-small" onclick="window.secureDel('finanzas','${dDoc.id}','loadFin')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
+                if(data.canal === 'CAJA') mainCash += amt; else if(data.canal === 'CAJA_CHICA') smallCash += amt; else bank += amt;
+                list.innerHTML += `<div class="list-row"><div><b>${data.desc}</b><br><small>${data.canal}</small></div><b style="color:${isG?'var(--terracota)':'var(--dorado)'}">$${data.monto}</b><button class="btn-action-small" onclick="window.secureDel('finanzas','${dDoc.id}','loadFin')">X</button></div>`;
             });
-            const total = mainCash + smallCash + bank;
-            document.getElementById('neto-val').innerText = `$${Math.round(total)}`;
+            document.getElementById('neto-val').innerText = `$${Math.round(mainCash + smallCash + bank)}`;
             document.getElementById('cash-val').innerText = `$${Math.round(mainCash)}`;
             document.getElementById('small-cash-val').innerText = `$${Math.round(smallCash)}`;
             document.getElementById('bank-val').innerText = `$${Math.round(bank)}`;
-            if(tI + tG > 0){
-                document.getElementById('bar-i').style.width = (tI / (tI+tG) * 100) + "%";
-                document.getElementById('bar-g').style.width = (tG / (tI+tG) * 100) + "%";
-                document.getElementById('util-txt').innerText = `UTILIDAD: ${Math.round((tI-tG)/tI*100)}%`;
-            }
         };
 
-        // --- BODEGA Y PACTO POS ---
-        window.addExpRow = () => {
-            const row = document.createElement('div');
-            row.style = "display:grid; grid-template-columns:2fr 1fr; gap:10px; margin-bottom:10px";
-            row.innerHTML = `<input type="text" class="input-premium exp-ing-nom" placeholder="Insumo"><input type="number" class="input-premium exp-ing-qty" placeholder="Cant.">`;
-            document.getElementById('exp-ingredients-cont').appendChild(row);
-        };
-
-        window.saveExplosion = async () => {
-            const plat = document.getElementById('exp-platillo').value;
-            const ings = [], noms = document.querySelectorAll('.exp-ing-nom'), qtys = document.querySelectorAll('.exp-ing-qty');
-            noms.forEach((n, i) => { if(n.value) ings.push({ item: n.value, qty: parseFloat(qtys[i].value) }); });
-            await addDoc(collection(db, "explosiones"), { platillo: plat, ingredientes: ings });
-            loadBodega();
-        };
-
-        window.processPactoPOS = async (input) => {
-            const reader = new FileReader();
-            reader.onload = async (e) => {
-                const lines = e.target.result.split('\n');
-                const eS = await getDocs(collection(db, "explosiones"));
-                const recipes = {}; eS.forEach(d => recipes[d.data().platillo] = d.data().ingredientes);
-                const iS = await getDocs(collection(db, "inventario"));
-                const stock = {}; iS.forEach(d => stock[d.data().item] = { id: d.id, q: d.data().qty });
-
-                for(let i=4; i<lines.length; i++){
-                    const col = lines[i].split(','); if(col.length < 32) continue;
-                    const name = col[0].trim();
-                    const sold = parseFloat(col[31]) || 0;
-                    if(recipes[name]) for(const ing of recipes[name]) if(stock[ing.item]) { 
-                        stock[ing.item].q -= (ing.qty * sold); 
-                        await updateDoc(doc(db, "inventario", stock[ing.item].id), { qty: stock[ing.item].q });
-                    }
-                }
-                window.notify("PACTO POS", "Ventas procesadas y stock actualizado."); loadBodega();
-            };
-            reader.readAsText(input.files[0]);
-        };
-
+        // --- BODEGA ---
         window.saveInv = async () => {
             await addDoc(collection(db, "inventario"), { item: document.getElementById('inv-nom').value, qty: parseFloat(document.getElementById('inv-can').value), min: parseFloat(document.getElementById('inv-min').value) });
             loadBodega();
@@ -429,55 +467,42 @@
             const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas'), eL = document.getElementById('lista-explosiones');
             iL.innerHTML = ""; rL.innerHTML = ""; eL.innerHTML = "";
             iS.forEach(d => {
-                const r = d.data(); const isLow = r.qty <= r.min;
-                iL.innerHTML += `<div class="list-row ${isLow?'alert-low':''}"><span><b>${r.item}</b> (${r.qty})</span><button class="btn-action-small" onclick="window.secureDel('inventario','${d.id}','loadBodega')">X</button></div>`;
+                const r = d.data(); const low = r.qty <= r.min;
+                iL.innerHTML += `<div class="list-row ${low?'alert-low':''}"><span><b>${r.item}</b> (${r.qty})</span><button class="btn-action-small" onclick="window.secureDel('inventario','${d.id}','loadBodega')">X</button></div>`;
             });
-            rS.forEach(d => { rL.innerHTML += `<div class="list-row"><span>${d.data().nom} ($${d.data().cost})</span><button class="btn-action-small" onclick="window.secureDel('recetas','${d.id}','loadBodega')">X</button></div>`; });
-            eS.forEach(d => { eL.innerHTML += `<div class="list-row"><span>${d.data().platillo}</span><button class="btn-action-small" onclick="window.secureDel('explosiones','${d.id}','loadBodega')">X</button></div>`; });
+            rS.forEach(d => rL.innerHTML += `<div class="list-row"><span>${d.data().nom}</span><button class="btn-action-small" onclick="window.secureDel('recetas','${d.id}','loadBodega')">X</button></div>`);
+            eS.forEach(d => eL.innerHTML += `<div class="list-row"><span>${d.data().platillo} (Vinculado)</span><button class="btn-action-small" onclick="window.secureDel('explosiones','${d.id}','loadBodega')">X</button></div>`);
         };
 
-        window.saveRecipe = async () => {
-            await addDoc(collection(db, "recetas"), { nom: document.getElementById('rec-nom').value, cost: document.getElementById('rec-cos').value, detail: document.getElementById('rec-det').value });
-            loadBodega();
-        };
-
-        // --- LIMPIEZA (RESTAURADO BOTONES V17.2) ---
+        // --- LIMPIEZA (RESTABLECIDO BOTONES V17.2) ---
         window.addCleanTask = async () => {
             await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-task-in').value });
             loadClean();
         };
-
         window.loadClean = async () => {
-            const tS = await getDocs(collection(db, "tareas_limpieza")), hS = await getDocs(query(collection(db, "historial_limpieza"), where("fecha", "==", new Date().toISOString().split('T')[0])));
+            const tS = await getDocs(collection(db, "tareas_limpieza")), hS = await getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])));
             const r = document.getElementById('render-clean-tasks'), h = document.getElementById('render-clean-history'), done = hS.docs.map(d => d.data().taskId);
             r.innerHTML = ""; h.innerHTML = "";
             tS.forEach(t => {
                 const ok = done.includes(t.id);
-                r.innerHTML += `<div class="list-row">
-                    <span>${t.data().tarea}</span>
-                    <div style="display:flex; gap:10px">
-                        ${ok ? '<b style="color:var(--dorado)">OK</b>' : `<button class="btn-premium gold-btn" style="width:auto; padding:8px 15px; font-size:0.6rem" onclick="window.doClean('${t.id}','${t.data().tarea}')">MARCAR</button>`}
-                        <button class="btn-action-small" onclick="window.secureDel('tareas_limpieza','${t.id}','loadClean')"><i class="fa-solid fa-xmark"></i></button>
-                    </div>
-                </div>`;
+                r.innerHTML += `<div class="list-row"><span>${t.data().tarea}</span><div>${ok?'<b>OK</b>':`<button class="btn-premium gold-btn" style="padding:5px 10px; font-size:0.6rem" onclick="window.doClean('${t.id}','${t.data().tarea}')">MARCAR</button>`}<button class="btn-action-small" onclick="window.secureDel('tareas_limpieza','${t.id}','loadClean')">X</button></div></div>`;
             });
-            hS.forEach(d => { h.innerHTML += `<div class="list-row"><span>${d.data().tarea} - ${d.data().empleado}</span></div>`; });
+            hS.forEach(d => h.innerHTML += `<div class="list-row"><span>${d.data().tarea} - ${d.data().empleado}</span></div>`);
         };
-
         window.doClean = async (id, n) => {
-            await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: n, empleado: sUser.nombre, fecha: new Date().toISOString().split('T')[0] });
+            await addDoc(collection(db, "historial_limpieza"), { taskId: id, tarea: n, empleado: sUser.nombre, fecha_dia: new Date().toISOString().split('T')[0] });
             loadClean();
         };
 
-        // --- STAFF Y ADMIN ---
+        // --- ADMIN Y NÓMINA ---
         window.loadAdmin = async () => {
-            const uS = await getDocs(collection(db, "usuarios"));
+            const uS = await getDocs(collection(db, "usuarios")), aS = await getDocs(collection(db, "asistencias"));
             const sL = document.getElementById('lista-staff'), nL = document.getElementById('render-nomina');
             sL.innerHTML = ""; nL.innerHTML = "";
             uS.forEach(uDoc => {
                 const u = uDoc.data();
                 sL.innerHTML += `<div class="list-row"><span>${u.nombre}</span><button class="btn-action-small" onclick="window.secureDel('usuarios','${uDoc.id}','loadAdmin')">X</button></div>`;
-                nL.innerHTML += `<div class="list-row"><span>${u.nombre}</span><button class="btn-premium gold-btn" style="width:auto; padding:8px 15px; font-size:0.7rem">PAGAR</button></div>`;
+                nL.innerHTML += `<div class="list-row"><span>${u.nombre}</span><button class="btn-premium gold-btn" style="width:auto; padding:5px 15px; font-size:0.7rem">PAGAR</button></div>`;
             });
         };
 
@@ -499,7 +524,6 @@
                 if(cb) window[cb]();
             });
         };
-
         const startApp = () => {
             window.nav('reloj');
             setInterval(() => {
