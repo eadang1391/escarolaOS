@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v17.9 - Enterprise System</title>
+    <title>EscarolaOS v18 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -314,9 +314,9 @@
                     <input type="number" id="st-pag" class="input-premium" placeholder="Pago por Hora" style="margin:0">
                     <select id="st-rol" class="input-premium" style="margin:0">
                         <option value="Staff">Staff</option>
+                        <option value="Barra">Barra</option>
                         <option value="Cocina">Cocina</option>
-                        <option value="Limpieza">Limpieza</option>
-                        <option value="Socio">Socio / Gerente</option>
+                        <option value="Gerente(Socio)">Gerente(Socio)</option>
                     </select>
                 </div>
                 <button class="btn-premium gold-btn" onclick="window.addStaffMember()">REGISTRAR NUEVO PERSONAL</button>
@@ -472,8 +472,13 @@
             const n = document.getElementById('inv-nom').value;
             const c = parseFloat(document.getElementById('inv-can').value);
             const m = parseFloat(document.getElementById('inv-min').value) || 0;
+            const cat = document.getElementById('inv-cat').value || 'Otros';
             if(!n) return;
-            await addDoc(collection(db, "inventario"), { item: n, qty: c, min: m });
+            await addDoc(collection(db, "inventario"), { item: n, qty: c, min: m, categoria: cat });
+            document.getElementById('inv-nom').value = "";
+            document.getElementById('inv-can').value = "";
+            document.getElementById('inv-min').value = "";
+            document.getElementById('inv-cat').value = "";
             loadBodega();
         };
 
@@ -483,23 +488,40 @@
             const searchI = document.getElementById('search-inv').value.toLowerCase();
             const searchR = document.getElementById('search-rec').value.toLowerCase();
             iL.innerHTML = ""; rL.innerHTML = "";
-            const items = iS.docs.map(d => ({id: d.id, ...d.data()}))
-                        .filter(data => data.item.toLowerCase().includes(searchI))
-                        .sort((a, b) => {
-                            const lowA = a.qty <= (a.min || 0) ? 0 : 1;
-                            const lowB = b.qty <= (b.min || 0) ? 0 : 1;
-                            return lowA - lowB;
-                        });
-            items.forEach(data => {
-                const isLow = data.qty <= (data.min || 0);
-                iL.innerHTML += `<div class="list-row ${isLow ? 'alert-low' : ''}">
-                    <div><b>${data.item}</b><br><small>Mín: ${data.min || 0}</small></div>
-                    <div style="display:flex; align-items:center; gap:15px">
-                        <b style="cursor:pointer" onclick="window.restockModal('${data.id}', '${data.item}', ${data.qty})">${data.qty} un.</b>
-                        <button class="btn-action-small" onclick="window.secureDel('inventario','${data.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
+            
+            // Agrupar por categoría y ordenar alfabéticamente
+            const itemsPorCategoria = {};
+            iS.docs.forEach(d => {
+                const data = { id: d.id, ...d.data() };
+                if(searchI && !data.item.toLowerCase().includes(searchI)) return;
+                const cat = data.categoria || 'Otros';
+                if(!itemsPorCategoria[cat]) itemsPorCategoria[cat] = [];
+                itemsPorCategoria[cat].push(data);
             });
+            
+            // Ordenar categorías y items alfabéticamente
+            const categoriasOrdenadas = Object.keys(itemsPorCategoria).sort();
+            categoriasOrdenadas.forEach(categoria => {
+                itemsPorCategoria[categoria].sort((a, b) => a.item.localeCompare(b.item));
+                
+                // Renderizar header de categoría
+                iL.innerHTML += `<div style="margin-top:15px; margin-bottom:10px; padding:8px 15px; background:rgba(197,160,89,0.1); border-left:4px solid var(--dorado); border-radius:10px">
+                    <small style="color:var(--dorado); font-weight:900; letter-spacing:2px">${categoria.toUpperCase()}</small>
+                </div>`;
+                
+                // Renderizar items de la categoría
+                itemsPorCategoria[categoria].forEach(data => {
+                    const isLow = data.qty <= (data.min || 0);
+                    iL.innerHTML += `<div class="list-row ${isLow ? 'alert-low' : ''}">
+                        <div><b>${data.item}</b><br><small>Mín: ${data.min || 0}</small></div>
+                        <div style="display:flex; align-items:center; gap:15px">
+                            <b style="cursor:pointer" onclick="window.restockModal('${data.id}', '${data.item}', ${data.qty})">${data.qty} un.</b>
+                            <button class="btn-action-small" onclick="window.secureDel('inventario','${data.id}','loadBodega')"><i class="fa-solid fa-trash"></i></button>
+                        </div>
+                    </div>`;
+                });
+            });
+            
             rS.forEach(d => {
                 const data = d.data();
                 if(!data.nom.toLowerCase().includes(searchR)) return;
@@ -509,7 +531,6 @@
                 </div>`;
             });
         };
-
         window.restockModal = (id, nom, qtyActual) => {
             document.getElementById('os-modal-content').innerHTML = `
                 <h2 style="color:var(--dorado); margin-bottom:15px">RESTOCK: ${nom}</h2>
@@ -596,8 +617,13 @@
             const sL = document.getElementById('lista-staff'), nL = document.getElementById('render-nomina');
             sL.innerHTML = ""; nL.innerHTML = "";
             const { monday, sunday } = getWeekRange();
-            uS.forEach(uDoc => {
-                const u = uDoc.data();
+            
+            // Ordenar usuarios alfabéticamente
+            const usuariosOrdenados = uS.docs
+                .map(uDoc => ({ doc: uDoc, data: uDoc.data() }))
+                .sort((a, b) => a.data.nombre.localeCompare(b.data.nombre));
+            
+            usuariosOrdenados.forEach(({ doc: uDoc, data: u }) => {
                 sL.innerHTML += `<div class="list-row">
                     <span>${u.nombre} (${u.rol})</span>
                     <div style="display:flex; gap:10px">
@@ -707,15 +733,71 @@
         };
 
         window.loadPunches = async () => {
-            const s = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc"), limit(10)));
+            const s = await getDocs(query(collection(db, "asistencias"), orderBy("fecha", "desc")));
             const l = document.getElementById('lista-asistencias'); l.innerHTML = "<h4>LOG RECIENTE</h4>";
-            s.forEach(d => {
-                const data = d.data();
+            
+            // Agrupar ENTRADA y SALIDA del mismo empleado
+            const registros = s.docs.map(d => ({ id: d.id, ...d.data() }));
+            const grupos = [];
+            let i = 0;
+            
+            while (i < registros.length && grupos.length < 10) {
+                const actual = registros[i];
+                
+                // Buscar la SALIDA correspondiente si es ENTRADA
+                if (actual.tipo === 'ENTRADA') {
+                    // Buscar siguiente SALIDA del mismo usuario
+                    let salidaIndex = -1;
+                    for (let j = i + 1; j < registros.length; j++) {
+                        if (registros[j].uid === actual.uid && registros[j].tipo === 'SALIDA') {
+                            salidaIndex = j;
+                            break;
+                        }
+                    }
+                    
+                    if (salidaIndex !== -1) {
+                        // Encontró par ENTRADA-SALIDA
+                        grupos.push({
+                            nombre: actual.name,
+                            entrada: { fecha: actual.fecha, id: actual.id },
+                            salida: { fecha: registros[salidaIndex].fecha, id: registros[salidaIndex].id }
+                        });
+                    } else {
+                        // ENTRADA sin SALIDA
+                        grupos.push({
+                            nombre: actual.name,
+                            entrada: { fecha: actual.fecha, id: actual.id },
+                            salida: null
+                        });
+                    }
+                } else if (actual.tipo === 'SALIDA') {
+                    // SALIDA sin ENTRADA previa (caso raro, mostrar solo)
+                    grupos.push({
+                        nombre: actual.name,
+                        entrada: null,
+                        salida: { fecha: actual.fecha, id: actual.id }
+                    });
+                }
+                i++;
+            }
+            
+            // Renderizar grupos
+            grupos.forEach(grupo => {
+                const entradaTime = grupo.entrada ? new Date(grupo.entrada.fecha).toLocaleTimeString() : '--:--:--';
+                const salidaTime = grupo.salida ? new Date(grupo.salida.fecha).toLocaleTimeString() : '--:--:--';
+                const entradaId = grupo.entrada ? grupo.entrada.id : '';
+                const salidaId = grupo.salida ? grupo.salida.id : '';
+                
                 l.innerHTML += `<div class="list-row">
-                    <div><span>${data.name}</span><br><small>${new Date(data.fecha).toLocaleTimeString()}</small></div>
-                    <div style="display:flex; align-items:center; gap:10px">
-                        <b>${data.tipo}</b>
-                        <button class="btn-action-small" onclick="window.secureDel('asistencias','${d.id}','loadPunches')"><i class="fa-solid fa-trash"></i></button>
+                    <div>
+                        <span><b>${grupo.nombre}</b></span><br>
+                        <small style="color:var(--dorado)">↓ ${entradaTime}</small>
+                        <small style="opacity:0.5"> → </small>
+                        <small style="color:var(--terracota)">↑ ${salidaTime}</small>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:5px">
+                        ${grupo.entrada ? `<button class="btn-action-small" onclick="window.secureDel('asistencias','${entradaId}','loadPunches')"><i class="fa-solid fa-trash"></i></button>` : ''}
+                        ${grupo.salida ? `<button class="btn-action-small" onclick="window.secureDel('asistencias','${salidaId}','loadPunches')"><i class="fa-solid fa-trash"></i></button>` : ''}
                     </div>
                 </div>`;
             });
