@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v17.2 - Enterprise System</title>
+    <title>EscarolaOS v17.7 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -132,7 +132,7 @@
                     <div id="bar-g" class="bar-g"></div>
                 </div>
                 <div style="display:flex; justify-content:space-between; font-size:0.7rem; font-weight:700">
-                    <span id="util-txt" style="color:var(--dorado)">UTILIDAD: 0%</span>
+                    <span id="util-txt" style="color:var(--dorado)">UTILIDAD: $0</span>
                     <span style="opacity:0.4">INGRESOS VS GASTOS</span>
                 </div>
             </div>
@@ -461,9 +461,9 @@
             if(totalFlujo > 0) {
                 document.getElementById('bar-i').style.width = (totalIngresado / totalFlujo * 100) + "%";
                 document.getElementById('bar-g').style.width = (totalGastado / totalFlujo * 100) + "%";
-                const margen = totalIngresado > 0 ? ((totalIngresado - totalGastado) / totalIngresado * 100) : 0;
-                document.getElementById('util-txt').innerText = `UTILIDAD: ${Math.round(margen)}%`;
-                document.getElementById('util-txt').style.color = paintRed(margen);
+                const utilidadCantidad = totalIngresado - totalGastado;
+                document.getElementById('util-txt').innerText = `UTILIDAD: $${Math.round(utilidadCantidad)}`;
+                document.getElementById('util-txt').style.color = paintRed(utilidadCantidad);
             }
         };
 
