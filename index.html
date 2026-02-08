@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v17.2 - Enterprise System</title>
+    <title>EscarolaOS v17.9 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -670,19 +670,19 @@
 
         // --- RELOJ ---
         window.handlePunch = async (t) => {
-            // Obtener el último registro del usuario actual
-            const ultimosRegistros = await getDocs(
-                query(
-                    collection(db, "asistencias"), 
-                    where("uid", "==", sUser.id),
-                    orderBy("fecha", "desc"), 
-                    limit(1)
-                )
+            // Obtener todos los registros y filtrar del usuario actual
+            const todosRegistros = await getDocs(
+                query(collection(db, "asistencias"), orderBy("fecha", "desc"))
             );
             
-            // Verificar si hay registros previos
-            if (!ultimosRegistros.empty) {
-                const ultimoTipo = ultimosRegistros.docs[0].data().tipo;
+            // Filtrar solo los del usuario actual y obtener el último
+            const registrosUsuario = todosRegistros.docs
+                .map(doc => ({ id: doc.id, ...doc.data() }))
+                .filter(reg => reg.uid === sUser.id);
+            
+            // Verificar si hay registros previos del usuario
+            if (registrosUsuario.length > 0) {
+                const ultimoTipo = registrosUsuario[0].tipo;
                 
                 // Validar: no puede hacer ENTRADA si la última acción fue ENTRADA
                 if (t === 'ENTRADA' && ultimoTipo === 'ENTRADA') {
