@@ -191,6 +191,11 @@
                     <input type="text" id="clean-task-in" class="input-premium" placeholder="Nueva tarea de limpieza..." style="margin:0">
                     <button class="btn-premium gold-btn" style="width:75px; padding:0" onclick="window.addCleanTask()">+</button>
                 </div>
+                <div style="margin-bottom:15px">
+                    <select id="clean-assign-select" class="input-premium">
+                        <option value="">Asignar empleado a tareas...</option>
+                    </select>
+                </div>
                 <div id="render-clean-tasks"></div>
             </div>
             <div class="card-panel">
@@ -369,7 +374,7 @@
             };
         };
 
-        // --- LÓGICA DE ACCESO PINPAD (RESTAURADA) ---
+        // --- LÓGICA DE ACCESO PINPAD ---
         const initKeys = () => {
             const cont = document.getElementById('numpad-logic');
             cont.innerHTML = "";
@@ -391,11 +396,7 @@
                     document.getElementById('login-screen').style.display = 'none';
                     document.getElementById('command-bar').style.display = 'grid';
                     startApp();
-                } else { 
-                    gPin=""; 
-                    upDots(); 
-                    window.notify("ACCESO DENEGADO", "PIN Incorrecto"); 
-                }
+                } else { gPin=""; upDots(); window.notify("ACCESO DENEGADO", "PIN Incorrecto"); }
             }
         };
         const upDots = () => document.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i < gPin.length));
@@ -416,7 +417,7 @@
             if(v==='reloj') loadPunches();
         };
 
-        // --- MÓDULO CAPITAL (ELIMINACIÓN HABILITADA) ---
+        // --- MÓDULO CAPITAL ---
         window.saveFinance = async () => {
             const m = parseFloat(document.getElementById('f-monto').value);
             const d = document.getElementById('f-desc').value;
@@ -562,6 +563,7 @@
         };
 
         window.loadMermas = async () => {
+            const today = new Date().toISOString().split('T')[0];
             const snap = await getDocs(query(collection(db, "mermas"), orderBy("fecha", "desc"), limit(20)));
             const list = document.getElementById('lista-mermas'); list.innerHTML = "";
             snap.forEach(d => {
@@ -576,7 +578,7 @@
             });
         };
 
-        // --- MÓDULO ADMIN (NÓMINA Y STAFF) ---
+        // --- MÓDULO ADMIN ---
         const getWeekRange = () => {
             const now = new Date();
             const day = now.getDay(); 
@@ -718,10 +720,26 @@
 
         // --- LIMPIEZA ---
         window.addCleanTask = async () => {
-            await addDoc(collection(db, "tareas_limpieza"), { tarea: document.getElementById('clean-task-in').value });
-            document.getElementById('clean-task-in').value = ""; loadClean();
+            const asignado = document.getElementById('clean-assign-select').value;
+            await addDoc(collection(db, "tareas_limpieza"), { 
+                tarea: document.getElementById('clean-task-in').value,
+                asignado: asignado || null
+            });
+            document.getElementById('clean-task-in').value = ""; 
+            document.getElementById('clean-assign-select').value = "";
+            loadClean();
         };
         window.loadClean = async () => {
+            // Cargar empleados en el selector
+            const usuarios = await getDocs(collection(db, "usuarios"));
+            const assignSelect = document.getElementById('clean-assign-select');
+            let optionsHTML = '<option value="">Asignar empleado a tareas...</option>';
+            usuarios.forEach(u => {
+                optionsHTML += `<option value="${u.data().nombre}">${u.data().nombre} - ${u.data().rol}</option>`;
+            });
+            assignSelect.innerHTML = optionsHTML;
+
+            // Cargar tareas y historial
             const tasks = await getDocs(collection(db, "tareas_limpieza"));
             const history = await getDocs(query(collection(db, "historial_limpieza"), where("fecha_dia", "==", new Date().toISOString().split('T')[0])));
             const render = document.getElementById('render-clean-tasks'); render.innerHTML = "";
@@ -729,10 +747,15 @@
             const doneIds = history.docs.map(h => h.data().taskId);
             tasks.forEach(tDoc => {
                 const isDone = doneIds.includes(tDoc.id);
+                const taskData = tDoc.data();
+                const asignadoInfo = taskData.asignado ? `<small style="color:var(--dorado); display:block; font-size:0.75rem">👤 ${taskData.asignado}</small>` : '';
                 render.innerHTML += `<div class="list-row">
-                    <span>${tDoc.data().tarea}</span>
+                    <div>
+                        <span>${taskData.tarea}</span>
+                        ${asignadoInfo}
+                    </div>
                     <div style="display:flex; gap:12px; align-items:center">
-                        ${isDone ? '<i class="fa-solid fa-check-circle" style="color:var(--dorado)"></i>' : `<button onclick="window.doClean('${tDoc.id}','${tDoc.data().tarea}')" style="background:var(--dorado); border:none; padding:5px 10px; border-radius:5px">MARCAR</button>`}
+                        ${isDone ? '<i class="fa-solid fa-check-circle" style="color:var(--dorado)"></i>' : `<button onclick="window.doClean('${tDoc.id}','${taskData.tarea}')" style="background:var(--dorado); border:none; padding:5px 10px; border-radius:5px">MARCAR</button>`}
                         <button class="btn-action-small" onclick="window.cleanDelLogic('tareas_limpieza','${tDoc.id}','loadClean')"><i class="fa-solid fa-trash"></i></button>
                     </div>
                 </div>`;
@@ -753,7 +776,7 @@
             loadClean();
         };
 
-        // --- LÓGICA DE EXPORTACIÓN ---
+        // --- LÓGICA DE EXPORTACIÓN CON FILTROS ---
         window.toggleMonthSelect = () => {
             const isMensual = document.getElementById('rep-periodo').value === 'mensual';
             const mSel = document.getElementById('rep-mes');
@@ -786,6 +809,7 @@
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
             doc.setFontSize(18); doc.text(title, 14, 22);
+            doc.setFontSize(10); doc.text(`Generado: ${new Date().toLocaleString()}`, 14, 30);
             doc.autoTable({ head: [headers], body: body, startY: 35, theme: 'grid', headStyles: {fillColor: [197, 160, 89]} });
             doc.save(`${title.replace(/ /g, '_')}.pdf`);
         };
@@ -843,10 +867,8 @@
                 if(cb) window[cb]();
             });
         };
-
         const startApp = () => {
-            window.nav('reloj'); 
-            loadFin();
+            window.nav('reloj'); loadFin();
             setInterval(() => {
                 const n = new Date();
                 document.getElementById('live-time').innerText = n.toLocaleTimeString('es-MX', { hour12: false });
