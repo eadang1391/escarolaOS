@@ -422,7 +422,7 @@
 
         // --- NAVEGACIÓN ---
         window.nav = (v) => {
-            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Gerente' && !sUser.rol.includes('Gerente')) return window.notify("RESTRINGIDO", "Requiere nivel Gerente.");
+            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Gerente' && sUser.rol !== 'Socio' && !sUser.rol.includes('Gerente')) return window.notify("RESTRINGIDO", "Requiere nivel Gerente.");
             document.querySelectorAll('.main-viewport').forEach(view => view.style.display = 'none');
             document.querySelectorAll('.cmd-item').forEach(i => i.classList.remove('active'));
             document.getElementById(`view-${v}`).style.display = 'block';
@@ -757,18 +757,48 @@
             
             // Agrupar ENTRADA y SALIDA del mismo empleado
             const registros = s.docs.map(d => ({ id: d.id, ...d.data() }));
+            const procesados = new Set();
             const grupos = [];
-            let i = 0;
             
-            while (i < registros.length && grupos.length < 10) {
+            for (let i = 0; i < registros.length && grupos.length < 10; i++) {
+                if (procesados.has(i)) continue;
+                
                 const actual = registros[i];
                 
-                // Buscar la SALIDA correspondiente si es ENTRADA
-                if (actual.tipo === 'ENTRADA') {
-                    // Buscar siguiente SALIDA del mismo usuario
-                    let salidaIndex = -1;
+                // Si es SALIDA, buscar su ENTRADA anterior
+                if (actual.tipo === 'SALIDA') {
+                    let entradaIndex = -1;
                     for (let j = i + 1; j < registros.length; j++) {
-                        if (registros[j].uid === actual.uid && registros[j].tipo === 'SALIDA') {
+                        if (!procesados.has(j) && registros[j].uid === actual.uid && registros[j].tipo === 'ENTRADA') {
+                            entradaIndex = j;
+                            break;
+                        }
+                    }
+                    
+                    if (entradaIndex !== -1) {
+                        // Encontró par ENTRADA-SALIDA
+                        grupos.push({
+                            nombre: actual.name,
+                            entrada: { fecha: registros[entradaIndex].fecha, id: registros[entradaIndex].id },
+                            salida: { fecha: actual.fecha, id: actual.id }
+                        });
+                        procesados.add(i);
+                        procesados.add(entradaIndex);
+                    } else {
+                        // SALIDA sin ENTRADA (error)
+                        grupos.push({
+                            nombre: actual.name,
+                            entrada: null,
+                            salida: { fecha: actual.fecha, id: actual.id }
+                        });
+                        procesados.add(i);
+                    }
+                } 
+                // Si es ENTRADA, buscar su SALIDA posterior
+                else if (actual.tipo === 'ENTRADA') {
+                    let salidaIndex = -1;
+                    for (let j = 0; j < i; j++) {
+                        if (!procesados.has(j) && registros[j].uid === actual.uid && registros[j].tipo === 'SALIDA') {
                             salidaIndex = j;
                             break;
                         }
@@ -781,23 +811,18 @@
                             entrada: { fecha: actual.fecha, id: actual.id },
                             salida: { fecha: registros[salidaIndex].fecha, id: registros[salidaIndex].id }
                         });
+                        procesados.add(i);
+                        procesados.add(salidaIndex);
                     } else {
-                        // ENTRADA sin SALIDA
+                        // ENTRADA sin SALIDA (aún en el trabajo)
                         grupos.push({
                             nombre: actual.name,
                             entrada: { fecha: actual.fecha, id: actual.id },
                             salida: null
                         });
+                        procesados.add(i);
                     }
-                } else if (actual.tipo === 'SALIDA') {
-                    // SALIDA sin ENTRADA previa (caso raro, mostrar solo)
-                    grupos.push({
-                        nombre: actual.name,
-                        entrada: null,
-                        salida: { fecha: actual.fecha, id: actual.id }
-                    });
                 }
-                i++;
             }
             
             // Renderizar grupos
@@ -900,7 +925,7 @@
             });
         };
         window.cleanDelLogic = (c, i, cb) => {
-            if(sUser.rol !== 'Gerente' && !sUser.rol.includes('Gerente')) return window.notify("PERMISO DENEGADO", "Solo un Gerente puede eliminar tareas maestras.");
+            if(sUser.rol !== 'Gerente' && sUser.rol !== 'Socio' && !sUser.rol.includes('Gerente')) return window.notify("PERMISO DENEGADO", "Solo un Gerente puede eliminar tareas maestras.");
             window.secureDel(c, i, cb);
         };
         window.doClean = async (id, nom) => {
