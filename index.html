@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v18 - Enterprise System</title>
+    <title>EscarolaOS v17.2 - Enterprise System</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;300;400;600;700;900&display=swap" rel="stylesheet">
@@ -39,6 +39,13 @@
             scrollbar-width: none;  
         }
         .main-viewport::-webkit-scrollbar { display: none; } 
+
+        /* Scroll personalizado para inventario */
+        #lista-inventario::-webkit-scrollbar { width: 8px; }
+        #lista-inventario::-webkit-scrollbar-track { background: rgba(0,0,0,0.3); border-radius: 10px; }
+        #lista-inventario::-webkit-scrollbar-thumb { background: var(--dorado); border-radius: 10px; }
+        #lista-inventario::-webkit-scrollbar-thumb:hover { background: var(--cantera); }
+        #lista-inventario { scrollbar-width: thin; scrollbar-color: var(--dorado) rgba(0,0,0,0.3); }
 
         @keyframes glowPulse { 0%, 100% { filter: drop-shadow(0 0 5px var(--dorado)); opacity: 0.8; } 50% { filter: drop-shadow(0 0 25px var(--dorado)); opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
@@ -213,8 +220,20 @@
                     <input type="number" id="inv-can" class="input-premium" placeholder="Cant." style="margin:0">
                     <input type="number" id="inv-min" class="input-premium" placeholder="Mín." style="margin:0">
                 </div>
+                <select id="inv-cat" class="input-premium">
+                    <option value="">Seleccionar categoría...</option>
+                    <option value="Bebidas">Bebidas</option>
+                    <option value="Carnes">Carnes</option>
+                    <option value="Verduras">Verduras</option>
+                    <option value="Lácteos">Lácteos</option>
+                    <option value="Granos">Granos</option>
+                    <option value="Especias">Especias</option>
+                    <option value="Limpieza">Limpieza</option>
+                    <option value="Desechables">Desechables</option>
+                    <option value="Otros">Otros</option>
+                </select>
                 <button class="btn-premium gold-btn" onclick="window.saveInv()">ACTUALIZAR INVENTARIO</button>
-                <div id="lista-inventario" style="margin-top:25px"></div>
+                <div id="lista-inventario" style="margin-top:25px; max-height:500px; overflow-y:auto; padding-right:10px"></div>
             </div>
             <div class="card-panel">
                 <div class="tag-header">Costeo de Recetas</div>
@@ -403,7 +422,7 @@
 
         // --- NAVEGACIÓN ---
         window.nav = (v) => {
-            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Socio') return window.notify("RESTRINGIDO", "Requiere nivel Socio/Gerente.");
+            if((v==='finanzas' || v==='admin') && sUser.rol !== 'Gerente' && !sUser.rol.includes('Gerente')) return window.notify("RESTRINGIDO", "Requiere nivel Gerente.");
             document.querySelectorAll('.main-viewport').forEach(view => view.style.display = 'none');
             document.querySelectorAll('.cmd-item').forEach(i => i.classList.remove('active'));
             document.getElementById(`view-${v}`).style.display = 'block';
@@ -881,7 +900,7 @@
             });
         };
         window.cleanDelLogic = (c, i, cb) => {
-            if(sUser.rol !== 'Socio') return window.notify("PERMISO DENEGADO", "Solo un Socio puede eliminar tareas maestras.");
+            if(sUser.rol !== 'Gerente' && !sUser.rol.includes('Gerente')) return window.notify("PERMISO DENEGADO", "Solo un Gerente puede eliminar tareas maestras.");
             window.secureDel(c, i, cb);
         };
         window.doClean = async (id, nom) => {
