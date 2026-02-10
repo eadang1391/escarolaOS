@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v19.1 - Enterprise System</title>
+    <title>EscarolaOS v17.2 - Enterprise System</title>
     
     
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -214,6 +214,10 @@
         </div>
 
         <div id="view-bodega" class="main-viewport">
+            
+            <!-- Alertas de Stock Mínimo -->
+            <div id="stock-alerts" style="margin-bottom: 20px"></div>
+
             <div class="card-panel">
                 <div class="tag-header">Gestión de Stock</div>
                 <input type="text" id="search-inv" class="input-premium" placeholder=" Buscar en almacén..." oninput="window.loadBodega()">
@@ -497,10 +501,18 @@
         
         // Inicializar vista de recetas
         if (v === 'recetas') {
-            setTimeout(() => {
-                window.cargarIngredientesDisponibles();
-                window.loadRecetas();
-            }, 100);
+            console.log('🍳 Vista de recetas activada');
+            setTimeout(async () => {
+                try {
+                    console.log('⏳ Iniciando carga de datos...');
+                    await window.cargarIngredientesDisponibles();
+                    await window.loadRecetas();
+                    console.log('✅ Datos cargados exitosamente');
+                } catch(error) {
+                    console.error('❌ Error cargando datos de recetas:', error);
+                    window.notify('ERROR', 'Error cargando datos: ' + error.message);
+                }
+            }, 300);
         }
             document.getElementById('f-monto').value = ""; document.getElementById('f-desc').value = "";
             loadFin();
@@ -562,6 +574,10 @@
         };
 
         window.loadBodega = async () => {
+        // Cargar alertas de stock primero
+        if (typeof window.mostrarAlertasStock === 'function') {
+            await window.mostrarAlertasStock();
+        }
             const iS = await getDocs(collection(db, "inventario")), rS = await getDocs(collection(db, "recetas"));
             const iL = document.getElementById('lista-inventario'), rL = document.getElementById('lista-recetas');
             const searchI = document.getElementById('search-inv').value.toLowerCase();
@@ -1103,13 +1119,19 @@ window.recetaActual = { ingredientes: [] };
 
 // Cargar ingredientes disponibles desde inventario y subrecetas
 window.cargarIngredientesDisponibles = async () => {
+    console.log('🔍 Cargando ingredientes disponibles...');
     const selector = document.getElementById('ing-selector');
-    if (!selector) return;
+    if (!selector) {
+        console.error('❌ Selector ing-selector no encontrado');
+        return;
+    }
+    console.log('✅ Selector encontrado');
     
     selector.innerHTML = '<option value="">-- Seleccionar Ingrediente/Subreceta --</option>';
     
     // Cargar desde inventario (stock)
     const inventarioSnap = await getDocs(collection(db, "inventario"));
+    console.log(`📦 Productos en stock encontrados: ${inventarioSnap.size}`);
     const optgroupInv = document.createElement('optgroup');
     optgroupInv.label = '📦 INGREDIENTES DE STOCK';
     
@@ -1211,6 +1233,7 @@ function calcularCostos() {
 
 // Guardar receta
 window.saveReceta = async () => {
+    console.log('💾 Guardando receta...');
     const nombre = document.getElementById('rec-nom').value.trim();
     const raciones = parseFloat(document.getElementById('rec-raciones').value) || 1;
     const esSubreceta = document.getElementById('rec-es-subreceta').checked;
@@ -1254,7 +1277,9 @@ window.saveReceta = async () => {
 
 // Cargar recetas
 window.loadRecetas = async () => {
-    const search = document.getElementById('search-rec').value.toLowerCase();
+    console.log('📖 Cargando recetas...');
+    const searchInput = document.getElementById('search-rec');
+    const search = searchInput ? searchInput.value.toLowerCase() : '';
     const snap = await getDocs(collection(db, "recetas"));
     const lista = document.getElementById('lista-recetas');
     lista.innerHTML = '';
@@ -1294,6 +1319,8 @@ window.loadRecetas = async () => {
         lista.appendChild(div);
     });
     
+    console.log(`📊 Recetas mostradas: ${lista.children.length}`);
+    
     if (lista.children.length === 0) {
         lista.innerHTML = '<div style="text-align:center; color:#888; padding:40px">No hay recetas registradas</div>';
     }
@@ -1303,11 +1330,17 @@ window.loadRecetas = async () => {
 // IMPORTADOR DE RECETARIO DESDE EXCEL
 // ============================================================================
 
+// ============================================================================
+// IMPORTADOR DE RECETARIO DESDE EXCEL - VERSIÓN CORREGIDA
+// ============================================================================
+
 window.importarRecetario = async () => {
+    console.log('📁 Iniciando importación de recetario...');
     const fileInput = document.getElementById('excel-recetario');
     if (!fileInput.files.length) {
         return window.notify("ERROR", "Selecciona un archivo Excel");
     }
+    console.log('📄 Archivo seleccionado:', fileInput.files[0].name);
     
     const file = fileInput.files[0];
     const reader = new FileReader();
@@ -1316,106 +1349,148 @@ window.importarRecetario = async () => {
         try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
+            console.log('📊 Hojas en Excel:', workbook.SheetNames.length);
             
             let recetasImportadas = 0;
             let subrecetasImportadas = 0;
+            const errores = [];
             
             // Procesar todas las hojas
             for (const sheetName of workbook.SheetNames) {
+                console.log(`\n🔍 Procesando hoja: ${sheetName}`);
+                
                 // Detectar si es receta o subreceta
                 const esSubreceta = sheetName.toLowerCase().includes('subreceta');
                 
                 // Ignorar hojas de configuración
                 if (['Tutoriales', 'Inicio', 'Ingredientes', 'Lista Productos', 'Precios', 'Calculadora mermas'].includes(sheetName)) {
+                    console.log('  ⏭️ Saltando hoja de configuración');
                     continue;
                 }
                 
                 const sheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
                 
-                // Buscar el nombre de la receta (fila 2, columna D generalmente)
+                // ESTRUCTURA REAL:
+                // Fila 2 (índice 1), Columna D (índice 3) = Nombre
+                // Fila 5 (índice 4), Columna H (índice 7) = Raciones
+                // Fila 6 (índice 5), Columna L (índice 11) = Costo total
+                // Desde fila 9 (índice 8): Ingredientes
+                
                 let nombreReceta = '';
                 if (jsonData[1] && jsonData[1][3]) {
                     nombreReceta = jsonData[1][3].toString().trim();
                 }
+                console.log(`  📝 Nombre: "${nombreReceta}"`);
                 
-                if (!nombreReceta) continue;
+                if (!nombreReceta || nombreReceta === '') {
+                    console.log('  ⚠️ Sin nombre válido, saltando...');
+                    continue;
+                }
                 
-                // Buscar raciones (fila 4, columna H)
+                // Raciones (fila 5, columna H = índice 7)
                 let raciones = 1;
                 if (jsonData[4] && jsonData[4][7]) {
                     raciones = parseFloat(jsonData[4][7]) || 1;
                 }
+                console.log(`  🍽️ Raciones: ${raciones}`);
                 
-                // Buscar costo total (fila 5, columna L)
+                // Costo total (fila 6, columna L = índice 11)
                 let costoTotal = 0;
                 if (jsonData[5] && jsonData[5][11]) {
                     costoTotal = parseFloat(jsonData[5][11]) || 0;
                 }
+                console.log(`  💰 Costo total: $${costoTotal}`);
                 
-                // Extraer ingredientes (desde fila 8)
+                // Extraer ingredientes (desde fila 9 = índice 8)
                 const ingredientes = [];
-                for (let i = 8; i < jsonData.length; i++) {
+                for (let i = 8; i < Math.min(jsonData.length, 40); i++) {
                     const row = jsonData[i];
-                    if (!row || !row[2]) continue; // Si no hay ingrediente en columna C
+                    if (!row || !row[2]) continue; // Columna C (índice 2) = Ingrediente
                     
                     const nombreIng = row[2].toString().trim();
-                    const cantidadNeta = parseFloat(row[7]) || 0;
-                    const unidad = row[8] ? row[8].toString().trim() : 'kg';
-                    const precioUnitario = parseFloat(row[11]) || 0;
-                    const costoIng = parseFloat(row[12]) || 0;
-                    const esSubrecetaIng = row[1] === 'Si';
+                    const cantidadNeta = parseFloat(row[7]) || 0; // Columna H (índice 7)
+                    const unidad = row[8] ? row[8].toString().trim() : 'kg'; // Columna I (índice 8)
+                    const precioUnitario = parseFloat(row[11]) || 0; // Columna L (índice 11)
+                    const costoIng = parseFloat(row[12]) || 0; // Columna M (índice 12)
+                    const esSubrecetaIng = row[1] === 'Si'; // Columna B (índice 1)
                     
-                    if (nombreIng && cantidadNeta > 0) {
-                        ingredientes.push({
-                            nombre: nombreIng,
-                            cantidad: cantidadNeta,
-                            unidad: unidad,
-                            costoUnitario: precioUnitario,
-                            costo: costoIng,
-                            tipo: esSubrecetaIng ? 'subreceta' : 'stock'
-                        });
-                    }
+                    // Validar que el ingrediente tenga datos mínimos
+                    if (!nombreIng || nombreIng === '' || cantidadNeta === 0) continue;
                     
-                    // Detener si llegamos a filas vacías
-                    if (i > 30 && !row[2]) break;
+                    ingredientes.push({
+                        nombre: nombreIng,
+                        cantidad: cantidadNeta,
+                        unidad: unidad,
+                        costoUnitario: precioUnitario,
+                        costo: costoIng,
+                        tipo: esSubrecetaIng ? 'subreceta' : 'stock'
+                    });
                 }
                 
-                if (ingredientes.length === 0) continue;
+                console.log(`  📦 Ingredientes encontrados: ${ingredientes.length}`);
                 
-                // Guardar receta
-                const receta = {
-                    nombre: nombreReceta,
-                    raciones: raciones,
-                    esSubreceta: esSubreceta,
-                    ingredientes: ingredientes,
-                    costoTotal: costoTotal,
-                    costoPorcion: costoTotal / raciones,
-                    fechaCreacion: new Date().toISOString(),
-                    importado: true
-                };
+                if (ingredientes.length === 0) {
+                    console.log('  ⚠️ No se encontraron ingredientes válidos');
+                    errores.push(`${nombreReceta}: Sin ingredientes`);
+                    continue;
+                }
                 
-                await addDoc(collection(db, "recetas"), receta);
-                
-                if (esSubreceta) {
-                    subrecetasImportadas++;
-                } else {
-                    recetasImportadas++;
+                // Guardar receta en Firestore
+                try {
+                    const receta = {
+                        nombre: nombreReceta,
+                        raciones: raciones,
+                        esSubreceta: esSubreceta,
+                        ingredientes: ingredientes,
+                        costoTotal: costoTotal,
+                        costoPorcion: costoTotal / raciones,
+                        fechaCreacion: new Date().toISOString(),
+                        importado: true
+                    };
+                    
+                    await addDoc(collection(db, "recetas"), receta);
+                    
+                    if (esSubreceta) {
+                        subrecetasImportadas++;
+                    } else {
+                        recetasImportadas++;
+                    }
+                    console.log(`  ✅ Guardada exitosamente`);
+                    
+                } catch (error) {
+                    console.error(`  ❌ Error guardando ${nombreReceta}:`, error);
+                    errores.push(`${nombreReceta}: ${error.message}`);
                 }
             }
             
-            window.notify("✅ IMPORTACIÓN COMPLETA", `${recetasImportadas} recetas y ${subrecetasImportadas} subrecetas importadas`);
+            // Mostrar resultado
+            let mensaje = `✅ IMPORTACIÓN COMPLETA\n\n`;
+            mensaje += `📊 ${recetasImportadas} recetas importadas\n`;
+            mensaje += `🔄 ${subrecetasImportadas} subrecetas importadas\n`;
+            
+            if (errores.length > 0) {
+                mensaje += `\n⚠️ ${errores.length} errores:\n`;
+                mensaje += errores.slice(0, 5).join('\n');
+                if (errores.length > 5) {
+                    mensaje += `\n... y ${errores.length - 5} más`;
+                }
+            }
+            
+            window.notify("IMPORTACIÓN COMPLETA", mensaje);
             loadRecetas();
             cargarIngredientesDisponibles();
             
         } catch (error) {
-            console.error('Error importando recetario:', error);
-            window.notify("ERROR", "Error al procesar el archivo Excel: " + error.message);
+            console.error('❌ Error procesando Excel:', error);
+            window.notify("ERROR", "Error al procesar el archivo: " + error.message);
         }
     };
     
     reader.readAsArrayBuffer(file);
 };
+
+
 
 // ============================================================================
 // PROCESADOR DE REPORTES DE VENTAS
@@ -1540,6 +1615,88 @@ window.procesarVentas = async () => {
     };
     
     reader.readAsArrayBuffer(file);
+};
+
+    
+
+
+// ============================================================================
+// SISTEMA DE ALERTAS DE STOCK MÍNIMO
+// ============================================================================
+
+window.mostrarAlertasStock = async () => {
+    const alertContainer = document.getElementById('stock-alerts');
+    if (!alertContainer) return;
+    
+    const snap = await getDocs(collection(db, "inventario"));
+    const productosMinimos = [];
+    
+    snap.forEach(doc => {
+        const data = doc.data();
+        const qty = parseFloat(data.qty) || 0;
+        const minimo = parseFloat(data.minimo) || 0;
+        
+        if (minimo > 0 && qty <= minimo) {
+            productosMinimos.push({
+                id: doc.id,
+                nombre: data.item,
+                cantidad: qty,
+                minimo: minimo,
+                categoria: data.categoria || 'Sin categoría'
+            });
+        }
+    });
+    
+    if (productosMinimos.length === 0) {
+        alertContainer.innerHTML = '<div style="text-align:center; color:var(--verde); padding:15px; background:rgba(27,48,34,0.3); border-radius:15px">✅ Todos los productos tienen stock suficiente</div>';
+        return;
+    }
+    
+    // Ordenar por categoría y nombre
+    productosMinimos.sort((a, b) => {
+        if (a.categoria !== b.categoria) {
+            return a.categoria.localeCompare(b.categoria);
+        }
+        return a.nombre.localeCompare(b.nombre);
+    });
+    
+    let html = `<div style="background: rgba(176,65,62,0.2); border: 2px solid var(--terracota); border-radius: 15px; padding: 15px; margin-bottom: 20px">
+        <h3 style="color: var(--terracota); margin: 0 0 15px 0; font-size: 16px">
+            🚨 ${productosMinimos.length} PRODUCTO${productosMinimos.length > 1 ? 'S' : ''} EN MÍNIMOS
+        </h3>`;
+    
+    let categoriaActual = '';
+    productosMinimos.forEach(prod => {
+        if (prod.categoria !== categoriaActual) {
+            if (categoriaActual !== '') {
+                html += '</div>';
+            }
+            categoriaActual = prod.categoria;
+            html += `<div style="margin-bottom: 10px">
+                <small style="color: var(--dorado); font-weight: 800; display: block; margin-bottom: 5px">${categoriaActual}</small>`;
+        }
+        
+        const porcentaje = (prod.cantidad / prod.minimo) * 100;
+        const urgente = prod.cantidad === 0 ? 'URGENTE' : porcentaje < 50 ? 'CRÍTICO' : 'BAJO';
+        const colorBarra = prod.cantidad === 0 ? '#8B0000' : porcentaje < 50 ? 'var(--terracota)' : '#FF6B35';
+        
+        html += `
+            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 10px; margin-bottom: 5px">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px">
+                    <span style="color: white; font-weight: 600">${prod.nombre}</span>
+                    <span style="background: ${colorBarra}; color: white; padding: 2px 8px; border-radius: 5px; font-size: 11px">${urgente}</span>
+                </div>
+                <div style="display: flex; align-items: center; gap: 10px">
+                    <div style="flex: 1; height: 8px; background: rgba(0,0,0,0.3); border-radius: 10px; overflow: hidden">
+                        <div style="width: ${Math.min(porcentaje, 100)}%; height: 100%; background: ${colorBarra}"></div>
+                    </div>
+                    <small style="color: #888; min-width: 80px; text-align: right">${prod.cantidad} / ${prod.minimo}</small>
+                </div>
+            </div>`;
+    });
+    
+    html += '</div></div>';
+    alertContainer.innerHTML = html;
 };
 
     </script>
