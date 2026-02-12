@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v19.5 - Enterprise System</title>
+    <title>EscarolaOS v20 - Enterprise System</title>
     
     
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -1355,9 +1355,7 @@ window.importarRecetario = async () => {
 
             for (const sheetName of workbook.SheetNames) {
 
-                if (['Tutoriales', 'Inicio', 'Ingredientes', 'Lista Productos', 'Precios', 'Calculadora mermas'].includes(sheetName)) {
-                    continue;
-                }
+                
 
                 const esSubreceta = sheetName.toLowerCase().includes('subreceta');
                 const sheet = workbook.Sheets[sheetName];
@@ -1660,4 +1658,5 @@ window.mostrarAlertasStock = async () => {
     </script>
 </body>
 </html>
+
 
