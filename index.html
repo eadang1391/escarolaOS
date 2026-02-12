@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v20 - Enterprise System</title>
+    <title>EscarolaOS v20.1 - Enterprise System</title>
     
     
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -1361,7 +1361,20 @@ window.importarRecetario = async () => {
                 const sheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                let nombreReceta = jsonData?.[1]?.[3]?.toString().trim() || '';
+                let nombreReceta = '';
+
+for (let r = 0; r < 6; r++) {
+    if (!jsonData[r]) continue;
+    for (let c = 0; c < jsonData[r].length; c++) {
+        const cell = jsonData[r][c];
+        if (cell && typeof cell === 'string' && cell.trim().length > 3) {
+            nombreReceta = cell.trim();
+            break;
+        }
+    }
+    if (nombreReceta) break;
+}
+
 
                 if (!nombreReceta) {
                     console.log(`⏭️ Hoja ${sheetName} sin nombre válido`);
@@ -1658,5 +1671,6 @@ window.mostrarAlertasStock = async () => {
     </script>
 </body>
 </html>
+
 
 
