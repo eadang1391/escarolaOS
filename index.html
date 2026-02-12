@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v20.5 - Enterprise System</title>
+    <title>EscarolaOS v20.6 - Enterprise System</title>
     
     
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -1724,7 +1724,9 @@ window.importarRecetarioSeguro = async () => {
                 const nombreReceta = sheet["D2"]?.v?.toString().trim();
                 if (!nombreReceta) continue;
 
-                const esSubreceta = sheet["B2"]?.v?.toString().trim().toLowerCase() === "si";
+                const tipoB2 = sheet["B2"]?.v?.toString().trim().toLowerCase() || "";
+const esSubreceta = tipoB2 === "subreceta";
+
 
                 const raciones = parseFloat(sheet["H5"]?.v) || 1;
                 const costoTotal = parseFloat(sheet["L6"]?.v) || 0;
@@ -1796,6 +1798,7 @@ window.importarRecetarioSeguro = async () => {
     </script>
 </body>
 </html>
+
 
 
 
