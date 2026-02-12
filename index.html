@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v20.1 - Enterprise System</title>
+    <title>EscarolaOS v20.3 - Enterprise System</title>
     
     
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -1359,73 +1359,37 @@ window.importarRecetario = async () => {
 
                 const esSubreceta = sheetName.toLowerCase().includes('subreceta');
                 const sheet = workbook.Sheets[sheetName];
-                const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
 
-                let nombreReceta = '';
+// Leer valores directos por celda
+const nombreReceta = sheet["D2"]?.v?.toString().trim() || '';
+if (!nombreReceta) continue;
 
-for (let r = 0; r < 6; r++) {
-    if (!jsonData[r]) continue;
-    for (let c = 0; c < jsonData[r].length; c++) {
-        const cell = jsonData[r][c];
-        if (cell && typeof cell === 'string' && cell.trim().length > 3) {
-            nombreReceta = cell.trim();
-            break;
-        }
-    }
-    if (nombreReceta) break;
+const raciones = parseFloat(sheet["H5"]?.v) || 1;
+const costoTotal = parseFloat(sheet["L6"]?.v) || 0;
+
+const ingredientes = [];
+
+for (let fila = 9; fila <= 60; fila++) {
+
+    const nombreIng = sheet[`C${fila}`]?.v;
+    if (!nombreIng) continue;
+
+    const cantidad = parseFloat(sheet[`H${fila}`]?.v) || 0;
+    const unidad = sheet[`I${fila}`]?.v?.toString().trim() || '';
+    const precioUnitario = parseFloat(sheet[`L${fila}`]?.v) || 0;
+    const costoIng = parseFloat(sheet[`M${fila}`]?.v) || 0;
+    const esSubrecetaIng = sheet[`B${fila}`]?.v?.toString().trim().toLowerCase() === 'si';
+
+    ingredientes.push({
+        nombre: nombreIng.toString().trim(),
+        cantidad: cantidad,
+        unidad: unidad,
+        costoUnitario: precioUnitario,
+        costo: costoIng,
+        tipo: esSubrecetaIng ? 'subreceta' : 'stock'
+    });
 }
 
-
-                if (!nombreReceta) {
-                    console.log(`⏭️ Hoja ${sheetName} sin nombre válido`);
-                    continue;
-                }
-
-                let raciones = 1;
-let costoTotal = 0;
-
-for (let r = 0; r < 8; r++) {
-    if (!jsonData[r]) continue;
-
-    for (let c = 0; c < jsonData[r].length; c++) {
-        const cell = jsonData[r][c];
-
-        if (!cell) continue;
-
-        const valor = parseFloat(
-            cell.toString().replace('$','').replace(',','')
-        );
-
-        if (!isNaN(valor)) {
-
-            // Detectar raciones (número pequeño)
-            if (valor > 0 && valor <= 50 && raciones === 1) {
-                raciones = valor;
-            }
-
-            // Detectar costo total (número más grande)
-            if (valor > costoTotal) {
-                costoTotal = valor;
-            }
-        }
-    }
-}
-
-
-                const ingredientes = [];
-
-                for (let i = 8; i < jsonData.length; i++) {
-                    const row = jsonData[i];
-                    if (!row) continue;
-
-                    const nombreIng = row?.[2]?.toString().trim();
-                    if (!nombreIng) continue;
-
-                    const cantidad = parseFloat(row?.[7]) || 0;
-                    const unidad = row?.[8]?.toString().trim() || '';
-                    const precioUnitario = parseFloat(row?.[11]) || 0;
-                    const costoIng = parseFloat(row?.[12]) || 0;
-                    const esSubrecetaIng = row?.[1]?.toString().trim().toLowerCase() === 'si';
 
                     // Validación más flexible: solo requiere nombre
                     ingredientes.push({
@@ -1699,6 +1663,7 @@ window.mostrarAlertasStock = async () => {
     </script>
 </body>
 </html>
+
 
 
 
