@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>EscarolaOS v20.1 - Enterprise System</title>
+    <title>EscarolaOS v20.5 - Enterprise System</title>
     
     
     <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
@@ -248,7 +248,7 @@
                 <div style="background: rgba(197,160,89,0.15); padding: 20px; border-radius: 25px; margin-bottom: 25px; border: 1px solid var(--dorado)">
                     <small style="color:var(--dorado); display:block; margin-bottom:10px; font-weight:800">📁 IMPORTAR RECETARIO DESDE EXCEL</small>
                     <input type="file" id="excel-recetario" accept=".xlsx,.xls" class="input-premium" style="margin-bottom:10px">
-                    <button class="btn-premium gold-btn" onclick="window.importarRecetario()">IMPORTAR RECETAS Y SUBRECETAS</button>
+                    <button class="btn-premium gold-btn" onclick="window.importarRecetarioSeguro()">IMPORTAR RECETAS Y SUBRECETAS</button>
                 </div>
 
                 <!-- Importar Reporte de Ventas -->
@@ -1695,10 +1695,108 @@ window.mostrarAlertasStock = async () => {
     html += '</div></div>';
     alertContainer.innerHTML = html;
 };
+window.importarRecetarioSeguro = async () => {
+
+    const fileInput = document.getElementById('excel-recetario');
+    if (!fileInput.files.length) {
+        return window.notify("ERROR", "Selecciona un archivo Excel");
+    }
+
+    const file = fileInput.files[0];
+    const reader = new FileReader();
+
+    reader.onload = async (e) => {
+
+        try {
+
+            const data = new Uint8Array(e.target.result);
+            const workbook = XLSX.read(data, { type: 'array' });
+
+            let recetasImportadas = 0;
+            let subrecetasImportadas = 0;
+
+            for (const sheetName of workbook.SheetNames) {
+
+                const sheet = workbook.Sheets[sheetName];
+
+                // ===== DATOS PRINCIPALES =====
+
+                const nombreReceta = sheet["D2"]?.v?.toString().trim();
+                if (!nombreReceta) continue;
+
+                const esSubreceta = sheet["B2"]?.v?.toString().trim().toLowerCase() === "si";
+
+                const raciones = parseFloat(sheet["H5"]?.v) || 1;
+                const costoTotal = parseFloat(sheet["L6"]?.v) || 0;
+
+                const ingredientes = [];
+
+                // ===== INGREDIENTES =====
+                for (let fila = 9; fila <= 80; fila++) {
+
+                    const nombreIng = sheet[`C${fila}`]?.v;
+                    if (!nombreIng) continue;
+
+                    const cantidad = parseFloat(sheet[`H${fila}`]?.v) || 0;
+                    const unidad = sheet[`I${fila}`]?.v?.toString().trim() || "";
+                    const precioUnitario = parseFloat(sheet[`L${fila}`]?.v) || 0;
+                    const costoIng = parseFloat(sheet[`M${fila}`]?.v) || 0;
+                    const esSubrecetaIng = sheet[`B${fila}`]?.v?.toString().trim().toLowerCase() === "si";
+
+                    ingredientes.push({
+                        nombre: nombreIng.toString().trim(),
+                        cantidad,
+                        unidad,
+                        costoUnitario: precioUnitario,
+                        costo: costoIng,
+                        tipo: esSubrecetaIng ? "subreceta" : "stock"
+                    });
+                }
+
+                // ===== GUARDAR =====
+
+                const receta = {
+                    nombre: nombreReceta,
+                    esSubreceta,
+                    raciones,
+                    costoTotal,
+                    costoPorcion: raciones > 0 ? costoTotal / raciones : 0,
+                    ingredientes,
+                    fechaCreacion: new Date().toISOString(),
+                    importado: true
+                };
+
+                await addDoc(collection(db, "recetas"), receta);
+
+                if (esSubreceta) {
+                    subrecetasImportadas++;
+                } else {
+                    recetasImportadas++;
+                }
+
+            }
+
+            window.notify(
+                "IMPORTACIÓN COMPLETA",
+                `📊 ${recetasImportadas} recetas\n🔄 ${subrecetasImportadas} subrecetas`
+            );
+
+            loadRecetas();
+            cargarIngredientesDisponibles();
+
+        } catch (error) {
+
+            window.notify("ERROR", error.message);
+        }
+    };
+
+    reader.readAsArrayBuffer(file);
+};
 
     </script>
 </body>
 </html>
+
 
 
 
