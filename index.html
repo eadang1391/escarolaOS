@@ -1340,103 +1340,67 @@ window.importarRecetario = async () => {
     if (!fileInput.files.length) {
         return window.notify("ERROR", "Selecciona un archivo Excel");
     }
-    console.log('📄 Archivo seleccionado:', fileInput.files[0].name);
-    
+
     const file = fileInput.files[0];
     const reader = new FileReader();
-    
+
     reader.onload = async (e) => {
         try {
             const data = new Uint8Array(e.target.result);
             const workbook = XLSX.read(data, { type: 'array' });
-            console.log('📊 Hojas en Excel:', workbook.SheetNames.length);
-            
+
             let recetasImportadas = 0;
             let subrecetasImportadas = 0;
             const errores = [];
-            
-            // Procesar todas las hojas
+
             for (const sheetName of workbook.SheetNames) {
-                console.log(`\n🔍 Procesando hoja: ${sheetName}`);
-                
-                // Detectar si es receta o subreceta
-                const esSubreceta = sheetName.toLowerCase().includes('subreceta');
-                
-                // Ignorar hojas de configuración
+
                 if (['Tutoriales', 'Inicio', 'Ingredientes', 'Lista Productos', 'Precios', 'Calculadora mermas'].includes(sheetName)) {
-                    console.log('  ⏭️ Saltando hoja de configuración');
                     continue;
                 }
-                
+
+                const esSubreceta = sheetName.toLowerCase().includes('subreceta');
                 const sheet = workbook.Sheets[sheetName];
                 const jsonData = XLSX.utils.sheet_to_json(sheet, { header: 1 });
-                
-                // ESTRUCTURA REAL:
-                // Fila 2 (índice 1), Columna D (índice 3) = Nombre
-                // Fila 5 (índice 4), Columna H (índice 7) = Raciones
-                // Fila 6 (índice 5), Columna L (índice 11) = Costo total
-                // Desde fila 9 (índice 8): Ingredientes
-                
-                let nombreReceta = '';
-                if (jsonData[1] && jsonData[1][3]) {
-                    nombreReceta = jsonData[1][3].toString().trim();
-                }
-                console.log(`  📝 Nombre: "${nombreReceta}"`);
-                
-                if (!nombreReceta || nombreReceta === '') {
-                    console.log('  ⚠️ Sin nombre válido, saltando...');
+
+                let nombreReceta = jsonData?.[1]?.[3]?.toString().trim() || '';
+
+                if (!nombreReceta) {
+                    console.log(`⏭️ Hoja ${sheetName} sin nombre válido`);
                     continue;
                 }
-                
-                // Raciones (fila 5, columna H = índice 7)
-                let raciones = 1;
-                if (jsonData[4] && jsonData[4][7]) {
-                    raciones = parseFloat(jsonData[4][7]) || 1;
-                }
-                console.log(`  🍽️ Raciones: ${raciones}`);
-                
-                // Costo total (fila 6, columna L = índice 11)
-                let costoTotal = 0;
-                if (jsonData[5] && jsonData[5][11]) {
-                    costoTotal = parseFloat(jsonData[5][11]) || 0;
-                }
-                console.log(`  💰 Costo total: $${costoTotal}`);
-                
-                // Extraer ingredientes (desde fila 9 = índice 8)
+
+                let raciones = parseFloat(jsonData?.[4]?.[7]) || 1;
+                let costoTotal = parseFloat(jsonData?.[5]?.[11]) || 0;
+
                 const ingredientes = [];
-                for (let i = 8; i < Math.min(jsonData.length, 40); i++) {
+
+                for (let i = 8; i < jsonData.length; i++) {
                     const row = jsonData[i];
-                    if (!row || !row[2]) continue; // Columna C (índice 2) = Ingrediente
-                    
-                    const nombreIng = row[2].toString().trim();
-                    const cantidadNeta = parseFloat(row[7]) || 0; // Columna H (índice 7)
-                    const unidad = row[8] ? row[8].toString().trim() : 'kg'; // Columna I (índice 8)
-                    const precioUnitario = parseFloat(row[11]) || 0; // Columna L (índice 11)
-                    const costoIng = parseFloat(row[12]) || 0; // Columna M (índice 12)
-                    const esSubrecetaIng = row[1] === 'Si'; // Columna B (índice 1)
-                    
-                    // Validar que el ingrediente tenga datos mínimos
-                    if (!nombreIng || nombreIng === '' || cantidadNeta === 0) continue;
-                    
+                    if (!row) continue;
+
+                    const nombreIng = row?.[2]?.toString().trim();
+                    if (!nombreIng) continue;
+
+                    const cantidad = parseFloat(row?.[7]) || 0;
+                    const unidad = row?.[8]?.toString().trim() || '';
+                    const precioUnitario = parseFloat(row?.[11]) || 0;
+                    const costoIng = parseFloat(row?.[12]) || 0;
+                    const esSubrecetaIng = row?.[1]?.toString().trim().toLowerCase() === 'si';
+
+                    // Validación más flexible: solo requiere nombre
                     ingredientes.push({
                         nombre: nombreIng,
-                        cantidad: cantidadNeta,
+                        cantidad: cantidad,
                         unidad: unidad,
                         costoUnitario: precioUnitario,
                         costo: costoIng,
                         tipo: esSubrecetaIng ? 'subreceta' : 'stock'
                     });
                 }
-                
-                console.log(`  📦 Ingredientes encontrados: ${ingredientes.length}`);
-                
-                if (ingredientes.length === 0) {
-                    console.log('  ⚠️ No se encontraron ingredientes válidos');
-                    errores.push(`${nombreReceta}: Sin ingredientes`);
-                    continue;
-                }
-                
-                // Guardar receta en Firestore
+
+                console.log(`📦 ${nombreReceta} → ${ingredientes.length} ingredientes detectados`);
+
                 try {
                     const receta = {
                         nombre: nombreReceta,
@@ -1444,51 +1408,45 @@ window.importarRecetario = async () => {
                         esSubreceta: esSubreceta,
                         ingredientes: ingredientes,
                         costoTotal: costoTotal,
-                        costoPorcion: costoTotal / raciones,
+                        costoPorcion: raciones > 0 ? costoTotal / raciones : 0,
                         fechaCreacion: new Date().toISOString(),
                         importado: true
                     };
-                    
+
                     await addDoc(collection(db, "recetas"), receta);
-                    
+
                     if (esSubreceta) {
                         subrecetasImportadas++;
                     } else {
                         recetasImportadas++;
                     }
-                    console.log(`  ✅ Guardada exitosamente`);
-                    
+
                 } catch (error) {
-                    console.error(`  ❌ Error guardando ${nombreReceta}:`, error);
                     errores.push(`${nombreReceta}: ${error.message}`);
                 }
             }
-            
-            // Mostrar resultado
+
             let mensaje = `✅ IMPORTACIÓN COMPLETA\n\n`;
             mensaje += `📊 ${recetasImportadas} recetas importadas\n`;
             mensaje += `🔄 ${subrecetasImportadas} subrecetas importadas\n`;
-            
+
             if (errores.length > 0) {
-                mensaje += `\n⚠️ ${errores.length} errores:\n`;
-                mensaje += errores.slice(0, 5).join('\n');
-                if (errores.length > 5) {
-                    mensaje += `\n... y ${errores.length - 5} más`;
-                }
+                mensaje += `\n⚠️ ${errores.length} errores\n`;
             }
-            
+
             window.notify("IMPORTACIÓN COMPLETA", mensaje);
+
             loadRecetas();
             cargarIngredientesDisponibles();
-            
+
         } catch (error) {
-            console.error('❌ Error procesando Excel:', error);
             window.notify("ERROR", "Error al procesar el archivo: " + error.message);
         }
     };
-    
+
     reader.readAsArrayBuffer(file);
 };
+
 
 
 
@@ -1702,3 +1660,4 @@ window.mostrarAlertasStock = async () => {
     </script>
 </body>
 </html>
+
