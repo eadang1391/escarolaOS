@@ -110,6 +110,133 @@
         .cal-unit.marked { border-bottom: 4px solid var(--terracota); }
     </style>
 </head>
+    <!-- PWA AUTO INSTALL SYSTEM -->
+
+<meta name="theme-color" content="#111111">
+
+<style>
+#installAppBtn{
+position:fixed;
+bottom:20px;
+right:20px;
+background:#111;
+color:white;
+border:none;
+padding:12px 18px;
+border-radius:12px;
+font-size:14px;
+cursor:pointer;
+box-shadow:0 6px 20px rgba(0,0,0,0.3);
+display:none;
+z-index:9999;
+}
+</style>
+
+<button id="installAppBtn">Instalar EscarolaOS</button>
+
+<script>
+(function(){
+
+/* ========= MANIFEST DINÁMICO ========= */
+
+const manifestData={
+name:"EscarolaOS",
+short_name:"Escarola",
+start_url:"./",
+display:"standalone",
+background_color:"#111111",
+theme_color:"#111111",
+icons:[
+{
+src:"logo.png",
+sizes:"192x192",
+type:"image/png"
+},
+{
+src:"logo.png",
+sizes:"512x512",
+type:"image/png"
+}
+]
+};
+
+const manifestBlob=new Blob(
+[JSON.stringify(manifestData)],
+{type:"application/manifest+json"}
+);
+
+const manifestURL=URL.createObjectURL(manifestBlob);
+
+const manifestLink=document.createElement("link");
+manifestLink.rel="manifest";
+manifestLink.href=manifestURL;
+document.head.appendChild(manifestLink);
+
+
+/* ========= SERVICE WORKER ========= */
+
+if("serviceWorker" in navigator){
+
+const swCode=`
+
+const CACHE_NAME="escarolaos-v1";
+
+self.addEventListener("install",event=>{
+event.waitUntil(
+caches.open(CACHE_NAME).then(cache=>{
+return cache.addAll(["./"]);
+})
+);
+self.skipWaiting();
+});
+
+self.addEventListener("fetch",event=>{
+event.respondWith(
+caches.match(event.request).then(response=>{
+return response || fetch(event.request);
+})
+);
+});
+
+`;
+
+const swBlob=new Blob([swCode],{type:"text/javascript"});
+const swURL=URL.createObjectURL(swBlob);
+
+navigator.serviceWorker.register(swURL);
+
+}
+
+
+/* ========= BOTÓN INSTALAR ========= */
+
+let deferredPrompt;
+const installBtn=document.getElementById("installAppBtn");
+
+window.addEventListener("beforeinstallprompt",(e)=>{
+
+e.preventDefault();
+
+deferredPrompt=e;
+
+installBtn.style.display="block";
+
+});
+
+installBtn.addEventListener("click",async()=>{
+
+installBtn.style.display="none";
+
+deferredPrompt.prompt();
+
+const { outcome } = await deferredPrompt.userChoice;
+
+deferredPrompt=null;
+
+});
+
+})();
+</script>
 <body>
 
     <div id="login-screen">
@@ -1802,6 +1929,7 @@ const esSubreceta = tipoB2 === "subreceta";
     </script>
 </body>
 </html>
+
 
 
 
